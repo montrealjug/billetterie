@@ -1,0 +1,25 @@
+gg:
+  jte:
+    development-mode: true
+spring:
+  application:
+    name: billetterie
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://host/mydb?user=username&password=password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+    access:
+      default: read_only
+  endpoint:
+    health:
+      show-details: always
+
