@@ -1,4 +1,4 @@
-@param dev.danvega.User user
+<%--@param dev.danvega.User user--%>
 @param String message = null
 @param String error = null
 
@@ -62,7 +62,7 @@
                 <div class="sm:col-span-4">
                     <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email address</label>
                     <div class="mt-2">
-                        <input type="email" name="email" id="email" value="${user.getEmail()}" class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+<%--                        <input type="email" name="email" id="email" value="${user.getEmail()}" class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">--%>
                     </div>
                 </div>
 
@@ -71,7 +71,7 @@
                     <div class="mt-2">
                         <select id="country" name="country" class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
                             <option value="">Select a country</option>
-                            <option value="US" selected="${user.getCountry() != null && user.getCountry().equals("US")}">United States</option>
+<%--                            <option value="US" selected="${user.getCountry() != null && user.getCountry().equals("US")}">United States</option>--%>
                             <!-- Add more countries as needed -->
                         </select>
                     </div>
@@ -80,14 +80,14 @@
                 <div class="col-span-full">
                     <label for="streetAddress" class="block text-sm font-medium leading-6 text-gray-900">Street address</label>
                     <div class="mt-2">
-                        <input type="text" name="streetAddress" id="streetAddress" value="${user.getStreetAddress()}" class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+<%--                        <input type="text" name="streetAddress" id="streetAddress" value="${user.getStreetAddress()}" class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">--%>
                     </div>
                 </div>
 
                 <div class="sm:col-span-2 sm:col-start-1">
                     <label for="city" class="block text-sm font-medium leading-6 text-gray-900">City</label>
                     <div class="mt-2">
-                        <input type="text" name="city" id="city" value="${user.getCity()}" class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+<%--                        <input type="text" name="city" id="city" value="${user.getCity()}" class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">--%>
                     </div>
                 </div>
 
@@ -96,7 +96,7 @@
                     <div class="mt-2">
                         <select id="region" name="region" class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
                             <option value="">Select a state</option>
-                            <option value="OH" selected="${user.getRegion() != null && user.getRegion().equals("OH")}">Ohio</option>
+<%--                            <option value="OH" selected="${user.getRegion() != null && user.getRegion().equals("OH")}">Ohio</option>--%>
                             <!-- Add more states as needed -->
                         </select>
                     </div>
@@ -105,7 +105,7 @@
                 <div class="sm:col-span-2">
                     <label for="postalCode" class="block text-sm font-medium leading-6 text-gray-900">ZIP / Postal code</label>
                     <div class="mt-2">
-                        <input type="text" name="postalCode" id="postalCode" value="${user.getPostalCode()}" class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+<%--                        <input type="text" name="postalCode" id="postalCode" value="${user.getPostalCode()}" class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">--%>
                     </div>
                 </div>
             </div>
