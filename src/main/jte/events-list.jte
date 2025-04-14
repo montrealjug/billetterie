@@ -31,7 +31,7 @@
             <div class="bg-gray-100 p-4 rounded-md shadow">
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between">
                     <div>
-                        <h2 class="text-lg font-semibold text-gray-700">${event.title()}</h2>
+                        <h2 class="text-lg font-semibold text-gray-700">${event.title()} - ${event.active() ? "Active" : "Not Active"}</h2>
                         <p class="text-gray-600">${event.description()}</p>
                         <p class="text-gray-500 text-sm mt-1">${event.date().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))}</p>
                     </div>

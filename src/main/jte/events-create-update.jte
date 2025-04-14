@@ -15,7 +15,19 @@
     <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
         <h1 class="text-2xl font-bold text-center mb-6">${event != null ? "Update" : "Create"} Event</h1>
         <form action="/events${event != null ? "/" + event.id() : ""}" method="POST">
-            <!-- Title Input -->
+            <div class="mb-4 flex items-center">
+                @if(event==null )
+                    <input type="checkbox" id="active" name="active" disabled
+                           class="w-5 h-5 text-blue-500 border-gray-300 rounded focus:ring focus:ring-blue-300">
+                @elseif(event.active())
+                    <input type="checkbox" id="active" name="active" checked
+                           class="w-5 h-5 text-blue-500 border-gray-300 rounded focus:ring focus:ring-blue-300">
+                @else
+                    <input type="checkbox" id="active" name="active"
+                           class="w-5 h-5 text-blue-500 border-gray-300 rounded focus:ring focus:ring-blue-300">
+                @endif
+                <label for="active" class="ml-2 text-gray-700 font-medium">Active</label>
+            </div>
             <div class="mb-4">
                 <label for="title" class="block text-gray-700 font-medium mb-2">Event Title</label>
                 <input type="text" id="title" name="title" required value="${event!=null ? event.title() : ""}"

@@ -15,6 +15,7 @@ public class Event {
     private long id;
     private LocalDate date;
     private String title;
+    private boolean active;
     @Column(columnDefinition = "TEXT")
     private String description;
     @OneToMany
@@ -60,15 +61,25 @@ public class Event {
         this.activities = activities;
     }
 
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Event event = (Event) o;
-        return id == event.id && Objects.equals(date, event.date) && Objects.equals(title, event.title) && Objects.equals(description, event.description) && Objects.equals(activities, event.activities);
+        return id == event.id ;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, date, title, description, activities);
     }
+
 }

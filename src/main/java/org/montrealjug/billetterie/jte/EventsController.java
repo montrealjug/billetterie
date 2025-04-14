@@ -38,7 +38,7 @@ public class EventsController {
         List<PresentationEvent> presentationEvents = new ArrayList<>();
         Iterable<Event> events = this.eventRepository.findAll();
         events.forEach(event -> {
-            PresentationEvent presentationEvent = new PresentationEvent(event.getId(), event.getTitle(), event.getDescription(), event.getDate(), toIndexActivities(event.getActivities()));
+            PresentationEvent presentationEvent = new PresentationEvent(event.getId(), event.getTitle(), event.getDescription(), event.getDate(), toIndexActivities(event.getActivities()), event.isActive());
             presentationEvents.add(presentationEvent);
         });
         model.addAttribute("events", presentationEvents);
@@ -52,7 +52,7 @@ public class EventsController {
         PresentationEvent presentationEvent;
         if (optionalEvent.isPresent()) {
             Event event = optionalEvent.get();
-            presentationEvent = new PresentationEvent(event.getId(), event.getTitle(), event.getDescription(), event.getDate(), Collections.emptyList());
+            presentationEvent = new PresentationEvent(event.getId(), event.getTitle(), event.getDescription(), event.getDate(), Collections.emptyList(), event.isActive());
         } else {
             throw new RuntimeException("Event with id " + id + " not found");
         }
@@ -69,6 +69,7 @@ public class EventsController {
             event.setTitle(presentationEvent.title);
             event.setDescription(presentationEvent.description);
             event.setDate(presentationEvent.date);
+            event.setActive(presentationEvent.active() !=null ? presentationEvent.active : false);
             eventRepository.save(event);
         } else {
             throw new RuntimeException("Event with id " + id + " not found");
@@ -212,7 +213,7 @@ public class EventsController {
 
 
     public record PresentationEvent(Long id, String title, String description, LocalDate date,
-                                    List<PresentationActivity> activities) {
+                                    List<PresentationActivity> activities, Boolean active) {
     }
 
     public record PresentationActivity(Long id, @NotBlank String title, @NotBlank String description,
