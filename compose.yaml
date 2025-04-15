@@ -8,10 +8,18 @@ services:
     ports:
       - '25432:5432'
 
+#  billetterie:
+##    image: 'registry.fly.io/billetterie:deployment-01JRVD2DCA9K1BA7YE25RCSH6T'
+#    image: 'docker.io/library/billetterie:0.0.1-SNAPSHOT'
+#    environment:
+#      - 'SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/mydatabase?user=myuser&password=secret'
+#    ports:
+#      - '28080:8080'
+
   pgadmin:
     image: dpage/pgadmin4
     ports:
-      - "28080:80"
+      - "20080:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: com@com.com
       PGADMIN_DEFAULT_PASSWORD: secret

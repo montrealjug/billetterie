@@ -1,20 +1,15 @@
-package org.montrealjug.billetterie;
+package org.montrealjug.billetterie.entity;
 
 import jakarta.persistence.*;
 
-import java.util.Set;
-
 @Entity
-public class Booker {
+public class Participant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String email;
     private String firstName;
     private String lastName;
 
-    @OneToMany
-    private Set<Participant> participants;
-
-
+    @ManyToOne
+    private Booker booker;
 }

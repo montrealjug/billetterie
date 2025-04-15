@@ -1,5 +1,5 @@
-@import org.montrealjug.billetterie.jte.EventsController
-@import org.montrealjug.billetterie.jte.EventsController.PresentationEvent
+@import org.montrealjug.billetterie.EventsController
+@import org.montrealjug.billetterie.EventsController.PresentationEvent
 @import java.time.format.DateTimeFormatter
 @import java.util.List
 
@@ -21,7 +21,7 @@
             <!-- Create Event Button -->
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold">Event List</h1>
-                <a href="/events/createEvent"
+                <a href="/admin/events/createEvent"
                    class="bg-green-500 text-white font-medium px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
                     Create Event
                 </a>
@@ -36,7 +36,7 @@
                         <p class="text-gray-500 text-sm mt-1">${event.date().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))}</p>
                     </div>
                     <div class="flex space-x-2 mt-4 md:mt-0">
-                        <a href="/events/${event.id()}"
+                        <a href="/admin/events/${event.id()}"
                            class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
                             Edit
                         </a>
@@ -68,7 +68,7 @@
                             <td class="border border-gray-300 px-4 py-2">${activity.description()}</td>
                             <td class="border border-gray-300 px-4 py-2">${activity.time().format(DateTimeFormatter.ofPattern("H:mm a"))}</td>
                             <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
-                                <a href="/events/${event.id()}/activities/${activity.id()}"
+                                <a href="/admin/events/${event.id()}/activities/${activity.id()}"
                                    class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
                                     Edit
                                 </a>
@@ -85,7 +85,7 @@
                     </table>
                     <!-- Create Activity Button -->
                     <div class="text-right mt-2">
-                        <button onclick="window.location.href = `/events/${event.id()}/createActivity`"
+                        <button onclick="window.location.href = `/admin/events/${event.id()}/createActivity`"
                                 class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
                             Add Activity
                         </button>
@@ -103,7 +103,7 @@
         if (confirm("Are you sure you want to delete this event?")) {
             try {
                 // Send DELETE request to the server
-                const response = await fetch(`/events/${eventId}`, {
+                const response = await fetch(`/admin/events/${eventId}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
@@ -133,7 +133,7 @@
         if (confirm("Are you sure you want to delete this activity?")) {
             try {
                 // Send DELETE request to the server
-                const response = await fetch(`/events/${eventId}/activities/${activityId}`, {
+                const response = await fetch(`/admin/events/${eventId}/activities/${activityId}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',

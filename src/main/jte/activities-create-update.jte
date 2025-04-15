@@ -1,4 +1,4 @@
-@import org.montrealjug.billetterie.jte.EventsController.PresentationActivity
+@import org.montrealjug.billetterie.EventsController.PresentationActivity
 
 @param PresentationActivity activity
 @param Long eventId
@@ -15,7 +15,7 @@
 <div class="min-h-screen flex items-center justify-center">
     <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
         <h1 class="text-2xl font-bold text-center mb-6">${activity != null ? "Update" : "Create"} Activity</h1>
-        <form action="/events/${eventId}/activities${activity != null ? "/" + activity.id() : ""}" method="POST">
+        <form action="/admin/events/${eventId}/activities${activity != null ? "/" + activity.id() : ""}" method="POST">
             <!-- Title Input -->
             <div class="mb-4">
                 <label for="title" class="block text-gray-700 font-medium mb-2">Activity Title</label>

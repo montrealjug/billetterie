@@ -1,20 +1,17 @@
-package org.montrealjug.billetterie.jte;
+package org.montrealjug.billetterie;
 
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import org.montrealjug.billetterie.Activity;
-import org.montrealjug.billetterie.ActivityRepository;
-import org.montrealjug.billetterie.Event;
-import org.montrealjug.billetterie.EventRepository;
+import org.montrealjug.billetterie.entity.Activity;
+import org.montrealjug.billetterie.entity.Event;
+import org.montrealjug.billetterie.repository.ActivityRepository;
+import org.montrealjug.billetterie.repository.EventRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.time.LocalDate;
@@ -23,6 +20,7 @@ import java.time.LocalTime;
 import java.util.*;
 
 @Controller
+@RequestMapping("/admin/events")
 public class EventsController {
 
     private final EventRepository eventRepository;
@@ -33,7 +31,7 @@ public class EventsController {
         this.activityRepository = activityRepository;
     }
 
-    @GetMapping("/events")
+    @GetMapping("")
     public String events(Model model) {
         List<PresentationEvent> presentationEvents = new ArrayList<>();
         Iterable<Event> events = this.eventRepository.findAll();
@@ -45,8 +43,21 @@ public class EventsController {
         return "events-list";
     }
 
+    @PostMapping
+    public ResponseEntity<Void> createEvents(@Valid PresentationEvent event, Model model) {
+        Event entity = new Event();
+        entity.setDescription(event.description);
+        entity.setTitle(event.title);
+        entity.setDate(event.date);
+        eventRepository.save(entity);
 
-    @GetMapping("/events/{id}")
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create("/admin/events"))
+                .build();
+
+    }
+
+    @GetMapping("{id}")
     public String event(Model model, @PathVariable long id) {
         Optional<Event> optionalEvent = this.eventRepository.findById(id);
         PresentationEvent presentationEvent;
@@ -60,7 +71,7 @@ public class EventsController {
         return "events-create-update";
     }
 
-    @PostMapping("/events/{id}")
+    @PostMapping("{id}")
     public ResponseEntity<Void> updateEvent(@Valid PresentationEvent presentationEvent, Model model, @PathVariable long id) {
         Optional<Event> optionalEvent = this.eventRepository.findById(id);
 
@@ -76,12 +87,12 @@ public class EventsController {
         }
 
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("/events"))
+                .location(URI.create("/admin/events"))
                 .build();
 
     }
 
-    @DeleteMapping("/events/{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(Model model, @PathVariable long id) {
         this.eventRepository.deleteById(id);
 
@@ -91,35 +102,20 @@ public class EventsController {
     }
 
 
-    @GetMapping("/events/createEvent")
+    @GetMapping("createEvent")
     public String createEvent(Model model) {
         return "events-create-update";
     }
 
 
-    @PostMapping("/events")
-    public ResponseEntity<Void> createEvents(@Valid PresentationEvent event, Model model) {
-        Event entity = new Event();
-        entity.setDescription(event.description);
-        entity.setTitle(event.title);
-        entity.setDate(event.date);
-        eventRepository.save(entity);
-
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("/events"))
-                .build();
-
-    }
-
-
-    @GetMapping("/events/{id}/createActivity")
+    @GetMapping("{id}/createActivity")
     public String createActivity(Model model, @PathVariable final Long id) {
         model.addAttribute("eventId", id);
         return "activities-create-update";
     }
 
 
-    @GetMapping("/events/{eventId}/activities/{activityId}")
+    @GetMapping("{eventId}/activities/{activityId}")
     public String activity(Model model, @PathVariable long eventId, @PathVariable Long activityId) {
         Optional<Activity> optionalActivity = this.activityRepository.findById(activityId);
         PresentationActivity presentationActivity;
@@ -134,7 +130,7 @@ public class EventsController {
         return "activities-create-update";
     }
 
-    @PostMapping("/events/{eventId}/activities/{activityId}")
+    @PostMapping("{eventId}/activities/{activityId}")
     public ResponseEntity<Void> updateActivity(@Valid PresentationActivity presentationActivity, Model model, @PathVariable long eventId, @PathVariable long activityId) {
         Optional<Activity> optionalActivity = activityRepository.findById(activityId);
 
@@ -155,12 +151,12 @@ public class EventsController {
         }
 
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("/events"))
+                .location(URI.create("/admin/events"))
                 .build();
 
     }
 
-    @PostMapping("/events/{id}/activities")
+    @PostMapping("{id}/activities")
     public ResponseEntity<Void> saveActivity(@Valid PresentationActivity activity, Model model, @PathVariable final Long id) {
 
         Optional<Event> byId = eventRepository.findById(id);
@@ -180,12 +176,12 @@ public class EventsController {
 
         });
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("/events"))
+                .location(URI.create("/admin/events"))
                 .build();
 
     }
 
-    @DeleteMapping("/events/{eventId}/activities/{activityId}")
+    @DeleteMapping("{eventId}/activities/{activityId}")
     public ResponseEntity<Void> deleteActivity(Model model, @PathVariable long eventId, @PathVariable long activityId) {
         this.eventRepository.findById(eventId).ifPresent(event -> {
             Optional<Activity> optionalActivity = activityRepository.findById(activityId);
@@ -201,7 +197,7 @@ public class EventsController {
     }
 
 
-    private List<PresentationActivity> toIndexActivities(Set<org.montrealjug.billetterie.Activity> activities) {
+    private List<PresentationActivity> toIndexActivities(Set<Activity> activities) {
         List<PresentationActivity> indexActivities = new ArrayList<>();
         activities.forEach(activity -> {
             PresentationActivity indexActivity = new PresentationActivity(activity.getId(), activity.getTitle(), activity.getDescription(), activity.getStartTime().toLocalTime());

@@ -1,6 +1,9 @@
+#gg:
+#  jte:
+#    development-mode: true
 gg:
   jte:
-    development-mode: true
+    usePrecompiledTemplates: true
 spring:
   application:
     name: billetterie

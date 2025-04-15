@@ -1,4 +1,4 @@
-@import org.montrealjug.billetterie.jte.EventsController.PresentationEvent
+@import org.montrealjug.billetterie.EventsController.PresentationEvent
 
 @param PresentationEvent event
 
@@ -14,7 +14,7 @@
 <div class="min-h-screen flex items-center justify-center">
     <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
         <h1 class="text-2xl font-bold text-center mb-6">${event != null ? "Update" : "Create"} Event</h1>
-        <form action="/events${event != null ? "/" + event.id() : ""}" method="POST">
+        <form action="/admin/events${event != null ? "/" + event.id() : ""}" method="POST">
             <div class="mb-4 flex items-center">
                 @if(event==null )
                     <input type="checkbox" id="active" name="active" disabled

@@ -1,4 +1,4 @@
-package org.montrealjug.billetterie;
+package org.montrealjug.billetterie.entity;
 
 import jakarta.persistence.*;
 
