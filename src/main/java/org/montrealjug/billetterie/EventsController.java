@@ -121,7 +121,7 @@ public class EventsController {
         PresentationActivity presentationActivity;
         if (optionalActivity.isPresent()) {
             Activity activity = optionalActivity.get();
-            presentationActivity = new PresentationActivity(activity.getId(), activity.getTitle(), activity.getDescription(), activity.getStartTime().toLocalTime());
+            presentationActivity = new PresentationActivity(activity.getId(), activity.getTitle(), activity.getDescription(), activity.getMaxParticipants(), activity.getMaxWaitingQueue(), activity.getStartTime().toLocalTime());
         } else {
             throw new RuntimeException("Activity with id " + activityId + " not found");
         }
@@ -138,6 +138,8 @@ public class EventsController {
             Activity activity = optionalActivity.get();
             activity.setTitle(presentationActivity.title);
             activity.setDescription(presentationActivity.description);
+            activity.setMaxParticipants(presentationActivity.maxParticipants);
+            activity.setMaxWaitingQueue(presentationActivity.maxWaitingQueue);
 
             eventRepository.findById(eventId).ifPresent(event -> {
                 LocalDate date = event.getDate();
@@ -165,6 +167,8 @@ public class EventsController {
             Activity entity = new Activity();
             entity.setDescription(activity.description);
             entity.setTitle(activity.title);
+            entity.setMaxParticipants(activity.maxParticipants);
+            entity.setMaxWaitingQueue(activity.maxWaitingQueue);
 
             LocalDate date = event.getDate();
             LocalDateTime localDateTime = date.atTime(activity.time);
@@ -200,7 +204,7 @@ public class EventsController {
     private List<PresentationActivity> toIndexActivities(Set<Activity> activities) {
         List<PresentationActivity> indexActivities = new ArrayList<>();
         activities.forEach(activity -> {
-            PresentationActivity indexActivity = new PresentationActivity(activity.getId(), activity.getTitle(), activity.getDescription(), activity.getStartTime().toLocalTime());
+            PresentationActivity indexActivity = new PresentationActivity(activity.getId(), activity.getTitle(), activity.getDescription(), activity.getMaxParticipants(),activity.getMaxWaitingQueue(), activity.getStartTime().toLocalTime());
             indexActivities.add(indexActivity);
         });
         return indexActivities;
@@ -212,7 +216,7 @@ public class EventsController {
                                     List<PresentationActivity> activities, Boolean active) {
     }
 
-    public record PresentationActivity(Long id, @NotBlank String title, @NotBlank String description,
+    public record PresentationActivity(Long id, @NotBlank String title, @NotBlank String description, int maxParticipants, int maxWaitingQueue,
                                        LocalTime time) {
     }
 }
