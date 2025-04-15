@@ -34,6 +34,21 @@
                 <input type="time" id="time" name="time" required value="${activity!=null ? activity.time().toString() : ""}"
                        class="border border-gray-300 rounded-md px-4 py-2 focus:ring focus:ring-blue-300 focus:outline-none">
             </div>
+            <!-- Max Participants Input -->
+            <div class="mb-4">
+                <label for="maxParticipants" class="block text-gray-700 font-medium mb-2">Max Participants</label>
+                <input type="number" id="maxParticipants" name="maxParticipants" required min="1"
+                       value="${activity != null ? activity.maxParticipants() : 0}"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none">
+            </div>
+
+            <!-- Max Waiting Queue Input -->
+            <div class="mb-4">
+                <label for="maxWaitingQueue" class="block text-gray-700 font-medium mb-2">Max Waiting Queue</label>
+                <input type="number" id="maxWaitingQueue" name="maxWaitingQueue" required min="0"
+                       value="${activity != null ? activity.maxWaitingQueue() : 0}"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none">
+            </div>
             <!-- Submit Button -->
             <div class="text-center">
                 <button type="submit"
