@@ -1,8 +1,7 @@
-package org.montrealjug.billetterie;
+package org.montrealjug.billetterie.ui;
 
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import org.montrealjug.billetterie.entity.Activity;
 import org.montrealjug.billetterie.entity.Event;
 import org.montrealjug.billetterie.repository.ActivityRepository;
@@ -16,8 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
+
+import static org.montrealjug.billetterie.ui.Utils.toIndexActivities;
 
 @Controller
 @RequestMapping("/admin/events")
@@ -46,9 +46,9 @@ public class EventsController {
     @PostMapping
     public ResponseEntity<Void> createEvents(@Valid PresentationEvent event, Model model) {
         Event entity = new Event();
-        entity.setDescription(event.description);
-        entity.setTitle(event.title);
-        entity.setDate(event.date);
+        entity.setDescription(event.description());
+        entity.setTitle(event.title());
+        entity.setDate(event.date());
         eventRepository.save(entity);
 
         return ResponseEntity.status(HttpStatus.FOUND)
@@ -77,10 +77,10 @@ public class EventsController {
 
         if (optionalEvent.isPresent()) {
             Event event = optionalEvent.get();
-            event.setTitle(presentationEvent.title);
-            event.setDescription(presentationEvent.description);
-            event.setDate(presentationEvent.date);
-            event.setActive(presentationEvent.active() !=null ? presentationEvent.active : false);
+            event.setTitle(presentationEvent.title());
+            event.setDescription(presentationEvent.description());
+            event.setDate(presentationEvent.date());
+            event.setActive(presentationEvent.active() !=null ? presentationEvent.active() : false);
             eventRepository.save(event);
         } else {
             throw new RuntimeException("Event with id " + id + " not found");
@@ -136,14 +136,14 @@ public class EventsController {
 
         if (optionalActivity.isPresent()) {
             Activity activity = optionalActivity.get();
-            activity.setTitle(presentationActivity.title);
-            activity.setDescription(presentationActivity.description);
-            activity.setMaxParticipants(presentationActivity.maxParticipants);
-            activity.setMaxWaitingQueue(presentationActivity.maxWaitingQueue);
+            activity.setTitle(presentationActivity.title());
+            activity.setDescription(presentationActivity.description());
+            activity.setMaxParticipants(presentationActivity.maxParticipants());
+            activity.setMaxWaitingQueue(presentationActivity.maxWaitingQueue());
 
             eventRepository.findById(eventId).ifPresent(event -> {
                 LocalDate date = event.getDate();
-                LocalDateTime localDateTime = date.atTime(presentationActivity.time);
+                LocalDateTime localDateTime = date.atTime(presentationActivity.time());
                 activity.setStartTime(localDateTime);
             });
 
@@ -165,13 +165,13 @@ public class EventsController {
 
         byId.ifPresent(event -> {
             Activity entity = new Activity();
-            entity.setDescription(activity.description);
-            entity.setTitle(activity.title);
-            entity.setMaxParticipants(activity.maxParticipants);
-            entity.setMaxWaitingQueue(activity.maxWaitingQueue);
+            entity.setDescription(activity.description());
+            entity.setTitle(activity.title());
+            entity.setMaxParticipants(activity.maxParticipants());
+            entity.setMaxWaitingQueue(activity.maxWaitingQueue());
 
             LocalDate date = event.getDate();
-            LocalDateTime localDateTime = date.atTime(activity.time);
+            LocalDateTime localDateTime = date.atTime(activity.time());
 
             entity.setStartTime(localDateTime);
             event.getActivities().add(entity);
@@ -200,23 +200,4 @@ public class EventsController {
 
     }
 
-
-    private List<PresentationActivity> toIndexActivities(Set<Activity> activities) {
-        List<PresentationActivity> indexActivities = new ArrayList<>();
-        activities.forEach(activity -> {
-            PresentationActivity indexActivity = new PresentationActivity(activity.getId(), activity.getTitle(), activity.getDescription(), activity.getMaxParticipants(),activity.getMaxWaitingQueue(), activity.getStartTime().toLocalTime());
-            indexActivities.add(indexActivity);
-        });
-        return indexActivities;
-
-    }
-
-
-    public record PresentationEvent(Long id, String title, String description, LocalDate date,
-                                    List<PresentationActivity> activities, Boolean active) {
-    }
-
-    public record PresentationActivity(Long id, @NotBlank String title, @NotBlank String description, int maxParticipants, int maxWaitingQueue,
-                                       LocalTime time) {
-    }
 }

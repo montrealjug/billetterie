@@ -1,4 +1,4 @@
-@import org.montrealjug.billetterie.EventsController.PresentationEvent
+@import org.montrealjug.billetterie.ui.PresentationEvent
 
 @param PresentationEvent event
 

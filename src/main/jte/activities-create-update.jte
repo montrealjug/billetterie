@@ -1,6 +1,4 @@
-@import org.montrealjug.billetterie.EventsController.PresentationActivity
-
-@param PresentationActivity activity
+@param org.montrealjug.billetterie.ui.PresentationActivity activity
 @param Long eventId
 
 <!DOCTYPE html>
@@ -60,4 +58,4 @@
     </div>
 </div>
 </body>
-</html>
+</html>>

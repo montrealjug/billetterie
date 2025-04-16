@@ -1,5 +1,5 @@
-@import org.montrealjug.billetterie.EventsController
-@import org.montrealjug.billetterie.EventsController.PresentationEvent
+@import org.montrealjug.billetterie.ui.PresentationEvent
+@import org.montrealjug.billetterie.ui.PresentationActivity
 @import java.time.format.DateTimeFormatter
 @import java.util.List
 
@@ -26,7 +26,7 @@
                     Create Event
                 </a>
             </div>
-            @for(EventsController.PresentationEvent event: events)
+            @for(PresentationEvent event: events)
 
             <div class="bg-gray-100 p-4 rounded-md shadow">
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between">
@@ -62,7 +62,7 @@
                         </thead>
                         <tbody id="activity-list-1">
                         <!-- Example Activity Row -->
-                        @for(EventsController.PresentationActivity activity: event.activities())
+                        @for(PresentationActivity activity: event.activities())
 
 
                         <tr>
