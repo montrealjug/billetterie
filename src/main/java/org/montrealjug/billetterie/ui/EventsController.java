@@ -4,6 +4,7 @@ package org.montrealjug.billetterie.ui;
 import jakarta.validation.Valid;
 import org.montrealjug.billetterie.entity.Activity;
 import org.montrealjug.billetterie.entity.Event;
+import org.montrealjug.billetterie.exception.EntityNotFoundException;
 import org.montrealjug.billetterie.repository.ActivityRepository;
 import org.montrealjug.billetterie.repository.EventRepository;
 import org.springframework.http.HttpStatus;
@@ -65,7 +66,7 @@ public class EventsController {
             Event event = optionalEvent.get();
             presentationEvent = new PresentationEvent(event.getId(), event.getTitle(), event.getDescription(), event.getDate(), Collections.emptyList(), event.isActive());
         } else {
-            throw new RuntimeException("Event with id " + id + " not found");
+            throw new EntityNotFoundException("Event with id " + id + " not found");
         }
         model.addAttribute("event", presentationEvent);
         return "events-create-update";
@@ -83,7 +84,7 @@ public class EventsController {
             event.setActive(presentationEvent.active() !=null ? presentationEvent.active() : false);
             eventRepository.save(event);
         } else {
-            throw new RuntimeException("Event with id " + id + " not found");
+            throw new EntityNotFoundException("Event with id " + id + " not found");
         }
 
         return ResponseEntity.status(HttpStatus.FOUND)
@@ -123,7 +124,7 @@ public class EventsController {
             Activity activity = optionalActivity.get();
             presentationActivity = new PresentationActivity(activity.getId(), activity.getTitle(), activity.getDescription(), activity.getMaxParticipants(), activity.getMaxWaitingQueue(), activity.getStartTime().toLocalTime());
         } else {
-            throw new RuntimeException("Activity with id " + activityId + " not found");
+            throw new EntityNotFoundException("Activity with id " + activityId + " not found");
         }
         model.addAttribute("activity", presentationActivity);
         model.addAttribute("eventId", eventId);
@@ -149,7 +150,7 @@ public class EventsController {
 
             activityRepository.save(activity);
         } else {
-            throw new RuntimeException("Activity with id " + activityId + " not found");
+            throw new EntityNotFoundException("Activity with id " + activityId + " not found");
         }
 
         return ResponseEntity.status(HttpStatus.FOUND)

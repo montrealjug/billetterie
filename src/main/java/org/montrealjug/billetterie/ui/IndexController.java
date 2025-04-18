@@ -1,6 +1,7 @@
 package org.montrealjug.billetterie.ui;
 
 import org.montrealjug.billetterie.entity.Event;
+import org.montrealjug.billetterie.exception.EntityNotFoundException;
 import org.montrealjug.billetterie.repository.EventRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,16 +23,16 @@ public class IndexController {
     @GetMapping("/")
     public String index(Model model) {
         Optional<Event> optionalEvent = this.eventRepository.findByActiveIsTrue();
-
+        PresentationEvent presentationEvent;
         if (optionalEvent.isPresent()) {
             Event event = optionalEvent.get();
-            PresentationEvent presentationEvent = new PresentationEvent(event.getId(), event.getTitle(), event.getDescription(), event.getDate(), toIndexActivities(event.getActivities()), event.isActive());
-            model.addAttribute("event", presentationEvent);
+            presentationEvent = new PresentationEvent(event.getId(), event.getTitle(), event.getDescription(), event.getDate(), toIndexActivities(event.getActivities()), event.isActive());
+        } else {
+            throw new EntityNotFoundException("No active event could be found!");
         }
-
+        model.addAttribute("event", presentationEvent);
         return "index";
     }
 
 
 }
-
