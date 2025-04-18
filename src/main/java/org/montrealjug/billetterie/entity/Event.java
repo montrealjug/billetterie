@@ -79,7 +79,7 @@ public class Event {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, date, title, description, activities);
+        return Objects.hash(id);
     }
 
 }
