@@ -84,6 +84,6 @@ public class Activity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, startTime, title, description, maxParticipants, maxWaitingQueue, participants);
+        return Objects.hash(id);
     }
 }
