@@ -18,7 +18,7 @@ public class Event {
     private boolean active;
     @Column(columnDefinition = "TEXT")
     private String description;
-    @OneToMany
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private Set<Activity> activities = new HashSet<>();
 
     public long getId() {
