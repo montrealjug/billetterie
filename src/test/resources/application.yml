@@ -1,11 +1,16 @@
-# required to have the Postgres dependency up and running during tests
 spring:
+  # required to have the Postgres dependency up and running during tests
   docker:
     compose:
       enabled: true
       file: compose.yaml
       skip:
         in-tests: false
+  # required for model creation during tests
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 
 # required to have the templates compiled
 gg:

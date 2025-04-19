@@ -2,6 +2,7 @@ package org.montrealjug.billetterie.entity;
 
 import jakarta.persistence.*;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -12,8 +13,8 @@ public class Booker {
     private String firstName;
     private String lastName;
 
-    @OneToMany
-    private Set<Participant> participants;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "booker")
+    private Set<Participant> participants = new HashSet<>();
 
     public String getEmail() {
         return email;

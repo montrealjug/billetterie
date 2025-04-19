@@ -3,6 +3,7 @@ package org.montrealjug.billetterie.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -16,8 +17,10 @@ public class Activity {
     private String description;
     private int maxParticipants;
     private int maxWaitingQueue;
-    @OneToMany
-    private Set<Participant> participants;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "activity")
+    private Set<ActivityParticipant> participants = new HashSet<>();
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    private Event event;
 
     public long getId() {
         return id;
@@ -67,11 +70,19 @@ public class Activity {
         this.maxWaitingQueue = maxWaitingQueue;
     }
 
-    public Set<Participant> getParticipants() {
+    public Set<ActivityParticipant> getParticipants() {
         return participants;
     }
 
-    public void setParticipants(Set<Participant> participants) {
+    public Event getEvent() {
+        return event;
+    }
+
+    public void setEvent(Event event) {
+        this.event = event;
+    }
+
+    public void setParticipants(Set<ActivityParticipant> participants) {
         this.participants = participants;
     }
 

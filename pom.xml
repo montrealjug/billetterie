@@ -134,6 +134,14 @@
 					<imageBuilder>paketobuildpacks/builder-noble-java-tiny</imageBuilder>
 				</configuration>
 			</plugin>
+			<!-- needed to avoid WARN with Mockito (works for both IDE and mvn because we reuse Spring property) -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>-javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar</argLine>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 

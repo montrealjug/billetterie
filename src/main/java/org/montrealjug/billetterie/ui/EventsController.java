@@ -169,13 +169,13 @@ public class EventsController {
             entity.setTitle(activity.title());
             entity.setMaxParticipants(activity.maxParticipants());
             entity.setMaxWaitingQueue(activity.maxWaitingQueue());
+            entity.setEvent(event);
 
             LocalDate date = event.getDate();
             LocalDateTime localDateTime = date.atTime(activity.time());
 
             entity.setStartTime(localDateTime);
             event.getActivities().add(entity);
-            activityRepository.save(entity);
             eventRepository.save(event);
 
         });
