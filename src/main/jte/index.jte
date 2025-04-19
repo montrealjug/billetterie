@@ -2,7 +2,7 @@
 @import org.montrealjug.billetterie.ui.PresentationActivity
 @import java.time.format.DateTimeFormatter
 
-@param PresentationEvent event
+@param PresentationEvent event = null
 
 <!DOCTYPE html>
 <html lang="en">
@@ -19,6 +19,7 @@
 
 
     <div class="min-h-screen flex flex-col items-center justify-center">
+        @if(event != null)
         <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
 
 
@@ -71,6 +72,13 @@
                 Register
             </button>
         </div>
+
+        @else
+            <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
+                There is no event planned currrently
+            </div>
+        @endif
+
     </div>
 
     <script>
