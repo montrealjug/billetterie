@@ -1,5 +1,6 @@
 @param org.montrealjug.billetterie.ui.PresentationActivity activity
 @param Long eventId
+@param String errorMessage
 
 <!DOCTYPE html>
 <html lang="en">
@@ -12,6 +13,13 @@
 <body class="bg-gray-100">
 <div class="min-h-screen flex items-center justify-center">
     <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+        @if(errorMessage != null)
+            <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                <p class="font-semibold">Error</p>
+                <p>${errorMessage}</p>
+            </div>
+        @endif
+        @if(errorMessage == null)
         <h1 class="text-2xl font-bold text-center mb-6">${activity != null ? "Update" : "Create"} Activity</h1>
         <form action="/admin/events/${eventId}/activities${activity != null ? "/" + activity.id() : ""}" method="POST">
             <!-- Title Input -->
@@ -55,6 +63,7 @@
                 </button>
             </div>
         </form>
+        @endif
     </div>
 </div>
 </body>

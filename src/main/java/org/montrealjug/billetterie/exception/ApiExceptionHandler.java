@@ -4,22 +4,33 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.ui.Model;
+
+
 
 import java.time.LocalDateTime;
 
 @ControllerAdvice
 public class ApiExceptionHandler {
-    @ExceptionHandler(value={EntityNotFoundException.class})
-    public ResponseEntity<ApiException> handleEntityNotFoundException(EntityNotFoundException exception) {
-        ApiException apiException = new ApiException(exception.getMessage(), HttpStatus.NOT_FOUND, LocalDateTime.now());
-
-        return new ResponseEntity<>(apiException, HttpStatus.NOT_FOUND);
+    @ExceptionHandler(EntityNotFoundException.class)
+    public String handleEntityNotFoundException(EntityNotFoundException exception, Model model) {
+        model.addAttribute("errorMessage", exception.getMessage());
+        model.addAttribute("event", null);
+        return exception.getViewName();
+    }
+    @ExceptionHandler(RedirectableNotFoundException.class)
+    public ModelAndView handleRedirectableNotFound(RedirectableNotFoundException exception, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("errorMessage", exception.getFlashMessage());
+        return new ModelAndView("redirect:" + exception.getRedirectUrl());
     }
 
-    @ExceptionHandler(value={RequestException.class})
-    public ResponseEntity<ApiException> handleRequestException(RequestException exception) {
-        ApiException apiException = new ApiException(exception.getMessage(), exception.getHttpStatus(), LocalDateTime.now());
 
-        return new ResponseEntity<>(apiException, exception.getHttpStatus());
+    @ExceptionHandler(value={RequestException.class})
+    public String handleRequestException(RequestException exception, Model model) {
+        model.addAttribute("errorMessage", exception.getMessage());
+        model.addAttribute("event", null);
+        return exception.getViewName();
     }
 }

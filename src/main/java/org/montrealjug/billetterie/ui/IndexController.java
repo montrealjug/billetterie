@@ -28,7 +28,7 @@ public class IndexController {
             Event event = optionalEvent.get();
             presentationEvent = new PresentationEvent(event.getId(), event.getTitle(), event.getDescription(), event.getDate(), toIndexActivities(event.getActivities()), event.isActive());
         } else {
-            throw new EntityNotFoundException("No active event could be found!");
+            throw new EntityNotFoundException("No active event could be found!", "index");
         }
         model.addAttribute("event", presentationEvent);
         return "index";

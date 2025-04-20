@@ -2,7 +2,8 @@
 @import org.montrealjug.billetterie.ui.PresentationActivity
 @import java.time.format.DateTimeFormatter
 
-@param PresentationEvent event = null
+@param PresentationEvent event
+@param String errorMessage
 
 <!DOCTYPE html>
 <html lang="en">
@@ -19,10 +20,15 @@
 
 
     <div class="min-h-screen flex flex-col items-center justify-center">
-        @if(event != null)
         <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
 
-
+            @if(errorMessage != null)
+                <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                    <p class="font-semibold">Error</p>
+                    <p>${errorMessage}</p>
+                </div>
+            @endif
+            @if(errorMessage == null)
                 <div class="bg-gray-100 p-4 rounded-md shadow">
                     <div class="flex flex-col md:flex-row items-start md:items-center justify-between">
                         <div>
@@ -67,6 +73,7 @@
 
                     </div>
                 </div>
+            @endif
             <button onclick="displayRegistrationModal()"
                     class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
                 Register

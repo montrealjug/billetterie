@@ -5,10 +5,12 @@ import org.springframework.http.HttpStatus;
 public class RequestException  extends RuntimeException{
     private String message;
     private HttpStatus httpStatus;
+    private String viewName;
 
-    public RequestException(String message, HttpStatus httpStatus) {
+    public RequestException(String message, HttpStatus httpStatus, String viewName) {
         this.message = message;
         this.httpStatus = httpStatus;
+        this.viewName = viewName;
     }
 
     public RequestException() {
@@ -28,5 +30,13 @@ public class RequestException  extends RuntimeException{
 
     public void setHttpStatus(HttpStatus httpStatus) {
         this.httpStatus = httpStatus;
+    }
+    public String getViewName() {
+        return viewName;
+    }
+
+
+    public void setViewName(String viewName) {
+        this.viewName = viewName;
     }
 }
