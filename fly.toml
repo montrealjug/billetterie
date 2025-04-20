@@ -16,7 +16,7 @@ primary_region = 'yul'
   processes = ['app']
 
 [[vm]]
-  memory = '1gb'
+  memory = '512MB'
   cpu_kind = 'shared'
   cpus = 1
 
