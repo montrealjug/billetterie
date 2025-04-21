@@ -96,10 +96,16 @@ public class EventsController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(Model model, @PathVariable long id) {
-        this.eventRepository.deleteById(id);
+        Optional<Event> optionalEvent = this.eventRepository.findById(id);
+        if(optionalEvent.isPresent()){
+            this.eventRepository.deleteById(id);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                .build();
+            return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                    .build();
+        }else {
+            throw new RedirectableNotFoundException("Event with id " + id + " not found",  "/admin/events/" + id);
+        }
+
 
     }
 
@@ -112,6 +118,11 @@ public class EventsController {
 
     @GetMapping("{id}/createActivity")
     public String createActivity(Model model, @PathVariable final Long id) {
+        Optional<Event> optionalEvent = this.eventRepository.findById(id);
+
+        if (!optionalEvent.isPresent()) {
+            throw new EntityNotFoundException("Event with id " + id + " not found", "activities-create-update");
+        }
         model.addAttribute("eventId", id);
         return "activities-create-update";
     }
@@ -165,7 +176,7 @@ public class EventsController {
 
         Optional<Event> byId = eventRepository.findById(id);
 
-        byId.ifPresent(event -> {
+        byId.ifPresentOrElse(event -> {
             Activity entity = new Activity();
             entity.setDescription(activity.description());
             entity.setTitle(activity.title());
@@ -180,6 +191,8 @@ public class EventsController {
             event.getActivities().add(entity);
             eventRepository.save(event);
 
+        }, () -> {
+            throw new EntityNotFoundException("Event with id " + id + " not found", "activities-create-update");
         });
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create("/admin/events"))

@@ -80,12 +80,6 @@
             </button>
         </div>
 
-        @else
-            <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
-                There is no event planned currrently
-            </div>
-        @endif
-
     </div>
 
     <script>
