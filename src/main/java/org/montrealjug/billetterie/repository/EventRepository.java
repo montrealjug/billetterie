@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface EventRepository extends CrudRepository<Event, Long> {
 
-    Optional<Event> findByActiveIsTrue();
+	Optional<Event> findByActiveIsTrue();
 }

@@ -12,28 +12,29 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class IndexController {
 
-    private final EventRepository eventRepository;
+	private final EventRepository eventRepository;
 
-    public IndexController(EventRepository eventRepository) {
-        this.eventRepository = eventRepository;
-    }
+	public IndexController(EventRepository eventRepository) {
+		this.eventRepository = eventRepository;
+	}
 
-    @GetMapping("/")
-    public String index(Model model) {
-        Optional<Event> optionalEvent = this.eventRepository.findByActiveIsTrue();
+	@GetMapping("/")
+	public String index(Model model) {
+		Optional<Event> optionalEvent = this.eventRepository.findByActiveIsTrue();
 
-        if (optionalEvent.isPresent()) {
-            Event event = optionalEvent.get();
-            PresentationEvent presentationEvent = new PresentationEvent(
-                    event.getId(),
-                    event.getTitle(),
-                    event.getDescription(),
-                    event.getDate(),
-                    toIndexActivities(event.getActivities()),
-                    event.isActive());
-            model.addAttribute("event", presentationEvent);
-        }
+		if (optionalEvent.isPresent()) {
+			Event event = optionalEvent.get();
+			PresentationEvent presentationEvent =
+					new PresentationEvent(
+							event.getId(),
+							event.getTitle(),
+							event.getDescription(),
+							event.getDate(),
+							toIndexActivities(event.getActivities()),
+							event.isActive());
+			model.addAttribute("event", presentationEvent);
+		}
 
-        return "index";
-    }
+		return "index";
+	}
 }

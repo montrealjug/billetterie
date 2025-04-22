@@ -7,56 +7,55 @@ import java.util.Set;
 
 @Entity
 public class Booker {
-    @Id
-    private String email;
+	@Id private String email;
 
-    private String firstName;
-    private String lastName;
+	private String firstName;
+	private String lastName;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "booker")
-    private Set<Participant> participants = new HashSet<>();
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "booker")
+	private Set<Participant> participants = new HashSet<>();
 
-    public String getEmail() {
-        return email;
-    }
+	public String getEmail() {
+		return email;
+	}
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
-    public String getFirstName() {
-        return firstName;
-    }
+	public String getFirstName() {
+		return firstName;
+	}
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
 
-    public String getLastName() {
-        return lastName;
-    }
+	public String getLastName() {
+		return lastName;
+	}
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
 
-    public Set<Participant> getParticipants() {
-        return participants;
-    }
+	public Set<Participant> getParticipants() {
+		return participants;
+	}
 
-    public void setParticipants(Set<Participant> participants) {
-        this.participants = participants;
-    }
+	public void setParticipants(Set<Participant> participants) {
+		this.participants = participants;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Booker booker = (Booker) o;
-        return Objects.equals(email, booker.email);
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+		Booker booker = (Booker) o;
+		return Objects.equals(email, booker.email);
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(email);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(email);
+	}
 }

@@ -12,20 +12,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Controller
 public class RegistrationController {
 
-    private final BookerRepository bookerRepository;
+	private final BookerRepository bookerRepository;
 
-    public RegistrationController(BookerRepository bookerRepository) {
-        this.bookerRepository = bookerRepository;
-    }
+	public RegistrationController(BookerRepository bookerRepository) {
+		this.bookerRepository = bookerRepository;
+	}
 
-    @PostMapping("/registerBooker")
-    public ResponseEntity<Void> registerBooker(@RequestBody @Valid PresentationBooker booker) {
-        Booker entity = new Booker();
-        entity.setFirstName(booker.firstName());
-        entity.setLastName(booker.lastName());
-        entity.setEmail(booker.email());
-        bookerRepository.save(entity);
+	@PostMapping("/registerBooker")
+	public ResponseEntity<Void> registerBooker(@RequestBody @Valid PresentationBooker booker) {
+		Booker entity = new Booker();
+		entity.setFirstName(booker.firstName());
+		entity.setLastName(booker.lastName());
+		entity.setEmail(booker.email());
+		bookerRepository.save(entity);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
 }
