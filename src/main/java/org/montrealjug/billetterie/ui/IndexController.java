@@ -23,14 +23,13 @@ public class IndexController {
     @GetMapping("/")
     public String index(Model model) {
         Optional<Event> optionalEvent = this.eventRepository.findByActiveIsTrue();
-        PresentationEvent presentationEvent;
+
         if (optionalEvent.isPresent()) {
             Event event = optionalEvent.get();
-            presentationEvent = new PresentationEvent(event.getId(), event.getTitle(), event.getDescription(), event.getDate(), toIndexActivities(event.getActivities()), event.isActive());
-        } else {
-            throw new EntityNotFoundException("No active event could be found!", "index");
+            PresentationEvent presentationEvent = new PresentationEvent(event.getId(), event.getTitle(), event.getDescription(), event.getDate(), toIndexActivities(event.getActivities()), event.isActive());
+            model.addAttribute("event", presentationEvent);
         }
-        model.addAttribute("event", presentationEvent);
+
         return "index";
     }
 
