@@ -1,7 +1,6 @@
 package org.montrealjug.billetterie.entity;
 
 import jakarta.persistence.Embeddable;
-
 import java.util.Objects;
 
 @Embeddable

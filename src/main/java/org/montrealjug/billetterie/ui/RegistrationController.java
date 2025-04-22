@@ -26,10 +26,6 @@ public class RegistrationController {
         entity.setEmail(booker.email());
         bookerRepository.save(entity);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
-
-
-
 }

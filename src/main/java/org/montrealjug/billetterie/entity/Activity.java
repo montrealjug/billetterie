@@ -1,7 +1,6 @@
 package org.montrealjug.billetterie.entity;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
@@ -12,13 +11,16 @@ public class Activity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     private LocalDateTime startTime;
     private String title;
     private String description;
     private int maxParticipants;
     private int maxWaitingQueue;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "activity")
     private Set<ActivityParticipant> participants = new HashSet<>();
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Event event;
 
@@ -90,7 +92,7 @@ public class Activity {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Activity activity = (Activity) o;
-        return id == activity.id ;
+        return id == activity.id;
     }
 
     @Override

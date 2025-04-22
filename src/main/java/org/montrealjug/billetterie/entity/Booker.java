@@ -1,7 +1,6 @@
 package org.montrealjug.billetterie.entity;
 
 import jakarta.persistence.*;
-
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -10,6 +9,7 @@ import java.util.Set;
 public class Booker {
     @Id
     private String email;
+
     private String firstName;
     private String lastName;
 

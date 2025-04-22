@@ -1,5 +1,9 @@
 package org.montrealjug.billetterie.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.montrealjug.billetterie.entity.Activity;
 import org.montrealjug.billetterie.entity.ActivityParticipant;
@@ -8,11 +12,6 @@ import org.montrealjug.billetterie.entity.Event;
 import org.montrealjug.billetterie.entity.Participant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 public class ActivityRepositoryTest {
@@ -40,8 +39,7 @@ public class ActivityRepositoryTest {
         firstBooker.getParticipants().add(firstPart);
         firstBooker = bookerRepository.save(firstBooker);
         // jpa does not set the @Id in the associated entity, inefficient, but we're in a test 🤷
-        firstBooker.getParticipants()
-                .stream()
+        firstBooker.getParticipants().stream()
                 .findFirst()
                 .map(Participant::getId)
                 .ifPresent(firstPart::setId);
@@ -54,8 +52,7 @@ public class ActivityRepositoryTest {
         firstBooker.getParticipants().add(secondPart);
         firstBooker = bookerRepository.save(firstBooker);
         // jpa does not set the @Id in the associated entity, inefficient, but we're in a test 🤷
-        firstBooker.getParticipants()
-                .stream()
+        firstBooker.getParticipants().stream()
                 .filter(p -> p.getId() != firstPart.getId())
                 .findFirst()
                 .map(Participant::getId)
@@ -73,8 +70,7 @@ public class ActivityRepositoryTest {
         secondBooker.getParticipants().add(thirdPart);
         secondBooker = bookerRepository.save(secondBooker);
         // jpa does not set the @Id in the associated entity, inefficient, but we're in a test 🤷
-        secondBooker.getParticipants()
-                .stream()
+        secondBooker.getParticipants().stream()
                 .findFirst()
                 .map(Participant::getId)
                 .ifPresent(thirdPart::setId);
@@ -118,9 +114,7 @@ public class ActivityRepositoryTest {
 
         var savedActivity = activityRepository.findById(activity.getId());
         assertThat(savedActivity).isPresent();
-        var participantIdList = savedActivity.get()
-                .getParticipants()
-                .stream()
+        var participantIdList = savedActivity.get().getParticipants().stream()
                 .sorted() // `natural` sorting, using `ActivityParticipant#compareTo`
                 .map(ActivityParticipant::getParticipant)
                 .map(Participant::getId)
