@@ -30,6 +30,7 @@ public class ActivityRepositoryTest {
         firstBooker.setFirstName("First");
         firstBooker.setLastName("Booker");
         firstBooker.setEmail("firstBooker@test.org");
+        firstBooker.setEmailSignature("pof");
         var firstPart = new Participant();
         firstPart.setFirstName("First");
         firstPart.setLastName("Participant");
@@ -61,6 +62,7 @@ public class ActivityRepositoryTest {
         secondBooker.setFirstName("Second");
         secondBooker.setLastName("Booker");
         secondBooker.setEmail("secondBooker@test.org");
+        secondBooker.setEmailSignature("pif");
         var thirdPart = new Participant();
         thirdPart.setFirstName("Third");
         thirdPart.setLastName("Participant");

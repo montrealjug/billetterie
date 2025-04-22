@@ -2,6 +2,7 @@
 package org.montrealjug.billetterie.entity;
 
 import jakarta.persistence.*;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -12,6 +13,14 @@ public class Booker {
 
     private String firstName;
     private String lastName;
+
+    @Column(nullable = false, updatable = false)
+    private Instant creationTime = Instant.now();
+
+    @Column(nullable = false)
+    private String emailSignature;
+
+    private Instant validationTime;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "booker")
     private Set<Participant> participants = new HashSet<>();
@@ -46,6 +55,30 @@ public class Booker {
 
     public void setParticipants(Set<Participant> participants) {
         this.participants = participants;
+    }
+
+    public Instant getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCreationTime(Instant creationTime) {
+        this.creationTime = creationTime;
+    }
+
+    public Instant getValidationTime() {
+        return validationTime;
+    }
+
+    public void setValidationTime(Instant validationTime) {
+        this.validationTime = validationTime;
+    }
+
+    public String getEmailSignature() {
+        return emailSignature;
+    }
+
+    public void setEmailSignature(String emailSignature) {
+        this.emailSignature = emailSignature;
     }
 
     @Override

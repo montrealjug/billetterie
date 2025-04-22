@@ -52,3 +52,35 @@ app:
     reply-to:
       address: quebec@devoxx4kids.org
       name: Devoxx4Kids Québec
+
+billetterie:
+  # prod key will be different ;-)
+  rsaKey: |
+    -----BEGIN PRIVATE KEY-----
+    MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC1Ni7AvSg7afrp
+    doa4mkstme3qKfOXvIm52RoHkE+24nyipe7mjTS1ysRgEMRKXiSgW0K+mFFHiCDP
+    RpIlZP2FIwFOQJeetjElW0Sk0hkvvjbene5dIXKNWCZl8z3B4kzFV0debIkoFC9t
+    izYQ8BXU0836Ors0HMSHhS3XYatMZbM/dvVz8RiDc19kd5Y76/FxZB1oxy+0RpIe
+    lTV6KfjHOBYFLV+1pZstdekoP45NXIeSFYManQn16TtlgiZVafS9sjK8Hd9JoXLt
+    wu53W2Dc7XMXagcshU5YExmvjs2I4ZoGQi5bcq12IWKBgMOK+XUZu8HzeqGcuH9W
+    8XLXzJPfAgMBAAECggEAWo5ZndLJXKuRCoNDPtRINmEiji7pvs2mq9us0NPSqiuT
+    qjou4UL2cNSD/xfR5/IU7pe8in+Wup7x+nMjTJGjyZkdKWxI+LTGaYsrCgy+Lmgp
+    hmU4/Yxd8Pl4suDz30SGJeYAUdT+U6uGqgD0A1HfLwyrdd1MuPWZVrn8lxIFZvbi
+    cCe2AhB/aRVadpTFCZ+F6j22gRcZ7dYnS/sH8jXXuzwZ9JR820XH9p6gq7Chyuq8
+    BA+r94En1M0fpKf0CC6+Bh2kByimLAMKR924ukDeU3pZF34DQaQBhgY1aexZ0cNW
+    BwXOOHDNWfR3wK906pDZKj2u8mrajblWsxuEnIf4iQKBgQDW6VJMUNfRL9FAsbuh
+    m4R9huGMJn1KIktJnV3zn29VGKKfzUfIZF2oBDuOkGkeurvPG0dQ35Wg0MMa9sVD
+    msEz1pUOy14ihm+cDFmXaSDPGveXJkBe345+kW36ArnbXjaCFWISIN+sFHB8Ufpg
+    XW7rjuBQk3HU+3mb5Mzrj3mDeQKBgQDX23OWmgOGZxhAwYWC8hN/XIvnC2kuzx56
+    DLissdp5Jp005Zp0K/SSSi6taoaisoUGz+0BYv+haO17zKuI+x4EhaR8KDX3Q98B
+    +H19n40+5vCRFD8+wTouqI6Ltla3bGjFStu/JVsPJg8bpoc9F0n3QK2au3yziKi+
+    EiP3xJrkFwKBgBeGdvHPr7BAccGJMybfpUMwbqQu2mwxENjAFzbB7yf7iGHB0OfI
+    xM/Nls9mU3t/qWtkawwZTYHLGHBtLu7Vk+yewrZZ4LYazUDhwTTn1yWUqCGtmEJK
+    aojEVquVfM7co07eFFwzqQhnPGD/gE7oK2oxu7BWU5Gi7Y75Hs1yaTTRAoGBAKoP
+    4mxHoPlV5fy2uupksEnKbwqzqcXQNlGwDhs48Eg8zORs9JgMPV64BThpUfOCtF2e
+    mTpbdc0ELv43TPnZ5ldntyR+Ra4ukdcqoCvF9XEWX3fdvMpDUASMlemq2X0fcxfl
+    F2XsF2bC9GozdB8EZyjekyfyCJgl1dQR1LaS9fk3AoGAFbqmcmxwjr+bTn6vFyci
+    u3va8Ghlw2b3hxlH9ru0nH1WLsUikJBEHlax3o4vv3LJuJ87kOervkAn3kvldKjX
+    KEh5GMyeudu4hV7Yv7xF91aYp7CxFmV9bmdNooIk4eCI7bx07QFJODmhZtTjyqba
+    vf8G7UCtrr28OTQGVbhUdx8=
+    -----END PRIVATE KEY-----

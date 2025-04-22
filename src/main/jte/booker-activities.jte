@@ -1,16 +1,23 @@
 @import org.montrealjug.billetterie.ui.PresentationEvent
 @import org.montrealjug.billetterie.ui.PresentationActivity
+@import org.montrealjug.billetterie.entity.Booker
+@import org.montrealjug.billetterie.entity.Participant
 @import java.time.format.DateTimeFormatter
+@import java.util.List
+@import java.util.Map
 
 @param PresentationEvent event = null
+@param Booker booker = null
 @param String error = null
+@param Map<Long, List<Participant>> activityParticipants = null
+@param Map<Long, Integer> activityTotalParticipants = null
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event List</title>
+    <title>Event Activities</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
@@ -23,12 +30,9 @@
         </div>
     @endif
 
-
     <div class="min-h-screen flex flex-col items-center justify-center">
         @if(event != null)
             <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
-
-
                 <div class="bg-gray-100 p-4 rounded-md shadow">
                     <div class="flex flex-col md:flex-row items-start md:items-center justify-between">
                         <div>
@@ -36,7 +40,6 @@
                             <p class="text-gray-600">${event.description()}</p>
                             <p class="text-gray-500 text-sm mt-1">${event.date().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))}</p>
                         </div>
-
                     </div>
                     <!-- Activities Table -->
                     <div class="mt-4">
@@ -46,62 +49,70 @@
                             <tr class="bg-gray-200">
                                 <th class="border border-gray-300 px-4 py-2 text-left">Title</th>
                                 <th class="border border-gray-300 px-4 py-2 text-left">Description</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Max Seats</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Max Waiting</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Currently booked</th>
                                 <th class="border border-gray-300 px-4 py-2 text-left">Start Time</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Actions</th>
                             </tr>
                             </thead>
                             <tbody id="activity-list-1">
-                            <!-- Example Activity Row -->
+                            <!-- Activities Rows -->
                             @for(PresentationActivity activity: event.activities())
-
-
                                 <tr>
                                     <td class="border border-gray-300 px-4 py-2">${activity.title()}</td>
                                     <td class="border border-gray-300 px-4 py-2">${activity.description()}</td>
-                                    <td class="border border-gray-300 px-4 py-2">${activity.maxParticipants()}</td>
-                                    <td class="border border-gray-300 px-4 py-2">${activity.maxWaitingQueue()}</td>
-
+                                    <td class="border border-gray-300 px-4 py-2">${activityTotalParticipants != null && activityTotalParticipants.containsKey(activity.id()) ? activityTotalParticipants.get(activity.id()) : 0}/${activity.maxParticipants()}</td>
                                     <td class="border border-gray-300 px-4 py-2">${activity.time().format(DateTimeFormatter.ofPattern("H:mm a"))}</td>
+                                    <td class="border border-gray-300 px-4 py-2">
+                                        <button onclick="displayParticipantModal(${activity.id()})" 
+                                                class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
+                                            Add participant
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr id="participants-container-${activity.id()}" class="${activityParticipants != null && activityParticipants.containsKey(activity.id()) && !activityParticipants.get(activity.id()).isEmpty() ? "" : "hidden"}">
+                                    <td colspan="6" class="border border-gray-300 px-4 py-2 bg-gray-50">
+                                        <div class="text-sm font-semibold mb-2">Participants:</div>
+                                        <ul id="participants-list-${activity.id()}" class="list-disc pl-5">
+                                            <!-- Display existing participants -->
+                                            @if(activityParticipants != null && activityParticipants.containsKey(activity.id()))
+                                                @for(Participant participant : activityParticipants.get(activity.id()))
+                                                    <li>${participant.getFirstName()} ${participant.getLastName()}, born in ${participant.getYearOfBirth()}</li>
+                                                @endfor
+                                            @endif
+                                            <!-- New participants will be added here dynamically -->
+                                        </ul>
+                                    </td>
                                 </tr>
                             @endfor
-
-                            <!-- More rows will be dynamically added -->
                             </tbody>
                         </table>
-                        <!-- Create Activity Button -->
-
                     </div>
                 </div>
-                <button id="register-button" onclick="displayRegistrationModal()"
-                        class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
-                    Register
-                </button>
-                <div id="success-message" class="mt-4 p-4 bg-green-100 text-green-700 rounded-md hidden">
-                    You have successfully registered your email address, please check your inbox and click on the verification link to register your kids to the activities
-                </div>
             </div>
-
         @else
             <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
-                There is no event planned currrently
+                There is no event planned currently
             </div>
         @endif
-
     </div>
 
     <script>
+        // Store booker email signature in a JavaScript variable
+        const bookerEmailSignature = "${booker.getEmailSignature()}";
+        // Store event ID in a JavaScript variable
+        const eventId = "${event.id()}";
 
-        function displayRegistrationModal() {
+        function displayParticipantModal(activityId) {
             // Create the modal elements
             const modal = document.createElement("div");
-            modal.id = "registration-modal";
+            modal.id = "participant-modal";
             modal.className = "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50";
 
             modal.innerHTML = `
         <div class="bg-white rounded-lg shadow-md p-6 w-96">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4">Register</h2>
-            <form id="registration-form" class="space-y-4">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Add Participant</h2>
+            <form id="participant-form" class="space-y-4">
+                <input type="hidden" id="activity-id" name="activityId" value="` + activityId + `">
                 <div>
                     <label for="first-name" class="block text-gray-700">First Name</label>
                     <input type="text" id="first-name" name="firstName" class="border border-gray-300 rounded px-3 py-2 w-full" required>
@@ -111,12 +122,8 @@
                     <input type="text" id="last-name" name="lastName" class="border border-gray-300 rounded px-3 py-2 w-full" required>
                 </div>
                 <div>
-                    <label for="email" class="block text-gray-700">Email</label>
-                    <input type="email" id="email" name="email" class="border border-gray-300 rounded px-3 py-2 w-full" required>
-                </div>
-                <div>
-                    <label for="confirm-email" class="block text-gray-700">Confirm Email</label>
-                    <input type="email" id="confirm-email" name="confirmEmail" class="border border-gray-300 rounded px-3 py-2 w-full" required>
+                    <label for="yearOfBirth" class="block text-gray-700">Year of Birth</label>
+                    <input type="number" id="yearOfBirth" name="yearOfBirth" min="1900" max="2023" class="border border-gray-300 rounded px-3 py-2 w-full" required>
                 </div>
                 <div id="error-message" class="text-red-500 text-sm hidden"></div>
                 <div class="flex justify-end gap-2">
@@ -129,27 +136,21 @@
 
             document.body.appendChild(modal);
 
-            const form = document.getElementById("registration-form");
+            const form = document.getElementById("participant-form");
             const errorMessage = document.getElementById("error-message");
 
             form.addEventListener("submit", async (e) => {
                 e.preventDefault();
 
                 // Gather form data
+                const activityId = form.activityId.value;
                 const firstName = form.firstName.value.trim();
                 const lastName = form.lastName.value.trim();
-                const email = form.email.value.trim();
-                const confirmEmail = form.confirmEmail.value.trim();
+                const yearOfBirth = form.yearOfBirth.value;
 
                 // Validate inputs
-                if (!firstName || !lastName || !email || !confirmEmail) {
+                if (!firstName || !lastName || !yearOfBirth) {
                     errorMessage.textContent = "Please fill in all fields.";
-                    errorMessage.classList.remove("hidden");
-                    return;
-                }
-
-                if (email !== confirmEmail) {
-                    errorMessage.textContent = "Emails do not match.";
                     errorMessage.classList.remove("hidden");
                     return;
                 }
@@ -158,23 +159,29 @@
 
                 // Send HTTP POST request
                 try {
-                    const response = await fetch("/registerBooker", {
+                    const url = "/events/" + eventId + "/registerParticipant";
+                    const response = await fetch(url, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                         },
-                        body: JSON.stringify({firstName, lastName, email}),
+                        body: JSON.stringify({
+                            activityId: parseInt(activityId),
+                            firstName: firstName,
+                            lastName: lastName,
+                            yearOfBirth: parseInt(yearOfBirth),
+                            bookerEmailSignature: bookerEmailSignature
+                        }),
                     });
 
                     if (response.ok) {
+                        // Get the participant data from the response
+                        const participantData = await response.json();
+
+                        // Add participant to the list
+                        addParticipantToList(activityId, participantData);
+
                         closeModal();
-                        // Show success message
-                        const successMessage = document.getElementById("success-message");
-                        successMessage.classList.remove("hidden");
-                        // Disable register button
-                        const registerButton = document.getElementById("register-button");
-                        registerButton.disabled = true;
-                        registerButton.classList.add("opacity-50", "cursor-not-allowed");
                     } else {
                         const errorData = await response.json();
                         errorMessage.textContent = errorData.message || "Registration failed.";
@@ -188,16 +195,29 @@
             });
         }
 
+        function addParticipantToList(activityId, participant) {
+            // Get the participants container and list
+            const container = document.getElementById("participants-container-" + activityId);
+            const list = document.getElementById("participants-list-" + activityId);
+
+            // Create a new list item for the participant
+            const listItem = document.createElement("li");
+            listItem.textContent = participant.firstName + " " + participant.lastName + ", born in " + participant.yearOfBirth;
+
+            // Add the list item to the list
+            list.appendChild(listItem);
+
+            // Show the participants container if it's hidden
+            container.classList.remove("hidden");
+        }
+
         function closeModal() {
-            const modal = document.getElementById("registration-modal");
+            const modal = document.getElementById("participant-modal");
             if (modal) {
                 modal.remove();
             }
         }
     </script>
-
 </div>
-
-
 </body>
 </html>

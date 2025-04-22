@@ -10,7 +10,9 @@ public class EntityNotFoundException extends RuntimeException {
         this.viewName = viewName;
     }
 
-    public EntityNotFoundException() {}
+    public EntityNotFoundException(String message) {
+        this.message = message;
+    }
 
     public String getMessage() {
         return message;

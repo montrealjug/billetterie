@@ -1,0 +1,8 @@
+{
+  "services": {
+    "default": {
+      "separateInterfaceAndImplementation": false,
+      "notes": "As per requirements, services should not be separated into interfaces and implementations."
+    }
+  }
+}
