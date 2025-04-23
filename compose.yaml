@@ -7,6 +7,9 @@ services:
       - 'POSTGRES_USER=myuser'
     ports:
       - '25432:5432'
+    profiles:
+      - ""
+      - "test"
 
 #  billetterie:
 ##    image: 'registry.fly.io/billetterie:deployment-01JRVD2DCA9K1BA7YE25RCSH6T'
@@ -23,3 +26,5 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: com@com.com
       PGADMIN_DEFAULT_PASSWORD: secret
+    profiles:
+      - ""
