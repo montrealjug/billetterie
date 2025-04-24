@@ -1,3 +1,11 @@
+logging:
+  level:
+    org:
+      springframework:
+        boot:
+          actuate:
+            mail: error
+
 gg:
   jte:
     use-precompiled-templates: off

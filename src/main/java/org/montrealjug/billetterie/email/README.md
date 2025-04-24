@@ -64,7 +64,7 @@ This common `layout` has 4 parameters:
 
 See the [`Content` part of the `jte` documentation for more](https://jte.gg/syntax/#content).
 
-An exemple of usage can be found in [`after_booking-html.jte`](../.././../../../jte/email/after_booking-html.jte).
+An example of usage can be found in [`after_booking-html.jte`](../.././../../../jte/email/after_booking-html.jte).
 
 While not being mandatory, the use of this common `layout` is encouraged to:
 - ease development and maintenance of new templates
@@ -111,7 +111,7 @@ The web-ui lets us check the conformity of the email.
 Especially `Outlook (classic)` is a massive **PAIN** because it uses `Word` html rendering engine (😱🤦🤷).  
 This situation has spawned an entire industry of tools and services to ensure that `Outlook (classic)` behaves as expected.  
 Don't go through this rabbit hole, there's nothing valuable to learn there.  
-If you're lucky enough to never have suffered the `IE` pain to code webapps, you can experiment it with `html` email and `Outlook (classic)`. Trigger warning for everyone that has suffered the `IE` pain coding webapps a decade ago...
+If you're lucky enough to never have suffered the `IE` pain to code webapps, you can experiment it with `html` email and `Outlook (classic)`. Trigger warning for everyone who has suffered the `IE` pain coding webapps a decade ago...
 The only good news is that `Outlook (new)` almost follows standards...
 
 To check rendering in an email client:
@@ -123,4 +123,4 @@ To check rendering in an email client:
 You can edit the `html` part of the `.eml` directly with your favorite text editor, save and check again in your local mail client.
 When you're satisfied with the result, backport your changes in the associated `jte` template, update your expected `html` file in the test resources, check again the result via `MailHog`...
 
-You know understand the rant about `Outlook` html rendering...
+You now understand the rant about `Outlook` html rendering...
