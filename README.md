@@ -15,6 +15,23 @@ And then:
 
 `./mvnw spring-boot:run`
 
+### Using development profiles
+
+To ease local development, two profiles are available:
+- `local`: for day to day development
+- `local-mail`: to test sent emails locally (it's a group that loads `local` and `mailhog` profiles in the expected order) (see [email module documentation](./src/main/java/org/montrealjug/billetterie/email/README.md#how-to-test-locally) for more)
+
+You can set your desired profile on the command line:
+
+```shell
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local
+``` 
+or 
+```shell
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local-mail
+```
+This can also be done in your `IDE` configuration.
+
 ### Issues you could encounter
 
 If the database schema changed, because of JPA entities, the safest way to rebuild everything is... to delete your DB!

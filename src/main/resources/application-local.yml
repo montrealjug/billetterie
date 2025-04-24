@@ -1,0 +1,18 @@
+logging:
+  level:
+    org:
+      springframework:
+        boot:
+          actuate:
+            mail: error
+
+gg:
+  jte:
+    use-precompiled-templates: off
+    development-mode: on
+spring:
+  mail:
+    test-connection: off
+app:
+  mail:
+    mode: no-op

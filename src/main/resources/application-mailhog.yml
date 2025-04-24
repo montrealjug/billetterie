@@ -1,0 +1,20 @@
+# profile to be used with `local` but with a MailHog SMTP server
+# set the appropriate docker compose profile and the mail properties
+# to send emails to the MailHog container
+spring:
+  docker:
+    compose:
+      profiles:
+        active: "mailhog"
+  mail:
+    host: localhost
+    port: 21025
+    properties:
+      mail.smtp.auth: false
+      mail.smtp.starttls.enabled: false
+      mail.smtp.starttls.required: false
+    test-connection: on
+
+app:
+  mail:
+    mode: smtp
