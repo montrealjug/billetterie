@@ -6,6 +6,8 @@ spring:
       file: compose.yaml
       skip:
         in-tests: false
+      profiles:
+        active: "test"
   # required for model creation during tests
   jpa:
     hibernate:
