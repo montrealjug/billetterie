@@ -1,21 +1,20 @@
+// SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.entity;
 
 import jakarta.persistence.*;
-
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 public class Participant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     private String firstName;
     private String lastName;
 
-    @ManyToOne(fetch = FetchType.LAZY,  optional = false)
-    @JoinColumn(name="booker_email", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "booker_email", nullable = false)
     private Booker booker;
 
     public long getId() {

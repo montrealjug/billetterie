@@ -1,6 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.exception;
 
-public class EntityNotFoundException extends RuntimeException{
+public class EntityNotFoundException extends RuntimeException {
     private String message;
     private String viewName;
 
@@ -9,8 +10,7 @@ public class EntityNotFoundException extends RuntimeException{
         this.viewName = viewName;
     }
 
-    public EntityNotFoundException() {
-    }
+    public EntityNotFoundException() {}
 
     public String getMessage() {
         return message;
@@ -23,7 +23,6 @@ public class EntityNotFoundException extends RuntimeException{
     public String getViewName() {
         return viewName;
     }
-
 
     public void setViewName(String viewName) {
         this.viewName = viewName;

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.ui;
 
 import jakarta.validation.Valid;
@@ -26,10 +27,6 @@ public class RegistrationController {
         entity.setEmail(booker.email());
         bookerRepository.save(entity);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
-
-
-
 }

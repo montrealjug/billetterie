@@ -34,6 +34,18 @@ This can also be done in your `IDE` configuration.
 
 ### Issues you could encounter
 
+#### Spotless format
+
+If you have a failure during compilation, make sure to run:
+
+```shell
+./mvnw spotless:apply
+```
+
+to make sure your files are formatted according to our convention.
+
+#### Database schema changes
+
 If the database schema changed, because of JPA entities, the safest way to rebuild everything is... to delete your DB!
 
 Simply issue this command:
@@ -60,5 +72,4 @@ select pg_terminate_backend(`PID`);
 CREATE DATABASE billetterie;
 # Make sure user billetterie can interact with its database
 GRANT ALL PRIVILEGES ON DATABASE "billetterie" to billetterie;
-
 ```

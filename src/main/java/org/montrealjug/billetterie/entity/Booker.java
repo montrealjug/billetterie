@@ -1,15 +1,15 @@
+// SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.entity;
 
 import jakarta.persistence.*;
-
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
 public class Booker {
-    @Id
-    private String email;
+    @Id private String email;
+
     private String firstName;
     private String lastName;
 

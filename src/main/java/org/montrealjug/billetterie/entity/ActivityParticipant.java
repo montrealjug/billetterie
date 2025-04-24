@@ -1,13 +1,12 @@
+// SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
-
 import java.time.Instant;
 import java.util.Objects;
 
@@ -75,7 +74,10 @@ public class ActivityParticipant implements Comparable<ActivityParticipant> {
 
     @Override
     public int compareTo(ActivityParticipant o) {
-        var activityComp = Long.compare(this.activityParticipantKey.getActivityId(),  o.activityParticipantKey.getActivityId());
+        var activityComp =
+                Long.compare(
+                        this.activityParticipantKey.getActivityId(),
+                        o.activityParticipantKey.getActivityId());
         if (activityComp == 0) {
             return this.registrationTime.compareTo(o.registrationTime);
         } else {

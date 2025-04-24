@@ -1,13 +1,13 @@
+// SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.email;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
+import java.nio.charset.StandardCharsets;
 import org.montrealjug.billetterie.email.EmailConfiguration.EmailProperties;
 import org.montrealjug.billetterie.email.EmailModel.EmailToSend;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-
-import java.nio.charset.StandardCharsets;
 
 class SmtpEmailSender implements EmailSender {
 

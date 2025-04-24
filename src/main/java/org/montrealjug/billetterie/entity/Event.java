@@ -1,7 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.entity;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Objects;
@@ -13,11 +13,14 @@ public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     private LocalDate date;
     private String title;
     private boolean active;
+
     @Column(columnDefinition = "TEXT")
     private String description;
+
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private Set<Activity> activities = new HashSet<>();
 
@@ -61,7 +64,6 @@ public class Event {
         this.activities = activities;
     }
 
-
     public boolean isActive() {
         return active;
     }
@@ -74,12 +76,11 @@ public class Event {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Event event = (Event) o;
-        return id == event.id ;
+        return id == event.id;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id);
     }
-
 }

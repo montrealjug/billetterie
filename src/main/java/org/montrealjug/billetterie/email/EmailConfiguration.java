@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.email;
 
 import gg.jte.TemplateEngine;
@@ -6,6 +7,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +23,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.validation.annotation.Validated;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(EmailConfiguration.EmailProperties.class)
 @EnableAsync
@@ -33,8 +33,7 @@ class EmailConfiguration {
     @Bean
     EmailSender emailSender(
             @Autowired(required = false) JavaMailSender javaMailSender, // useful for tests
-            EmailProperties emailProperties
-    ) {
+            EmailProperties emailProperties) {
         final EmailSender emailSender;
         if (javaMailSender != null && emailProperties.mode != EmailMode.NO_OP) {
             emailSender = new SmtpEmailSender(javaMailSender, emailProperties);
@@ -49,8 +48,7 @@ class EmailConfiguration {
     EmailService emailService(
             EmailSender emailSender,
             TemplateEngine templateEngine,
-            ResourceBundleMessageSource messageSource
-    ) {
+            ResourceBundleMessageSource messageSource) {
         var emailWriter = new EmailWriter(templateEngine, messageSource);
         return new EmailService(emailSender, emailWriter);
     }
@@ -58,29 +56,16 @@ class EmailConfiguration {
     @Validated
     @ConfigurationProperties(prefix = "app.mail")
     record EmailProperties(
-            @DefaultValue("SMTP")
-            EmailMode mode,
-            @Valid
-            @NotNull
-            @NestedConfigurationProperty
-            EmailAddress from,
-            @Valid
-            @NotNull
-            @NestedConfigurationProperty
-            EmailAddress replyTo
-    ) {}
+            @DefaultValue("SMTP") EmailMode mode,
+            @Valid @NotNull @NestedConfigurationProperty EmailAddress from,
+            @Valid @NotNull @NestedConfigurationProperty EmailAddress replyTo) {}
 
     enum EmailMode {
-        NO_OP, SMTP
+        NO_OP,
+        SMTP
     }
 
-    record EmailAddress(
-            @Email
-            @NotBlank
-            String address,
-            @NotBlank
-            String name
-    ) {
+    record EmailAddress(@Email @NotBlank String address, @NotBlank String name) {
         InternetAddress asInternetAddress() {
             try {
                 return new InternetAddress(address, name, StandardCharsets.UTF_8.name());

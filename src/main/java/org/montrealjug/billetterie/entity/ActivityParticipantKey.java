@@ -1,7 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.entity;
 
 import jakarta.persistence.Embeddable;
-
 import java.util.Objects;
 
 @Embeddable
