@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.repository;
 
 import java.util.Optional;
@@ -6,5 +7,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface EventRepository extends CrudRepository<Event, Long> {
 
-	Optional<Event> findByActiveIsTrue();
+    Optional<Event> findByActiveIsTrue();
 }

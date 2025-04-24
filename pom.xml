@@ -165,20 +165,19 @@
 				<configuration>
 					<java>
 						<googleJavaFormat>
-							<version>1.17.0</version>
+							<version>1.26.0</version>
 							<style>AOSP</style>
 							<reflowLongStrings>true</reflowLongStrings>
 							<formatJavadoc>false</formatJavadoc>
 						</googleJavaFormat>
-						<importOrder />
-						<removeUnusedImports />
+						<importOrder/>
+						<removeUnusedImports/>
 						<toggleOffOn/>
 						<trimTrailingWhitespace/>
 						<endWithNewline/>
-						<indent>
-							<tabs>true</tabs>
-							<spacesPerTab>4</spacesPerTab>
-						</indent>
+						<licenseHeader>
+							<content>// SPDX-License-Identifier: Apache-2.0</content>
+						</licenseHeader>
 					</java>
 				</configuration>
 			</plugin>
