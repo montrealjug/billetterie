@@ -30,7 +30,7 @@
 		<!-- general properties -->
 		<java.version>21</java.version>
 		<!-- third-party dependencies (outside of springboot BOM) -->
-		<jte.version>3.1.16</jte.version>
+		<jte.version>3.2.0</jte.version>
 	</properties>
 	<dependencies>
 		<dependency>
