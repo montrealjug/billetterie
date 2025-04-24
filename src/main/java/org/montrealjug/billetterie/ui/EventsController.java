@@ -4,6 +4,8 @@ package org.montrealjug.billetterie.ui;
 import jakarta.validation.Valid;
 import org.montrealjug.billetterie.entity.Activity;
 import org.montrealjug.billetterie.entity.Event;
+import org.montrealjug.billetterie.exception.EntityNotFoundException;
+import org.montrealjug.billetterie.exception.RedirectableNotFoundException;
 import org.montrealjug.billetterie.repository.ActivityRepository;
 import org.montrealjug.billetterie.repository.EventRepository;
 import org.springframework.http.HttpStatus;
@@ -65,7 +67,7 @@ public class EventsController {
             Event event = optionalEvent.get();
             presentationEvent = new PresentationEvent(event.getId(), event.getTitle(), event.getDescription(), event.getDate(), Collections.emptyList(), event.isActive());
         } else {
-            throw new RuntimeException("Event with id " + id + " not found");
+            throw new EntityNotFoundException("Event with id " + id + " not found", "events-create-update");
         }
         model.addAttribute("event", presentationEvent);
         return "events-create-update";
@@ -83,7 +85,7 @@ public class EventsController {
             event.setActive(presentationEvent.active() !=null ? presentationEvent.active() : false);
             eventRepository.save(event);
         } else {
-            throw new RuntimeException("Event with id " + id + " not found");
+            throw new RedirectableNotFoundException("Event with id " + id + " not found",  "/admin/events/" + id);
         }
 
         return ResponseEntity.status(HttpStatus.FOUND)
@@ -94,10 +96,16 @@ public class EventsController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(Model model, @PathVariable long id) {
-        this.eventRepository.deleteById(id);
+        Optional<Event> optionalEvent = this.eventRepository.findById(id);
+        if(optionalEvent.isPresent()){
+            this.eventRepository.deleteById(id);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                .build();
+            return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                    .build();
+        }else {
+            throw new RedirectableNotFoundException("Event with id " + id + " not found",  "/admin/events/" + id);
+        }
+
 
     }
 
@@ -110,6 +118,11 @@ public class EventsController {
 
     @GetMapping("{id}/createActivity")
     public String createActivity(Model model, @PathVariable final Long id) {
+        Optional<Event> optionalEvent = this.eventRepository.findById(id);
+
+        if (!optionalEvent.isPresent()) {
+            throw new EntityNotFoundException("Event with id " + id + " not found", "activities-create-update");
+        }
         model.addAttribute("eventId", id);
         return "activities-create-update";
     }
@@ -123,7 +136,7 @@ public class EventsController {
             Activity activity = optionalActivity.get();
             presentationActivity = new PresentationActivity(activity.getId(), activity.getTitle(), activity.getDescription(), activity.getMaxParticipants(), activity.getMaxWaitingQueue(), activity.getStartTime().toLocalTime());
         } else {
-            throw new RuntimeException("Activity with id " + activityId + " not found");
+            throw new EntityNotFoundException("Activity with id " + activityId + " not found", "activities-create-update");
         }
         model.addAttribute("activity", presentationActivity);
         model.addAttribute("eventId", eventId);
@@ -149,7 +162,7 @@ public class EventsController {
 
             activityRepository.save(activity);
         } else {
-            throw new RuntimeException("Activity with id " + activityId + " not found");
+            throw new RedirectableNotFoundException("Activity with id " + activityId + " not found", eventId + "/activities/"+activityId);
         }
 
         return ResponseEntity.status(HttpStatus.FOUND)
@@ -163,7 +176,7 @@ public class EventsController {
 
         Optional<Event> byId = eventRepository.findById(id);
 
-        byId.ifPresent(event -> {
+        byId.ifPresentOrElse(event -> {
             Activity entity = new Activity();
             entity.setDescription(activity.description());
             entity.setTitle(activity.title());
@@ -178,6 +191,8 @@ public class EventsController {
             event.getActivities().add(entity);
             eventRepository.save(event);
 
+        }, () -> {
+            throw new EntityNotFoundException("Event with id " + id + " not found", "activities-create-update");
         });
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create("/admin/events"))

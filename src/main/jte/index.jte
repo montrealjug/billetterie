@@ -20,7 +20,7 @@
 
     <div class="min-h-screen flex flex-col items-center justify-center">
         @if(event != null)
-        <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
+            <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
 
 
                 <div class="bg-gray-100 p-4 rounded-md shadow">
@@ -67,11 +67,11 @@
 
                     </div>
                 </div>
-            <button onclick="displayRegistrationModal()"
-                    class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
-                Register
-            </button>
-        </div>
+                <button onclick="displayRegistrationModal()"
+                        class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
+                    Register
+                </button>
+            </div>
 
         @else
             <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
