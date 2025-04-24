@@ -1,8 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class RequestException  extends RuntimeException{
+public class RequestException extends RuntimeException {
     private String message;
     private HttpStatus httpStatus;
     private String viewName;
@@ -13,8 +14,7 @@ public class RequestException  extends RuntimeException{
         this.viewName = viewName;
     }
 
-    public RequestException() {
-    }
+    public RequestException() {}
 
     public String getMessage() {
         return message;
@@ -31,10 +31,10 @@ public class RequestException  extends RuntimeException{
     public void setHttpStatus(HttpStatus httpStatus) {
         this.httpStatus = httpStatus;
     }
+
     public String getViewName() {
         return viewName;
     }
-
 
     public void setViewName(String viewName) {
         this.viewName = viewName;

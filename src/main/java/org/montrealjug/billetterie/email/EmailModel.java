@@ -1,10 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.email;
 
 import jakarta.mail.internet.InternetAddress;
-import org.montrealjug.billetterie.entity.ActivityParticipant;
-import org.montrealjug.billetterie.entity.Booker;
-import org.montrealjug.billetterie.entity.Event;
-
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
@@ -14,27 +11,29 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import org.montrealjug.billetterie.entity.ActivityParticipant;
+import org.montrealjug.billetterie.entity.Booker;
+import org.montrealjug.billetterie.entity.Event;
 
 public class EmailModel {
 
     // to use in email templates via Email implementation utility methods
-    private static final DateTimeFormatter FR_DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-            .withLocale(Locale.CANADA_FRENCH);
-    private static final DateTimeFormatter EN_DATE_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy")
-            .withLocale(Locale.CANADA_FRENCH);
-    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("H:mm a")
-            .withLocale(Locale.CANADA_FRENCH);
-    private static final DateTimeFormatter ISO_DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
-            .withLocale(Locale.CANADA_FRENCH);
-    private static final DateTimeFormatter ISO_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-            .withLocale(Locale.CANADA_FRENCH);
+    private static final DateTimeFormatter FR_DATE_FORMAT =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.CANADA_FRENCH);
+    private static final DateTimeFormatter EN_DATE_FORMAT =
+            DateTimeFormatter.ofPattern("MM/dd/yyyy").withLocale(Locale.CANADA_FRENCH);
+    private static final DateTimeFormatter TIME_FORMAT =
+            DateTimeFormatter.ofPattern("H:mm a").withLocale(Locale.CANADA_FRENCH);
+    private static final DateTimeFormatter ISO_DATE_TIME_FORMAT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss").withLocale(Locale.CANADA_FRENCH);
+    private static final DateTimeFormatter ISO_DATE_FORMAT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd").withLocale(Locale.CANADA_FRENCH);
 
     private EmailModel() {
         // model class
     }
 
     public enum EmailType {
-
         AFTER_BOOKING;
 
         public String subjectKey() {
@@ -53,6 +52,7 @@ public class EmailModel {
     public interface Email {
 
         EmailType type();
+
         InternetAddress to();
 
         default String formatDateFr(Temporal temporal) {
@@ -73,15 +73,13 @@ public class EmailModel {
             } else if (temporal.isSupported(ChronoField.DAY_OF_MONTH)) {
                 return ISO_DATE_FORMAT.format(temporal);
             } else {
-                throw new UnsupportedOperationException("Unsupported temporal type: " + temporal.getClass());
+                throw new UnsupportedOperationException(
+                        "Unsupported temporal type: " + temporal.getClass());
             }
         }
 
         static Email afterBooking(
-                Booker booker,
-                Event event,
-                Set<ActivityParticipant> participants
-        ) {
+                Booker booker, Event event, Set<ActivityParticipant> participants) {
             return new AfterBookingEmail(booker, event, participants);
         }
 
@@ -90,8 +88,7 @@ public class EmailModel {
                 return new InternetAddress(
                         booker.getEmail(),
                         "%s %s".formatted(booker.getFirstName(), booker.getLastName()),
-                        StandardCharsets.UTF_8.name()
-                );
+                        StandardCharsets.UTF_8.name());
             } catch (UnsupportedEncodingException e) {
                 throw new IllegalArgumentException(e);
             }
@@ -100,15 +97,14 @@ public class EmailModel {
 
     // must be public to be used in jte template
     public record AfterBookingEmail(
-            Booker booker,
-            Event event,
-            Set<ActivityParticipant> participants
-    ) implements Email {
+            Booker booker, Event event, Set<ActivityParticipant> participants) implements Email {
 
-        public AfterBookingEmail(Booker booker, Event event, Set<ActivityParticipant> participants) {
+        public AfterBookingEmail(
+                Booker booker, Event event, Set<ActivityParticipant> participants) {
             this.booker = booker;
             this.event = event;
-            this.participants = participants instanceof SortedSet ? participants : new TreeSet<>(participants);
+            this.participants =
+                    participants instanceof SortedSet ? participants : new TreeSet<>(participants);
         }
 
         @Override
@@ -126,10 +122,5 @@ public class EmailModel {
         }
     }
 
-    record EmailToSend(
-            InternetAddress to,
-            String subject,
-            String plainText,
-            String html
-    ) {}
+    record EmailToSend(InternetAddress to, String subject, String plainText, String html) {}
 }

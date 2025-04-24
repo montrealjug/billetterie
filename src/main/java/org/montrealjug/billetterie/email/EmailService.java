@@ -1,11 +1,11 @@
+// SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.email;
 
+import java.util.Collection;
 import org.montrealjug.billetterie.email.EmailModel.Email;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
-
-import java.util.Collection;
 
 public class EmailService {
 

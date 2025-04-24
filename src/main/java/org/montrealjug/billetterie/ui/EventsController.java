@@ -72,15 +72,17 @@ public class EventsController {
         PresentationEvent presentationEvent;
         if (optionalEvent.isPresent()) {
             Event event = optionalEvent.get();
-            presentationEvent = new PresentationEvent(
-                    event.getId(),
-                    event.getTitle(),
-                    event.getDescription(),
-                    event.getDate(),
-                    Collections.emptyList(),
-                    event.isActive());
+            presentationEvent =
+                    new PresentationEvent(
+                            event.getId(),
+                            event.getTitle(),
+                            event.getDescription(),
+                            event.getDate(),
+                            Collections.emptyList(),
+                            event.isActive());
         } else {
-            throw new EntityNotFoundException("Event with id " + id + " not found", "events-create-update");
+            throw new EntityNotFoundException(
+                    "Event with id " + id + " not found", "events-create-update");
         }
         model.addAttribute("event", presentationEvent);
         return "events-create-update";
@@ -96,10 +98,12 @@ public class EventsController {
             event.setTitle(presentationEvent.title());
             event.setDescription(presentationEvent.description());
             event.setDate(presentationEvent.date());
-            event.setActive(presentationEvent.active() != null ? presentationEvent.active() : false);
+            event.setActive(
+                    presentationEvent.active() != null ? presentationEvent.active() : false);
             eventRepository.save(event);
         } else {
-            throw new RedirectableNotFoundException("Event with id " + id + " not found",  "/admin/events/" + id);
+            throw new RedirectableNotFoundException(
+                    "Event with id " + id + " not found", "/admin/events/" + id);
         }
 
         return ResponseEntity.status(HttpStatus.FOUND)
@@ -110,16 +114,14 @@ public class EventsController {
     @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(Model model, @PathVariable long id) {
         Optional<Event> optionalEvent = this.eventRepository.findById(id);
-        if(optionalEvent.isPresent()){
+        if (optionalEvent.isPresent()) {
             this.eventRepository.deleteById(id);
 
-            return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                    .build();
-        }else {
-            throw new RedirectableNotFoundException("Event with id " + id + " not found",  "/admin/events/" + id);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } else {
+            throw new RedirectableNotFoundException(
+                    "Event with id " + id + " not found", "/admin/events/" + id);
         }
-
-
     }
 
     @GetMapping("createEvent")
@@ -132,7 +134,8 @@ public class EventsController {
         Optional<Event> optionalEvent = this.eventRepository.findById(id);
 
         if (!optionalEvent.isPresent()) {
-            throw new EntityNotFoundException("Event with id " + id + " not found", "activities-create-update");
+            throw new EntityNotFoundException(
+                    "Event with id " + id + " not found", "activities-create-update");
         }
         model.addAttribute("eventId", id);
         return "activities-create-update";
@@ -144,15 +147,17 @@ public class EventsController {
         PresentationActivity presentationActivity;
         if (optionalActivity.isPresent()) {
             Activity activity = optionalActivity.get();
-            presentationActivity = new PresentationActivity(
-                    activity.getId(),
-                    activity.getTitle(),
-                    activity.getDescription(),
-                    activity.getMaxParticipants(),
-                    activity.getMaxWaitingQueue(),
-                    activity.getStartTime().toLocalTime());
+            presentationActivity =
+                    new PresentationActivity(
+                            activity.getId(),
+                            activity.getTitle(),
+                            activity.getDescription(),
+                            activity.getMaxParticipants(),
+                            activity.getMaxWaitingQueue(),
+                            activity.getStartTime().toLocalTime());
         } else {
-            throw new EntityNotFoundException("Activity with id " + activityId + " not found", "activities-create-update");
+            throw new EntityNotFoundException(
+                    "Activity with id " + activityId + " not found", "activities-create-update");
         }
         model.addAttribute("activity", presentationActivity);
         model.addAttribute("eventId", eventId);
@@ -186,7 +191,9 @@ public class EventsController {
 
             activityRepository.save(activity);
         } else {
-            throw new RedirectableNotFoundException("Activity with id " + activityId + " not found", eventId + "/activities/"+activityId);
+            throw new RedirectableNotFoundException(
+                    "Activity with id " + activityId + " not found",
+                    eventId + "/activities/" + activityId);
         }
 
         return ResponseEntity.status(HttpStatus.FOUND)
@@ -200,24 +207,26 @@ public class EventsController {
 
         Optional<Event> byId = eventRepository.findById(id);
 
-        byId.ifPresentOrElse(event -> {
-            Activity entity = new Activity();
-            entity.setDescription(activity.description());
-            entity.setTitle(activity.title());
-            entity.setMaxParticipants(activity.maxParticipants());
-            entity.setMaxWaitingQueue(activity.maxWaitingQueue());
-            entity.setEvent(event);
+        byId.ifPresentOrElse(
+                event -> {
+                    Activity entity = new Activity();
+                    entity.setDescription(activity.description());
+                    entity.setTitle(activity.title());
+                    entity.setMaxParticipants(activity.maxParticipants());
+                    entity.setMaxWaitingQueue(activity.maxWaitingQueue());
+                    entity.setEvent(event);
 
                     LocalDate date = event.getDate();
                     LocalDateTime localDateTime = date.atTime(activity.time());
 
-            entity.setStartTime(localDateTime);
-            event.getActivities().add(entity);
-            eventRepository.save(event);
-
-        }, () -> {
-            throw new EntityNotFoundException("Event with id " + id + " not found", "activities-create-update");
-        });
+                    entity.setStartTime(localDateTime);
+                    event.getActivities().add(entity);
+                    eventRepository.save(event);
+                },
+                () -> {
+                    throw new EntityNotFoundException(
+                            "Event with id " + id + " not found", "activities-create-update");
+                });
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create("/admin/events"))
                 .build();

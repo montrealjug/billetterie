@@ -1,4 +1,10 @@
+// SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.email;
+
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,26 +14,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.montrealjug.billetterie.email.EmailModel.Email;
 import org.montrealjug.billetterie.email.EmailModel.EmailToSend;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-
 @ExtendWith(MockitoExtension.class)
 class EmailServiceTest {
 
-    @Mock
-    SmtpEmailSender emailSender;
+    @Mock SmtpEmailSender emailSender;
 
-    @Mock
-    EmailWriter emailWriter;
+    @Mock EmailWriter emailWriter;
 
-    @Mock
-    Email email;
+    @Mock Email email;
 
-    @Mock
-    EmailToSend emailToSend;
+    @Mock EmailToSend emailToSend;
 
     EmailService emailService;
 
@@ -37,7 +33,8 @@ class EmailServiceTest {
     }
 
     @Test
-    void sendEmail_should_call_emailSender_send_with_the_result_of_emailWriter_write() throws Exception {
+    void sendEmail_should_call_emailSender_send_with_the_result_of_emailWriter_write()
+            throws Exception {
         when(emailWriter.write(email)).thenReturn(emailToSend);
 
         emailService.sendEmail(email);

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.exception;
 
 public class RedirectableNotFoundException extends RuntimeException {
@@ -18,4 +19,3 @@ public class RedirectableNotFoundException extends RuntimeException {
         return flashMessage;
     }
 }
-
