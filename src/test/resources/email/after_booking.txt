@@ -1,0 +1,38 @@
+Devoxx4Kids Québec, confirmation d'inscription à une activité (English version will follow):
+
+Bonjour booker-firstName-é booker-lastName-ü,
+Nous vous confirmons votre inscription pour l'événement Devoxx4kids Test Event le 15/04/2025.
+Lors de cet événement,
+
+  part-firstName-é part-lastName-ü
+  participera à l'activité:
+  Test Activity démarrant à 13:25 p.m.
+
+  second-firstName-é second-lastName-ü
+  participera à l'activité:
+  Test Activity démarrant à 13:25 p.m.
+
+Vous pouvez modifier votre inscription en utilisant le lien suivant: https://placeholder_for_registration_link.test
+
+On s'y voit bientôt!
+L'équipe Devoxx4Kids Québec.
+
+English version:
+Devoxx4Kids Québec, activity booking confirmation:
+
+Hi booker-firstName-é booker-lastName-ü,
+We confirm your activity booking for the Devoxx4Kids event Test Event on 04/15/2025.
+During this event,
+
+  part-firstName-é part-lastName-ü
+  will attend the activity:
+  Test Activity starting at 13:25 p.m.
+
+  second-firstName-é second-lastName-ü
+  will attend the activity:
+  Test Activity starting at 13:25 p.m.
+
+You can manage your booking using the following link: https://placeholder_for_registration_link.test
+
+See you soon there!
+The Devoxx4Kids Québec team.

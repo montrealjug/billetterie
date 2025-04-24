@@ -18,3 +18,13 @@ spring:
 gg:
   jte:
     developmentMode: true
+
+# required for email configuration
+app:
+  mail:
+    from:
+      address: "from@test.org"
+      name: "From Test"
+    reply-to:
+      address: "reply-to@test.org"
+      name: "ReplyTo Test"

@@ -10,6 +10,7 @@ services:
     profiles:
       - ""
       - "test"
+      - "mailhog"
 
 #  billetterie:
 ##    image: 'registry.fly.io/billetterie:deployment-01JRVD2DCA9K1BA7YE25RCSH6T'
@@ -28,3 +29,15 @@ services:
       PGADMIN_DEFAULT_PASSWORD: secret
     profiles:
       - ""
+      - "mailhog"
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "21025:1025"
+      - "28025:8025"
+    profiles:
+      - "mailhog"
+
+  # to use profiles with docker compose: docker compose --profile mailhog up/down
+  # or let Spring do the job by using the `local-mail` Spring profile

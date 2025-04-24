@@ -13,6 +13,24 @@ spring:
     hibernate:
       ddl-auto: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  mail:
+    host: ${MAIL_SERVER:in-v3.mailjet.com}
+    username: ${MAIL_USER:}
+    password: ${MAIL_PASSWORD:}
+    port: 587
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enabled: true
+      mail.smtp.starttls.required: true
+      #mail.smtp.debug: true # uncomment to have SMTP exchanges logged to the console
+    # switch to on when credentials are confirmed
+    # if `on`, the app will fail to launch if the connection to the SMTP server fails
+    test-connection: off
+  messages:
+    fallback-to-system-locale: false
+  profiles:
+    group:
+      local-mail: local,mailhog
 
 management:
   endpoints:
@@ -26,3 +44,11 @@ management:
     health:
       show-details: always
 
+app:
+  mail:
+    from:
+      address: quebec@devoxx4kids.org
+      name: Devoxx4Kids Québec
+    reply-to:
+      address: quebec@devoxx4kids.org
+      name: Devoxx4Kids Québec
