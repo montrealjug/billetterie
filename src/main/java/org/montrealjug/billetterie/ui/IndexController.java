@@ -1,7 +1,6 @@
 package org.montrealjug.billetterie.ui;
 
 import org.montrealjug.billetterie.entity.Event;
-import org.montrealjug.billetterie.exception.EntityNotFoundException;
 import org.montrealjug.billetterie.repository.EventRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

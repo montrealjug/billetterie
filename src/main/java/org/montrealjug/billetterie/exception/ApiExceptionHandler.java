@@ -1,16 +1,10 @@
 package org.montrealjug.billetterie.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.ui.Model;
-
-
-
-import java.time.LocalDateTime;
 
 @ControllerAdvice
 public class ApiExceptionHandler {
