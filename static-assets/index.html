@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="fr-CA" xml:lang="fr-CA">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Devoxx4kids Québec: site statique pour présenter l'application Billetterie</title>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer" />
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.3/gh-fork-ribbon.min.css"
+  />
+  <style>
+    @property --devoxx4kids-orange {
+      syntax: "<color>";
+      inherits: false;
+      initial-value: #f0690a;
+    }
+    @property --devoxx4kids-grey {
+      syntax: "<color>";
+      inherits: false;
+      initial-value: #777;
+    }
+    @property --border-radius {
+      syntax: "<length>";
+      inherits:  false;
+      initial-value: 4px;
+    }
+    .github-fork-ribbon:before {
+      background-color: var(--devoxx4kids-orange);
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    html {
+      background-color: var(--devoxx4kids-grey);
+      padding: 0.6rem;
+    }
+    body {
+      background-color: white;
+      width: 90vw;
+      min-width: 400px;
+      margin: auto;
+      border-radius: var(--border-radius);
+      font-family: "Helvetica Neue", Helvetica, Arial, "sans-serif";
+      padding: 1rem 0;
+    }
+    body > * {
+      padding: 0 1rem;
+    }
+    header figure {
+      margin: 0;
+    }
+    header figure img {
+      margin: auto;
+      max-width: 100%;
+    }
+    header figure figcaption {
+      color:  var(--devoxx4kids-grey);
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+    header h1 {
+      font-size: 2rem;
+      margin: 0.7em 0;
+    }
+    main blockquote {
+      color:  var(--devoxx4kids-grey);
+      font-style: italic;
+    }
+    main blockquote + p {
+      font-size: 0.9rem;
+    }
+    main p.motivation {
+      font-size: 1.2em;
+      line-height: 1.6em;
+    }
+    main p.links {
+      display: flex;
+      flex-flow: column nowrap;
+      justify-content: space-evenly;
+      align-items: center;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+    main p.links > a {
+      display: inline-block;
+      padding: 1rem;
+      color: white;
+      background-color: var(--devoxx4kids-orange);
+      border: 2px solid var(--devoxx4kids-orange);
+      border-radius: var(--border-radius);
+      font-size: 1.4rem;
+      max-width: 22rem;
+      line-height: 1.6rem;
+      text-align: center;
+    }
+    main p.links > a:hover {
+      background-color: white;
+      color: var(--devoxx4kids-orange);
+    }
+    main p.signature {
+      font-style: italic;
+    }
+    main details > summary {
+      list-style-type: none;
+      font-size: 0.7rem;
+      font-style: italic;
+      cursor: pointer;
+      color: var(--devoxx4kids-grey);
+    }
+    main details > summary > span {
+      font-style: normal;
+    }
+    main details > div {
+      display: flex;
+      flex-flow: column nowrap;
+      align-items: center;
+      gap: 1rem;
+      font-style: italic;
+      padding: 2rem 0;
+      color: var(--devoxx4kids-grey);
+    }
+    main details > div img {
+      max-width: 100%;
+    }
+    main details > div > p > a {
+      color: rgb(150, 168, 200);
+    }
+    main details > div > p span {
+      font-style: normal;
+    }
+    footer {
+      color: var(--devoxx4kids-grey);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    footer p {
+      font-size: 0.8rem;
+    }
+    footer ul {
+      list-style-type: none;
+    }
+    footer ul > li {
+      display: inline-block;
+      margin: 0 0 0 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <figure>
+      <a href="https://www.devoxx4kids.org/quebec/" target="_blank" rel="noopener noreferrer">
+        <img src="https://www.devoxx4kids.org/quebec/wp-content/uploads/sites/12/2014/06/D4K_QUEBEC_1000px.png"
+             alt="Devoxx4kids Québec logo" />
+      </a>
+      <figcaption>Devoxx4Kids Québec</figcaption>
+    </figure>
+    <h1>Devoxx4kids Québec: l'Application Billetterie</h1>
+    <a class="github-fork-ribbon"
+       href="https://github.com/montrealjug/billetterie"
+       data-ribbon="Fork me on GitHub"
+       title="Fork me on GitHub"
+       target="_blank"
+    >Fork me on GitHub</a>
+  </header>
+  <main>
+    <blockquote cite="https://www.devoxx4kids.org/quebec/mission/">
+      <p>
+        Le but de Devoxx4Kids est de faire découvrir l’informatique, la robotique et l’ingénierie à nos jeunes.
+        Le tout afin de leur montrer que l’on peut faire autre chose avec un ordinateur que jouer,
+        regarder des vidéos en ligne ou encore surfer sur Facebook!
+      </p>
+      <p>
+        Afin de rendre le tout amusant pour nos jeunes, nous (parents, accessoirement ingénieurs la journée) animons
+        de façon bénévole des ateliers au Québec en français/anglais autour de la programmation,
+        la robotique et l’électronique pour des jeunes entre 5 et 14 ans.
+      </p>
+    </blockquote>
+    <p>Devoxx4Kids Québec,
+      <cite>
+        <a href="https://www.devoxx4kids.org/quebec/mission/" target="_blank">notre mission</a>
+      </cite>
+    </p>
+    <p class="motivation">
+      Après avoir essayé plusieurs outils pour gérer les inscriptions aux ateliers proposés,
+      l'équipe Devoxx4Kids Québec a finalement décidé de faire le sien&nbsp;!
+    </p>
+    <p class=links>
+      <a href="https://billetterie.fly.dev/">Accéder à l'application Billetterie pour réserver une activité</a>
+      <a href="https://www.devoxx4kids.org/quebec/" target="_blank">En apprendre plus sur Devoxx4Kids Québec</a>
+    </p>
+    <p class="signature">
+      À bientôt,
+    </p>
+    <p class="signature">
+      L'équipe Devoxx4Kids Québec
+    </p>
+    <details>
+      <summary>et oui, on est au courant... <span>😉</span></summary>
+      <div>
+        <a href="https://xkcd.com/927" target="_blank">
+          <img src="https://imgs.xkcd.com/comics/standards.png"
+               alt="XKCD comic sur les standards et leur prolifération"
+          />
+        </a>
+        <p>et...</p>
+        <a href="https://xkcd.com/1629" target="_blank">
+          <img src="https://imgs.xkcd.com/comics/tools.png"
+               alt="XKCD comic sur les outils et leur prolifération"
+          />
+        </a>
+        <p>mais...</p>
+        <a href="https://xkcd.com/378" target="_blank">
+          <img src="https://imgs.xkcd.com/comics/real_programmers.png"
+               alt="XKCD comic sur les vrais développeurs"
+          />
+        </a>
+        <p>ok...</p>
+        <a href="https://xkcd.com/378" target="_blank">
+          <img src="https://imgs.xkcd.com/comics/tech_loops.png"
+               alt="XKCD comic sur les piles technologiques"
+          />
+        </a>
+        <p>merci
+          <a href="https://xkcd.com" target="_blank">xkcd<span>&nbsp;😅</span></a>
+        </p>
+      </div>
+    </details>
+  </main>
+  <footer>
+    <p>&copy;&nbsp;<span id="current-year">2025</span>&nbsp;Devoxx4Kids Québec – Tous droits réservés</p>
+    <ul>
+      <li>
+        <a rel="nofollow"
+           title="Souscrire à notre flux RSS"
+           aria-label="Souscrire à notre flux RSS"
+           href="https://www.devoxx4kids.org/quebec/feed/rss/"
+           target="_blank">
+          <i class="fas fa-rss"></i>
+        </a>
+      </li>
+      <li>
+        <a rel="nofollow"
+           title="Courriel"
+           aria-label="Courriel"
+           href="mailto:quebec@devoxx4kids.org"
+           target="_blank">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+      <li>
+        <a rel="nofollow"
+           title="Suivez nous sur Facebook"
+           aria-label="Suivez nous sur Facebook"
+           href="https://www.facebook.com/Devoxx4KidsQC"
+           target="_blank">
+          <i class="fab fa-facebook-square"></i>
+        </a>
+      </li>
+      <li>
+        <a rel="nofollow"
+           title="Suivez nous sur LinkedIn"
+           aria-label="Suivez nous sur LinkedIn"
+           href="https://www.linkedin.com/company/devoxx4kids-quebec/?viewAsMember=true"
+           target="_blank">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+  </footer>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("current-year").textContent = `${new Date().getFullYear()}`;
+    });
+  </script>
+</body>
+</html>

@@ -30,7 +30,13 @@
                             <p class="text-gray-600">${event.description()}</p>
                             <p class="text-gray-500 text-sm mt-1">${event.date().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))}</p>
                         </div>
-
+                        <div class="size-24">
+                            @template.layouts.image_with_fallback(
+                                entityType = "event",
+                                cssClass = "object-cover object-center size-full rounded-lg",
+                                id = event.id()
+                            )
+                        </div>
                     </div>
                     <!-- Activities Table -->
                     <div class="mt-4">

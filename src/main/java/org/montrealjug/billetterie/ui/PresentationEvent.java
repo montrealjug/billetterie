@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.ui;
 
+import jakarta.annotation.Nullable;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -10,4 +11,5 @@ public record PresentationEvent(
         String description,
         LocalDate date,
         List<PresentationActivity> activities,
-        Boolean active) {}
+        Boolean active,
+        @Nullable String imagePath) {}

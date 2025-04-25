@@ -34,6 +34,7 @@
                         <h2 class="text-lg font-semibold text-gray-700">${event.title()} - ${event.active() ? "Active" : "Not Active"}</h2>
                         <p class="text-gray-600">${event.description()}</p>
                         <p class="text-gray-500 text-sm mt-1">${event.date().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))}</p>
+                        <p class="text-gray-500 text-sm mt-1">image path: ${event.imagePath()}</p>
                     </div>
                     <div class="flex space-x-2 mt-4 md:mt-0">
                         <a href="/admin/events/${event.id()}"

@@ -32,7 +32,8 @@ public class IndexController {
                             event.getDescription(),
                             event.getDate(),
                             toIndexActivities(event.getActivities()),
-                            event.isActive());
+                            event.isActive(),
+                            event.getImagePath());
             model.addAttribute("event", presentationEvent);
         }
 
