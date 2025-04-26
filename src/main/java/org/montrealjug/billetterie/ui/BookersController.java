@@ -1,6 +1,11 @@
+// SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.ui;
 
 import jakarta.validation.Valid;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.montrealjug.billetterie.entity.Booker;
 import org.montrealjug.billetterie.repository.BookerRepository;
 import org.springframework.http.HttpStatus;
@@ -11,11 +16,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("admin/bookers")
@@ -29,12 +29,17 @@ public class BookersController {
 
     @GetMapping("")
     public String bookers(Model model) {
-        List<PresentationBooker> presentationBookers  = new ArrayList<>();
+        List<PresentationBooker> presentationBookers = new ArrayList<>();
         Iterable<Booker> bookers = bookerRepository.findAll();
 
-        bookers.forEach((booker -> {
-            presentationBookers.add(new PresentationBooker(booker.getFirstName(),booker.getLastName(),booker.getEmail()));
-        }));
+        bookers.forEach(
+                (booker -> {
+                    presentationBookers.add(
+                            new PresentationBooker(
+                                    booker.getFirstName(),
+                                    booker.getLastName(),
+                                    booker.getEmail()));
+                }));
 
         model.addAttribute("bookerList", presentationBookers);
 
@@ -50,11 +55,13 @@ public class BookersController {
 
         bookerRepository.save(bookerEntity);
 
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create("/admin/bookers")).build();
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create("/admin/bookers"))
+                .build();
     }
 
     @GetMapping("add-booker")
-    public String showAddBookerPage(){
+    public String showAddBookerPage() {
         return "bookers-create-update";
     }
 
@@ -64,7 +71,9 @@ public class BookersController {
 
         if (optionalBooker.isPresent()) {
             Booker booker = optionalBooker.get();
-            PresentationBooker presentationBooker = new PresentationBooker(booker.getFirstName(), booker.getLastName(), booker.getEmail());
+            PresentationBooker presentationBooker =
+                    new PresentationBooker(
+                            booker.getFirstName(), booker.getLastName(), booker.getEmail());
             model.addAttribute("booker", presentationBooker);
         } else {
             throw new RuntimeException("Booker email not present: " + email);
@@ -72,6 +81,4 @@ public class BookersController {
 
         return "bookers-create-update";
     }
-
-
 }
