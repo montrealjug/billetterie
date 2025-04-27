@@ -27,7 +27,7 @@
 
         @for(PresentationBooker booker: bookerList)
             <div class="bg-gray-150 p-4 rounded-md shadow my-1 flex justify-between">
-                <p class="mx-10">${booker.firstName() + " " + booker.lastName()} (${booker.email()})</p>
+                <p class="mx-10">${booker.firstName() + " " + booker.lastName()}</p>
                 <a href="/admin/bookers/${booker.email()}"
                    class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
                     Edit
