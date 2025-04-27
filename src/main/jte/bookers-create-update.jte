@@ -1,4 +1,5 @@
 @param org.montrealjug.billetterie.ui.PresentationBooker booker = null
+@param String errorMessage = null
 
 <!DOCTYPE html>
 <html lang="en">
@@ -11,14 +12,27 @@
 <body class="bg-gray-100">
 <div class="min-h-screen flex items-center justify-center">
     <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+        @if(errorMessage != null)
+            <h2 class="text-red-500">${errorMessage}</h2>
+        @else
         <h1 class="text-2xl font-bold text-center mb-6">${booker != null ? "Update" : "Add"} Booker</h1>
-        <form action="/admin/bookers" method="POST">
-            <div>
-                <label for="email" class="block text-gray-700 font-medium mb-2">Booker email</label>
-                <input type="email" id="email" name="email" required value="${booker != null ? booker.email() : ""}"
-                       class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none"
-                >
-            </div>
+        <form action="${"/admin/bookers" + (booker != null ? "/" + booker.email() : "")}" method="POST">
+            @if(booker != null)
+                <div>
+                    <label for="email" class="block text-gray-700 font-medium mb-2">Booker email</label>
+                    <input type="email" id="email" name="email" disabled value="${booker.email()}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none"
+                    >
+                </div>
+            @else
+                <div>
+                    <label for="email" class="block text-gray-700 font-medium mb-2">Booker email</label>
+                    <input type="email" id="email" name="email" required value=""
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none"
+                    >
+                </div>
+
+            @endif
 
             <div>
                 <label for="firstName" class="block text-gray-700 font-medium mb-2">First name</label>
@@ -44,6 +58,7 @@
                 </button>
             </div>
         </form>
+        @endif
     </div>
 
 </div>
