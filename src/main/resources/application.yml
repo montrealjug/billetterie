@@ -47,10 +47,10 @@ management:
 app:
   mail:
     from:
-      address: quebec@devoxx4kids.org
+      address: devoxx4kidsqc@montreal-jug.org
       name: Devoxx4Kids Québec
     reply-to:
-      address: quebec@devoxx4kids.org
+      address: devoxx4kidsqc@montreal-jug.org
       name: Devoxx4Kids Québec
 
 billetterie:
