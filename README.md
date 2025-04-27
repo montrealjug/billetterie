@@ -9,7 +9,7 @@ https://billetterie.fly.dev/
 
 ## Run the app in development
 
-Make sure to have a Docker daemon running (so that tests and dev. can start the postgresql container).
+Make sure to have a Docker daemon running (so that tests and dev. can start the postgresql and mailhog containers).
 
 And then:
 
@@ -52,7 +52,12 @@ Simply issue this command:
 
 ```shell
 docker-compose down
+# or  docker-compose --profile mailhog down
 ```
+
+## Run the app in production (fly.io)
+
+### Database schema changes
 
 Notes for administrators connecting to the Fly.io db: you can't simply destroy it. 
 
@@ -73,3 +78,22 @@ CREATE DATABASE billetterie;
 # Make sure user billetterie can interact with its database
 GRANT ALL PRIVILEGES ON DATABASE "billetterie" to billetterie;
 ```
+
+### Configure the SMTP Server in production
+
+Set those environment variables:
+
+* MAIL_SERVER , defaults to in-v3.mailjet.com
+* MAIL_USER
+* MAIL_PASSWORD
+
+### Configure a non default RSA Key
+
+The RSA key is used to create signatures of the email addresses of the booker; this signature is then used to identify and manage the bookings of the user (booker).
+
+```bash
+# Generate a 2048-bit RSA private key in PKCS#8 format
+openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
+```
+
+then set the env. variable / secret `APP_RSA_KEY`

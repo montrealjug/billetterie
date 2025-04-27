@@ -6,5 +6,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * Configuration properties for the billetterie application.
  */
-@ConfigurationProperties(prefix = "billetterie")
+@ConfigurationProperties(prefix = "app")
 public record BilletterieProperties(String rsaKey) {}
