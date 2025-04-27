@@ -168,7 +168,8 @@ public class RegistrationController {
                             event.getDescription(),
                             event.getDate(),
                             toIndexActivities(event.getActivities()),
-                            event.isActive());
+                            event.isActive(),
+                            event.getImagePath());
 
             // Create a map of activity ID to participants for the current booker
             Map<Long, List<Participant>> activityParticipantsForBooker = new HashMap<>();
@@ -216,7 +217,8 @@ public class RegistrationController {
                             event.getDescription(),
                             event.getDate(),
                             toIndexActivities(event.getActivities()),
-                            event.isActive());
+                            event.isActive(),
+                            event.getImagePath());
 
             model.addAttribute("event", presentationEvent);
             model.addAttribute("error", "The booker could not be retrieved from the DB");
