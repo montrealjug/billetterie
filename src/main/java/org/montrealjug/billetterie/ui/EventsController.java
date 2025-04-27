@@ -46,7 +46,8 @@ public class EventsController {
                                     event.getDescription(),
                                     event.getDate(),
                                     toIndexActivities(event.getActivities()),
-                                    event.isActive());
+                                    event.isActive(),
+                                    event.getImagePath());
                     presentationEvents.add(presentationEvent);
                 });
         model.addAttribute("events", presentationEvents);
@@ -79,7 +80,8 @@ public class EventsController {
                             event.getDescription(),
                             event.getDate(),
                             Collections.emptyList(),
-                            event.isActive());
+                            event.isActive(),
+                            event.getImagePath());
         } else {
             throw new EntityNotFoundException(
                     "Event with id " + id + " not found", "events-create-update");
