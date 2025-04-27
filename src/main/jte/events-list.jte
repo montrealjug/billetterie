@@ -13,6 +13,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
+<a href="/">Go to the main page</a>
 <div class="min-h-screen flex flex-col items-center justify-center">
 
 

@@ -20,16 +20,17 @@ services:
 #    ports:
 #      - '28080:8080'
 
-  pgadmin:
-    image: dpage/pgadmin4
-    ports:
-      - "20080:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: com@com.com
-      PGADMIN_DEFAULT_PASSWORD: secret
-    profiles:
-      - ""
-      - "mailhog"
+# not really useful, if you have intellij DB explorer...
+#  pgadmin:
+#    image: dpage/pgadmin4
+#    ports:
+#      - "20080:80"
+#    environment:
+#      PGADMIN_DEFAULT_EMAIL: com@com.com
+#      PGADMIN_DEFAULT_PASSWORD: secret
+#    profiles:
+#      - ""
+#      - "mailhog"
 
   mailhog:
     image: mailhog/mailhog
