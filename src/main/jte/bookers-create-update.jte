@@ -21,7 +21,7 @@
                 <div>
                     <label for="email" class="block text-gray-700 font-medium mb-2">Booker email</label>
                     <input type="email" id="email" name="email" disabled value="${booker.email()}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none bg-gray-300"
                     >
                 </div>
             @else

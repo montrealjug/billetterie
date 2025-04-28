@@ -102,8 +102,7 @@ public class BookersController {
 
     @PostMapping("{email}")
     public ResponseEntity<Void> updateBooker(
-            Model model, @PathVariable String email, @Valid PresentationBooker presentationBooker)
-            throws Exception {
+            Model model, @PathVariable String email, @Valid PresentationBooker presentationBooker) {
         Optional<Booker> optionalBooker = bookerRepository.findById(email);
 
         if (optionalBooker.isEmpty()) {
@@ -135,7 +134,7 @@ public class BookersController {
 
         // return to the new email as url path variable if changed
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("/admin/bookers/" + presentationBooker.email()))
+                .location(URI.create("/admin/bookers"))
                 .build();
     }
 }
