@@ -14,6 +14,8 @@
 </head>
 <body class="bg-gray-100">
 <a href="/">Go to the main page</a>
+<a href="/admin/bookers">Go to the bookers admin page</a>
+
 <div class="min-h-screen flex flex-col items-center justify-center">
 
 
