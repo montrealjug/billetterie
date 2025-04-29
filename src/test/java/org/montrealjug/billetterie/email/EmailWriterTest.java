@@ -58,7 +58,7 @@ class EmailWriterTest {
     }
 
     static Stream<Arguments> emails() {
-        return Stream.of(Arguments.of(forAfterBooking()));
+        return Stream.of(Arguments.of(forAfterBooking()), Arguments.of(forReturningBooker()));
     }
 
     static Email forAfterBooking() {
@@ -99,5 +99,15 @@ class EmailWriterTest {
                 .setParticipantId(secondParticipant.getId());
         var participants = Set.of(firstActivityParticipant, secondActivityParticipant);
         return Email.afterBooking(booker, event, participants);
+    }
+
+    static Email forReturningBooker() {
+        var booker = new Booker();
+        booker.setEmail("email@test.org");
+        booker.setFirstName("booker-firstName");
+        booker.setLastName("booker-lastName");
+        booker.setEmailSignature("signature");
+        var baseUrl = "base_url";
+        return Email.returningBooker(booker, baseUrl);
     }
 }

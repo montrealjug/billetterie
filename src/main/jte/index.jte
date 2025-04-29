@@ -18,7 +18,7 @@
 
 <div class="min-h-screen flex flex-col items-center justify-center">
     @if(error != null)
-        <div class="bg-red-500 text-white p-4 mb-4 rounded-md w-full max-w-4xl">
+        <div id="main-error-message" class="bg-red-500 text-white p-4 mb-4 rounded-md w-full max-w-4xl">
             ${error}
         </div>
     @endif
@@ -83,8 +83,11 @@
                         class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
                     Register
                 </button>
-                <div id="success-message" class="mt-4 p-4 bg-green-100 text-green-700 rounded-md hidden">
+                <div id="success-registration-message" class="mt-4 p-4 bg-green-100 text-green-700 rounded-md hidden">
                     You have successfully registered your email address, please check your inbox and click on the verification link to register your kids to the activities
+                </div>
+                <div id="success-returning-message" class="mt-4 p-4 bg-green-100 text-green-700 rounded-md hidden">
+                    We've sent you an email to finish the registration, please check your inbox and click on the registration link to register your kids to the activities
                 </div>
             </div>
 
@@ -97,101 +100,36 @@
     </div>
 
     <script>
-
         function displayRegistrationModal() {
             // Create the modal elements
             const modal = document.createElement("div");
             modal.id = "registration-modal";
             modal.className = "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50";
-
             modal.innerHTML = `
-        <div class="bg-white rounded-lg shadow-md p-6 w-96">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4">Register</h2>
-            <form id="registration-form" class="space-y-4">
-                <div>
-                    <label for="first-name" class="block text-gray-700">First Name</label>
-                    <input type="text" id="first-name" name="firstName" class="border border-gray-300 rounded px-3 py-2 w-full" required>
-                </div>
-                <div>
-                    <label for="last-name" class="block text-gray-700">Last Name</label>
-                    <input type="text" id="last-name" name="lastName" class="border border-gray-300 rounded px-3 py-2 w-full" required>
-                </div>
-                <div>
-                    <label for="email" class="block text-gray-700">Email</label>
-                    <input type="email" id="email" name="email" class="border border-gray-300 rounded px-3 py-2 w-full" required>
-                </div>
-                <div>
-                    <label for="confirm-email" class="block text-gray-700">Confirm Email</label>
-                    <input type="email" id="confirm-email" name="confirmEmail" class="border border-gray-300 rounded px-3 py-2 w-full" required>
-                </div>
-                <div id="error-message" class="text-red-500 text-sm hidden"></div>
-                <div class="flex justify-end gap-2">
-                    <button type="button" onclick="closeModal()" class="bg-gray-300 text-gray-700 px-3 py-1 rounded hover:bg-gray-400 focus:outline-none focus:ring">Cancel</button>
-                    <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">Submit</button>
-                </div>
-            </form>
-        </div>
-    `;
-
+            <div class="bg-white rounded-lg shadow-md p-6 w-96">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Register</h2>
+                <p id="first-registration-message" class="text-gray-800 text-sm mb-4 hidden">
+                  You're registering for the first time, please let us know a little more about yourself
+                </p>
+                <form id="registration-form" class="space-y-4">
+                    <fieldset>
+                        <div>
+                            <label for="email" class="block text-gray-700">Email</label>
+                            <input type="email" id="email" name="email" class="border border-gray-300 rounded px-3 py-2 w-full" required>
+                        </div>
+                    </fieldset>
+                    <p id="error-message" class="text-red-500 text-sm hidden"></p>
+                    <div class="flex justify-end gap-2">
+                        <button type="button" onclick="closeModal()" class="bg-gray-300 text-gray-700 px-3 py-1 rounded hover:bg-gray-400 focus:outline-none focus:ring">Cancel</button>
+                        <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">Submit</button>
+                    </div>
+                </form>
+            </div>
+            `;
+            // add the modal in DOM
             document.body.appendChild(modal);
-
-            const form = document.getElementById("registration-form");
-            const errorMessage = document.getElementById("error-message");
-
-            form.addEventListener("submit", async (e) => {
-                e.preventDefault();
-
-                // Gather form data
-                const firstName = form.firstName.value.trim();
-                const lastName = form.lastName.value.trim();
-                const email = form.email.value.trim();
-                const confirmEmail = form.confirmEmail.value.trim();
-
-                // Validate inputs
-                if (!firstName || !lastName || !email || !confirmEmail) {
-                    errorMessage.textContent = "Please fill in all fields.";
-                    errorMessage.classList.remove("hidden");
-                    return;
-                }
-
-                if (email !== confirmEmail) {
-                    errorMessage.textContent = "Emails do not match.";
-                    errorMessage.classList.remove("hidden");
-                    return;
-                }
-
-                errorMessage.classList.add("hidden");
-
-                // Send HTTP POST request
-                try {
-                    const response = await fetch("/registerBooker", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({firstName, lastName, email}),
-                    });
-
-                    if (response.ok) {
-                        closeModal();
-                        // Show success message
-                        const successMessage = document.getElementById("success-message");
-                        successMessage.classList.remove("hidden");
-                        // Disable register button
-                        const registerButton = document.getElementById("register-button");
-                        registerButton.disabled = true;
-                        registerButton.classList.add("opacity-50", "cursor-not-allowed");
-                    } else {
-                        const errorData = await response.json();
-                        errorMessage.textContent = errorData.message || "Registration failed.";
-                        errorMessage.classList.remove("hidden");
-                    }
-                } catch (error) {
-                    console.error("Error during registration:", error);
-                    errorMessage.textContent = "An error occurred. Please try again.";
-                    errorMessage.classList.remove("hidden");
-                }
-            });
+            const form = modal.querySelector("#registration-form");
+            form.addEventListener("submit", onRegistrationFormSubmit);
         }
 
         function closeModal() {
@@ -200,10 +138,133 @@
                 modal.remove();
             }
         }
+
+        function displayFullRegistrationForm(form, email) {
+            const fieldSet = form.querySelector("fieldset");
+            fieldSet.innerHTML = `
+            <div>
+                <label for="first-name" class="block text-gray-700">First Name</label>
+                <input type="text" id="first-name" name="firstName" class="border border-gray-300 rounded px-3 py-2 w-full" required>
+            </div>
+            <div>
+                <label for="last-name" class="block text-gray-700">Last Name</label>
+                <input type="text" id="last-name" name="lastName" class="border border-gray-300 rounded px-3 py-2 w-full" required>
+            </div>
+            <div>
+                <label for="email" class="block text-gray-700">Email</label>
+                <input type="email" id="email" name="email" class="border border-gray-300 rounded px-3 py-2 w-full" required>
+            </div>
+            <div>
+                <label for="confirm-email" class="block text-gray-700">Confirm Email</label>
+                <input type="email" id="confirm-email" name="confirmEmail" class="border border-gray-300 rounded px-3 py-2 w-full" required>
+            </div>
+            `;
+            form.email.value = email;
+            form.parentElement.querySelector("#first-registration-message").classList.remove("hidden");
+        }
+
+        async function onRegistrationFormSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const errorMessage = form.querySelector("#error-message");
+            errorMessage.classList.add("hidden");
+            const isFullRegistration = form.querySelector("#confirm-email") !== null;
+            if (isFullRegistration) {
+                await registerNewBooker(form, errorMessage);
+            } else {
+                await checkReturningBooker(form, errorMessage);
+            }
+        }
+
+        async function checkReturningBooker(form, errorMessage) {
+            const email = form.email.value.trim();
+            if (!email) {
+                errorMessage.textContent = "Please provide an email address.";
+                errorMessage.classList.remove("hidden");
+                return;
+            }
+            try {
+                const response = await fetch("/check-returning-booker", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ email }),
+                });
+                switch (response.status) {
+                    case 204:
+                        onRegistrationCompleted("returning");
+                        break;
+                    case 404:
+                        displayFullRegistrationForm(form, email);
+                        break;
+                    default:
+                        console.error("unexpected status code: " + response.status);
+                        errorMessage.textContent = "An error occurred. Please try again.";
+                        errorMessage.classList.remove("hidden");
+                        break;
+                }
+            } catch (error) {
+                console.error("Error during registration:", error);
+                errorMessage.textContent = "An error occurred. Please try again.";
+                errorMessage.classList.remove("hidden");
+            }
+        }
+
+        async function registerNewBooker(form, errorMessage) {
+            // Gather form data
+            const firstName = form.firstName.value.trim();
+            const lastName = form.lastName.value.trim();
+            const email = form.email.value.trim();
+            const confirmEmail = form.confirmEmail.value.trim();
+            // Validate inputs
+            if (!firstName || !lastName || !email || !confirmEmail) {
+                errorMessage.textContent = "Please fill in all fields.";
+                errorMessage.classList.remove("hidden");
+                return;
+            }
+            if (email !== confirmEmail) {
+                errorMessage.textContent = "Emails do not match.";
+                errorMessage.classList.remove("hidden");
+                return;
+            }
+            // Send HTTP POST request
+            try {
+                const response = await fetch("/register-booker", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ firstName, lastName, email }),
+                });
+                if (response.ok) {
+                    onRegistrationCompleted("registration");
+                } else {
+                    const errorData = await response.json();
+                    errorMessage.textContent = errorData.message || "Registration failed.";
+                    errorMessage.classList.remove("hidden");
+                }
+            } catch (error) {
+                console.error("Error during registration:", error);
+                errorMessage.textContent = "An error occurred. Please try again.";
+                errorMessage.classList.remove("hidden");
+            }
+        }
+
+        function onRegistrationCompleted(registrationType) {
+            closeModal();
+            @raw
+            const successMessageId = `success-${registrationType}-message`;
+            @endraw
+            // Show success message
+            const successMessage = document.getElementById(successMessageId);
+            successMessage.classList.remove("hidden");
+            // Disable register button
+            const registerButton = document.getElementById("register-button");
+            registerButton.disabled = true;
+            registerButton.classList.add("opacity-50", "cursor-not-allowed");
+        }
     </script>
-
 </div>
-
-
 </body>
 </html>
