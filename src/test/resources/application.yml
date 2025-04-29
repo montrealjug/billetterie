@@ -13,6 +13,8 @@ spring:
     hibernate:
       ddl-auto: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  main:
+    banner-mode: off
 
 # required to have the templates compiled
 gg:
@@ -28,3 +30,12 @@ app:
     reply-to:
       address: "reply-to@test.org"
       name: "ReplyTo Test"
+# quiet mode for logs during tests
+logging:
+  level:
+    root: error # just log errors for root
+    org:
+      montrealjug:
+        billetterie:
+          email:
+            EmailService: off # deactivate logs for EmailService to avoid long useless stacks
