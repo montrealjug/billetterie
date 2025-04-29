@@ -6,13 +6,15 @@ import static org.montrealjug.billetterie.ui.Utils.toIndexActivities;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.logging.Logger;
-import org.montrealjug.billetterie.email.EmailModel;
+import org.montrealjug.billetterie.email.EmailModel.Email;
 import org.montrealjug.billetterie.email.EmailService;
 import org.montrealjug.billetterie.entity.*;
 import org.montrealjug.billetterie.exception.EntityNotFoundException;
@@ -54,7 +56,30 @@ public class RegistrationController {
         this.participantRepository = participantRepository;
     }
 
-    @PostMapping("/registerBooker")
+    record BookerCheck(@NotBlank String email) {}
+
+    @PostMapping("/check-returning-booker")
+    public ResponseEntity<?> checkReturningBooker(
+            @RequestBody @Valid BookerCheck bookerCheck, HttpServletRequest request) {
+        return bookerRepository
+                .findById(bookerCheck.email().toLowerCase().trim())
+                .map(
+                        booker -> {
+                            var baseUrl = retrieveBaseUrl(request);
+                            // someone is trying to use a known but not confirmed email
+                            // send the email for confirmation again
+                            if (booker.getValidationTime() == null) {
+                                emailService.sendEmail(Email.afterRegistration(booker, baseUrl));
+                            } else {
+                                // send the email for returning Booker otherwise
+                                emailService.sendEmail(Email.returningBooker(booker, baseUrl));
+                            }
+                            return ResponseEntity.noContent().build();
+                        })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/register-booker")
     public ResponseEntity<?> registerBooker(
             @RequestBody @Valid PresentationBooker booker, HttpServletRequest request)
             throws Exception {
@@ -62,7 +87,8 @@ public class RegistrationController {
 
         // Check if email already exists in the database
         if (bookerRepository.existsById(email)) {
-            // TODO: instead of just error'ing, send an email with the link
+            // should never happen as it should be tested first via `/check-returning-booker`
+            // but let's play it safe if someone tries to call this directly without using our UI
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("{\"message\":\"Email address already registered\"}");
         }
@@ -78,10 +104,17 @@ public class RegistrationController {
         bookerRepository.save(bookerEntity);
 
         var baseUrl = retrieveBaseUrl(request);
-        emailService.sendEmail(EmailModel.Email.afterRegistration(bookerEntity, baseUrl));
+        emailService.sendEmail(Email.afterRegistration(bookerEntity, baseUrl));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(signature);
     }
+
+    record ParticipantSubmission(
+            @NotBlank String firstName,
+            @NotBlank String lastName,
+            @Min(2005) int yearOfBirth,
+            @NotNull Long activityId,
+            @NotBlank String bookerEmailSignature) {}
 
     @PostMapping("/events/{eventId}/registerParticipant")
     public ResponseEntity<?> registerParticipant(
@@ -146,21 +179,22 @@ public class RegistrationController {
     }
 
     @GetMapping("/bookings/{signature}")
-    public String verifyBooker(@PathVariable String signature, Model model) {
+    public String startBooking(@PathVariable String signature, Model model) {
         // Find booker by email signature
-        Optional<Booker> optionalBooker = bookerRepository.findByEmailSignature(signature);
+        var booker = bookerRepository.findByEmailSignature(signature).orElse(null);
 
         // Get active event
-        Optional<Event> optionalEvent = eventRepository.findByActiveIsTrue();
+        var event = eventRepository.findByActiveIsTrue().orElse(null);
 
-        if (optionalBooker.isPresent() && optionalEvent.isPresent()) {
-            // update booker validationTime
-            Booker booker = optionalBooker.get();
-            booker.setValidationTime(Instant.now());
-            bookerRepository.save(booker);
+        // we found the Booker, and there is an active Event, so Booker can register Participant(s)
+        if (booker != null && event != null) {
+            // update booker validationTime if not set yet
+            if (booker.getValidationTime() == null) {
+                booker.setValidationTime(Instant.now());
+                bookerRepository.save(booker);
+            }
 
             // Create presentation event
-            Event event = optionalEvent.get();
             PresentationEvent presentationEvent =
                     new PresentationEvent(
                             event.getId(),
@@ -207,30 +241,30 @@ public class RegistrationController {
 
             // Return booker-activities template
             return "booker-activities";
-        } else if (optionalEvent.isPresent()) {
-            // Booker not found but event exists, return index with error
-            Event event = optionalEvent.get();
-            PresentationEvent presentationEvent =
-                    new PresentationEvent(
-                            event.getId(),
-                            event.getTitle(),
-                            event.getDescription(),
-                            event.getDate(),
-                            toIndexActivities(event.getActivities()),
-                            event.isActive(),
-                            event.getImagePath());
-
-            model.addAttribute("event", presentationEvent);
-            model.addAttribute("error", "The booker could not be retrieved from the DB");
-
-            return "index";
         } else {
-            // No active event, return index
+            // or the Booker is missing, or there is no active Event, so we go to `index`
+            if (event != null) {
+                // add the Event for index, if any
+                PresentationEvent presentationEvent =
+                        new PresentationEvent(
+                                event.getId(),
+                                event.getTitle(),
+                                event.getDescription(),
+                                event.getDate(),
+                                toIndexActivities(event.getActivities()),
+                                event.isActive(),
+                                event.getImagePath());
+                model.addAttribute("event", presentationEvent);
+            }
+            if (booker == null) {
+                // set the error msg if no Booker found
+                model.addAttribute("error", "The booker could not be retrieved from the DB");
+            }
             return "index";
         }
     }
 
-    String retrieveBaseUrl(HttpServletRequest request) {
+    static String retrieveBaseUrl(HttpServletRequest request) {
         String requestURL = request.getRequestURL().toString();
         String requestURI = request.getRequestURI();
 
@@ -238,16 +272,9 @@ public class RegistrationController {
                 + request.getContextPath();
     }
 
-    boolean isSameParticipant(Participant p, @Valid ParticipantSubmission participantSub) {
+    static boolean isSameParticipant(Participant p, ParticipantSubmission participantSub) {
         return p.getLastName().equalsIgnoreCase(participantSub.lastName())
                 && p.getFirstName().equalsIgnoreCase(participantSub.firstName())
                 && p.getYearOfBirth() == participantSub.yearOfBirth();
     }
 }
-
-record ParticipantSubmission(
-        String firstName,
-        String lastName,
-        int yearOfBirth,
-        Long activityId,
-        String bookerEmailSignature) {}

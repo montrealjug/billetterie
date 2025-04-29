@@ -35,7 +35,8 @@ public class EmailModel {
 
     public enum EmailType {
         AFTER_BOOKING,
-        AFTER_REGISTRATION;
+        AFTER_REGISTRATION,
+        RETURNING_BOOKER;
 
         public String subjectKey() {
             return this.name().toLowerCase();
@@ -88,6 +89,10 @@ public class EmailModel {
             return new AfterRegistrationEmail(booker, baseUrl);
         }
 
+        static Email returningBooker(Booker booker, String baseUrl) {
+            return new ReturningBookingEmail(booker, baseUrl);
+        }
+
         private static InternetAddress fromBooker(Booker booker) {
             try {
                 return new InternetAddress(
@@ -131,6 +136,22 @@ public class EmailModel {
         @Override
         public EmailType type() {
             return EmailType.AFTER_REGISTRATION;
+        }
+
+        @Override
+        public InternetAddress to() {
+            return Email.fromBooker(booker);
+        }
+
+        public String registrationLink() {
+            return baseUrl + "/bookings/" + booker.getEmailSignature();
+        }
+    }
+
+    public record ReturningBookingEmail(Booker booker, String baseUrl) implements Email {
+        @Override
+        public EmailType type() {
+            return EmailType.RETURNING_BOOKER;
         }
 
         @Override
