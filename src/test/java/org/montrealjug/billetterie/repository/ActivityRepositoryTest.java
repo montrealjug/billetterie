@@ -12,9 +12,11 @@ import org.montrealjug.billetterie.entity.Booker;
 import org.montrealjug.billetterie.entity.Event;
 import org.montrealjug.billetterie.entity.Participant;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-@DataJpaTest
+@DataJpaTest(showSql = false)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class ActivityRepositoryTest {
 
     @Autowired EventRepository eventRepository;
