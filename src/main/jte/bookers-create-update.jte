@@ -1,16 +1,12 @@
 @param org.montrealjug.billetterie.ui.PresentationBooker booker = null
 @param String errorMessage = null
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Bookers</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
-<div class="min-h-screen flex items-center justify-center">
+@template.layouts.admin_layout(
+title = "${booker != null ? \"Add\" : \"Modify\"} Booker",
+content = @`
+
+<div class="min-h-screen flex flex-col items-center justify-center">
+    <a href="/admin/bookers" class="text-blue text-gray w-full max-w-md">&lt;&lt;&lt; Back</a>
     <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
         @if(errorMessage != null)
             <h2 class="text-red-500">${errorMessage}</h2>
@@ -62,6 +58,5 @@
     </div>
 
 </div>
-</body>
-</html>
+`)
 
