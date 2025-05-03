@@ -72,10 +72,15 @@ content = @`
 
                     </div>
                 </div>
-                <button id="register-button" onclick="displayRegistrationModal()"
-                        class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
-                    Register
-                </button>
+
+                <br>
+                <div class="flex justify-end">
+                    <button id="register-button" onclick="displayRegistrationModal()"
+                            class="bg-[#ee7c2a] text-white px-3 py-2 rounded border hover:opacity-80 focus:outline-none focus:ring focus:ring-orange-300">
+                        Register
+                    </button>
+                </div>
+
                 <div id="success-registration-message" class="mt-4 p-4 bg-green-100 text-green-700 rounded-md hidden">
                     You have successfully registered your email address, please check your inbox and click on the verification link to register your kids to the activities
                 </div>
@@ -117,7 +122,7 @@ content = @`
                     <p id="error-message" class="text-red-500 text-sm hidden"></p>
                     <div class="flex justify-end gap-2">
                         <button type="button" onclick="closeModal()" class="bg-gray-300 text-gray-700 px-3 py-1 rounded hover:bg-gray-400 focus:outline-none focus:ring">Cancel</button>
-                        <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">Submit</button>
+                        <button type="submit" class="bg-[#ee7c2a] text-white px-3 py-1 rounded hover:opacity-80 focus:outline-none focus:ring focus:ring-orange-300">Submit</button>
                     </div>
                 </form>
             </div>
