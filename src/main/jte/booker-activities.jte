@@ -56,7 +56,7 @@ content = @`
                                     <td class="border border-gray-300 px-4 py-2">${activity.time().format(DateTimeFormatter.ofPattern("H:mm a"))}</td>
                                     <td class="border border-gray-300 px-4 py-2">
                                         <button onclick="displayParticipantModal(${activity.id()})" 
-                                                class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
+                                                class="bg-[#e16309] text-white px-3 py-1 rounded hover:opacity-80 focus:outline-none focus:ring focus:ring-orange-300">
                                             Add participant
                                         </button>
                                     </td>
@@ -123,7 +123,7 @@ content = @`
                 <div id="error-message" class="text-red-500 text-sm hidden"></div>
                 <div class="flex justify-end gap-2">
                     <button type="button" onclick="closeModal()" class="bg-gray-300 text-gray-700 px-3 py-1 rounded hover:bg-gray-400 focus:outline-none focus:ring">Cancel</button>
-                    <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">Submit</button>
+                    <button type="submit" class="bg-[#ee7c2a] text-white px-3 py-1 rounded hover:opacity-80 focus:outline-none focus:ring focus:ring-blue-300">Submit</button>
                 </div>
             </form>
         </div>
