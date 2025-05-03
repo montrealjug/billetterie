@@ -4,9 +4,9 @@ package org.montrealjug.billetterie.ui;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 import org.montrealjug.billetterie.entity.Booker;
 import org.montrealjug.billetterie.exception.EntityNotFoundException;
 import org.montrealjug.billetterie.exception.RedirectableNotFoundException;
@@ -35,18 +35,17 @@ public class BookersController {
 
     @GetMapping("")
     public String bookers(Model model) {
-        List<PresentationBooker> presentationBookers = new ArrayList<>();
-        System.out.println("REREREERE");
         Iterable<Booker> bookers = bookerRepository.findAll();
 
-        bookers.forEach(
-                (booker -> {
-                    presentationBookers.add(
-                            new PresentationBooker(
-                                    booker.getFirstName(),
-                                    booker.getLastName(),
-                                    booker.getEmail()));
-                }));
+        List<PresentationBooker> presentationBookers =
+                StreamSupport.stream(bookers.spliterator(), false)
+                        .map(
+                                booker ->
+                                        new PresentationBooker(
+                                                booker.getFirstName(),
+                                                booker.getLastName(),
+                                                booker.getEmail()))
+                        .toList();
 
         model.addAttribute("bookerList", presentationBookers);
 
