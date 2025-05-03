@@ -13,12 +13,17 @@
 </head>
 <body class="bg-gray-100">
 
-<nav class="shadow-md p-4 bg-[#f78c40] w-full absolute">
+<nav class="shadow-md p-4 bg-[#f78c40] w-full absolute flex justify-between">
+    <div>
+        DEVOXX4KIDS Admin
+    </div>
     <ul class="flex justify-center space-x-10">
-        <li><a href="/" class="hover:text-gray-700">Go to website</a></li>
         <li><a href="/admin/events" class="hover:text-gray-700">Manage Event</a></li>
         <li><a href="/admin/bookers" class="hover:text-gray-700">Manage Booker</a></li>
     </ul>
+    <div>
+        <a href="/" class="hover:text-gray-700">Go to main website</a>
+    </div>
 </nav>
 
 <div>

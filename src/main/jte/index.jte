@@ -5,16 +5,9 @@
 @param PresentationEvent event = null
 @param String error = null
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event List</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
-<a href="/admin/events">Go to the events admin page</a>
+@template.layouts.guest_layout(
+title = "Welcome",
+content = @`
 
 <div class="min-h-screen flex flex-col items-center justify-center">
     @if(error != null)
@@ -93,19 +86,22 @@
 
         @else
             <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
-                There is no event planned currrently
+                There is no event planned currently
             </div>
         @endif
 
     </div>
 
-    <script>
-        function displayRegistrationModal() {
-            // Create the modal elements
-            const modal = document.createElement("div");
-            modal.id = "registration-modal";
-            modal.className = "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50";
-            modal.innerHTML = `
+</div>
+`)
+
+<script>
+    function displayRegistrationModal() {
+        // Create the modal elements
+        const modal = document.createElement("div");
+        modal.id = "registration-modal";
+        modal.className = "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50";
+        modal.innerHTML = `
             <div class="bg-white rounded-lg shadow-md p-6 w-96">
                 <h2 class="text-lg font-semibold text-gray-800 mb-4">Register</h2>
                 <p id="first-registration-message" class="text-gray-800 text-sm mb-4 hidden">
@@ -126,22 +122,22 @@
                 </form>
             </div>
             `;
-            // add the modal in DOM
-            document.body.appendChild(modal);
-            const form = modal.querySelector("#registration-form");
-            form.addEventListener("submit", onRegistrationFormSubmit);
-        }
+        // add the modal in DOM
+        document.body.appendChild(modal);
+        const form = modal.querySelector("#registration-form");
+        form.addEventListener("submit", onRegistrationFormSubmit);
+    }
 
-        function closeModal() {
-            const modal = document.getElementById("registration-modal");
-            if (modal) {
-                modal.remove();
-            }
+    function closeModal() {
+        const modal = document.getElementById("registration-modal");
+        if (modal) {
+            modal.remove();
         }
+    }
 
-        function displayFullRegistrationForm(form, email) {
-            const fieldSet = form.querySelector("fieldset");
-            fieldSet.innerHTML = `
+    function displayFullRegistrationForm(form, email) {
+        const fieldSet = form.querySelector("fieldset");
+        fieldSet.innerHTML = `
             <div>
                 <label for="first-name" class="block text-gray-700">First Name</label>
                 <input type="text" id="first-name" name="firstName" class="border border-gray-300 rounded px-3 py-2 w-full" required>
@@ -159,112 +155,109 @@
                 <input type="email" id="confirm-email" name="confirmEmail" class="border border-gray-300 rounded px-3 py-2 w-full" required>
             </div>
             `;
-            form.email.value = email;
-            form.parentElement.querySelector("#first-registration-message").classList.remove("hidden");
-        }
+        form.email.value = email;
+        form.parentElement.querySelector("#first-registration-message").classList.remove("hidden");
+    }
 
-        async function onRegistrationFormSubmit(event) {
-            event.preventDefault();
-            const form = event.target;
-            const errorMessage = form.querySelector("#error-message");
-            errorMessage.classList.add("hidden");
-            const isFullRegistration = form.querySelector("#confirm-email") !== null;
-            if (isFullRegistration) {
-                await registerNewBooker(form, errorMessage);
-            } else {
-                await checkReturningBooker(form, errorMessage);
-            }
+    async function onRegistrationFormSubmit(event) {
+        event.preventDefault();
+        const form = event.target;
+        const errorMessage = form.querySelector("#error-message");
+        errorMessage.classList.add("hidden");
+        const isFullRegistration = form.querySelector("#confirm-email") !== null;
+        if (isFullRegistration) {
+            await registerNewBooker(form, errorMessage);
+        } else {
+            await checkReturningBooker(form, errorMessage);
         }
+    }
 
-        async function checkReturningBooker(form, errorMessage) {
-            const email = form.email.value.trim();
-            if (!email) {
-                errorMessage.textContent = "Please provide an email address.";
-                errorMessage.classList.remove("hidden");
-                return;
-            }
-            try {
-                const response = await fetch("/check-returning-booker", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ email }),
-                });
-                switch (response.status) {
-                    case 204:
-                        onRegistrationCompleted("returning");
-                        break;
-                    case 404:
-                        displayFullRegistrationForm(form, email);
-                        break;
-                    default:
-                        console.error("unexpected status code: " + response.status);
-                        errorMessage.textContent = "An error occurred. Please try again.";
-                        errorMessage.classList.remove("hidden");
-                        break;
-                }
-            } catch (error) {
-                console.error("Error during registration:", error);
-                errorMessage.textContent = "An error occurred. Please try again.";
-                errorMessage.classList.remove("hidden");
-            }
+    async function checkReturningBooker(form, errorMessage) {
+        const email = form.email.value.trim();
+        if (!email) {
+            errorMessage.textContent = "Please provide an email address.";
+            errorMessage.classList.remove("hidden");
+            return;
         }
-
-        async function registerNewBooker(form, errorMessage) {
-            // Gather form data
-            const firstName = form.firstName.value.trim();
-            const lastName = form.lastName.value.trim();
-            const email = form.email.value.trim();
-            const confirmEmail = form.confirmEmail.value.trim();
-            // Validate inputs
-            if (!firstName || !lastName || !email || !confirmEmail) {
-                errorMessage.textContent = "Please fill in all fields.";
-                errorMessage.classList.remove("hidden");
-                return;
-            }
-            if (email !== confirmEmail) {
-                errorMessage.textContent = "Emails do not match.";
-                errorMessage.classList.remove("hidden");
-                return;
-            }
-            // Send HTTP POST request
-            try {
-                const response = await fetch("/register-booker", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ firstName, lastName, email }),
-                });
-                if (response.ok) {
-                    onRegistrationCompleted("registration");
-                } else {
-                    const errorData = await response.json();
-                    errorMessage.textContent = errorData.message || "Registration failed.";
+        try {
+            const response = await fetch("/check-returning-booker", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email }),
+            });
+            switch (response.status) {
+                case 204:
+                    onRegistrationCompleted("returning");
+                    break;
+                case 404:
+                    displayFullRegistrationForm(form, email);
+                    break;
+                default:
+                    console.error("unexpected status code: " + response.status);
+                    errorMessage.textContent = "An error occurred. Please try again.";
                     errorMessage.classList.remove("hidden");
-                }
-            } catch (error) {
-                console.error("Error during registration:", error);
-                errorMessage.textContent = "An error occurred. Please try again.";
+                    break;
+            }
+        } catch (error) {
+            console.error("Error during registration:", error);
+            errorMessage.textContent = "An error occurred. Please try again.";
+            errorMessage.classList.remove("hidden");
+        }
+    }
+
+    async function registerNewBooker(form, errorMessage) {
+        // Gather form data
+        const firstName = form.firstName.value.trim();
+        const lastName = form.lastName.value.trim();
+        const email = form.email.value.trim();
+        const confirmEmail = form.confirmEmail.value.trim();
+        // Validate inputs
+        if (!firstName || !lastName || !email || !confirmEmail) {
+            errorMessage.textContent = "Please fill in all fields.";
+            errorMessage.classList.remove("hidden");
+            return;
+        }
+        if (email !== confirmEmail) {
+            errorMessage.textContent = "Emails do not match.";
+            errorMessage.classList.remove("hidden");
+            return;
+        }
+        // Send HTTP POST request
+        try {
+            const response = await fetch("/register-booker", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ firstName, lastName, email }),
+            });
+            if (response.ok) {
+                onRegistrationCompleted("registration");
+            } else {
+                const errorData = await response.json();
+                errorMessage.textContent = errorData.message || "Registration failed.";
                 errorMessage.classList.remove("hidden");
             }
+        } catch (error) {
+            console.error("Error during registration:", error);
+            errorMessage.textContent = "An error occurred. Please try again.";
+            errorMessage.classList.remove("hidden");
         }
+    }
 
-        function onRegistrationCompleted(registrationType) {
-            closeModal();
-            @raw
-            const successMessageId = `success-${registrationType}-message`;
-            @endraw
-            // Show success message
-            const successMessage = document.getElementById(successMessageId);
-            successMessage.classList.remove("hidden");
-            // Disable register button
-            const registerButton = document.getElementById("register-button");
-            registerButton.disabled = true;
-            registerButton.classList.add("opacity-50", "cursor-not-allowed");
-        }
-    </script>
-</div>
-</body>
-</html>
+    function onRegistrationCompleted(registrationType) {
+        closeModal();
+        @raw
+        const successMessageId = `success-${registrationType}-message`;
+        @endraw
+        // Show success message
+        const successMessage = document.getElementById(successMessageId);
+        successMessage.classList.remove("hidden");
+        // Disable register button
+        const registerButton = document.getElementById("register-button");
+        registerButton.disabled = true;
+        registerButton.classList.add("opacity-50", "cursor-not-allowed");
+    }
+</script>

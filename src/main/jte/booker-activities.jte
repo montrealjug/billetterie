@@ -12,17 +12,9 @@
 @param Map<Long, List<Participant>> activityParticipants = null
 @param Map<Long, Integer> activityTotalParticipants = null
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Activities</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
-<a href="/admin/events">Go to the admin page</a>
-
+@template.layouts.guest_layout(
+title = "Event Activities",
+content = @`
 <div class="min-h-screen flex flex-col items-center justify-center">
     @if(error != null)
         <div class="bg-red-500 text-white p-4 mb-4 rounded-md w-full max-w-4xl">
@@ -95,6 +87,9 @@
             </div>
         @endif
     </div>
+
+</div>
+`)
 
     <script>
         // Store booker email signature in a JavaScript variable
@@ -218,6 +213,4 @@
             }
         }
     </script>
-</div>
-</body>
-</html>
+
