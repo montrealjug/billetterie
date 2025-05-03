@@ -6,7 +6,7 @@
 @param String error = null
 
 @template.layouts.guest_layout(
-title = "Welcome",
+title = "Event List",
 content = @`
 
 <div class="min-h-screen flex flex-col items-center justify-center">
