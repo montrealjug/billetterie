@@ -328,7 +328,7 @@ class RegistrationControllerTest {
         assertThat((String) htmlPath.get("html.head.title")).isEqualTo("Event List");
         // check that the error msg is present
         // not ideal because coupled to the `html` structure but will do the job for now
-        var errorMsgNode = ((NodeChildren) htmlPath.get("html.body.div.div")).get(0);
+        var errorMsgNode = ((NodeChildren) htmlPath.get("html.body.div.div.div")).get(0);
         assertThat(errorMsgNode.getAttribute("id")).isEqualTo("main-error-message");
     }
 
