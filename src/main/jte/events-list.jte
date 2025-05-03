@@ -4,22 +4,10 @@
 @import java.util.List
 
 @param List<PresentationEvent> events
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event List</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
-<a href="/">Go to the main page</a>
-<a href="/admin/bookers">Go to the bookers admin page</a>
 
-<div class="min-h-screen flex flex-col items-center justify-center">
+@template.layouts.admin_layout(title = "Event List", content = @`
 
-
-    <div class="min-h-screen flex flex-col items-center justify-center">
+    <div class="min-h-screen flex flex-col items-center justify-center my-100">
         <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
             <!-- Create Event Button -->
             <div class="flex justify-between items-center mb-6">
@@ -94,7 +82,7 @@
                     </table>
                     <!-- Create Activity Button -->
                     <div class="text-right mt-2">
-                        <button onclick="window.location.href = `/admin/events/${event.id()}/createActivity`"
+                        <button onclick="window.location.href = '/admin/events/${event.id()}/createActivity'"
                                 class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
                             Add Activity
                         </button>
@@ -104,7 +92,7 @@
             @endfor
         </div>
     </div>
-
+`)
     <script>
 @raw
     async function deleteEvent(eventId) {
@@ -196,8 +184,3 @@
         <%--    // Redirect to a form or handle activity creation logic--%>
         <%--}--%>
     </script>
-
-
-</div>
-</body>
-</html>

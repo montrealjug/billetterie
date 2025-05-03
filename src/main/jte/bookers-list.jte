@@ -3,20 +3,11 @@
 
 @param List<PresentationBooker> bookerList
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booker List</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
-<a href="/admin/events">Go to the events admin page</a>
+@template.layouts.admin_layout(title = "Booker List",content = @`
+
 <div class="min-h-screen flex flex-col items-center justify-center">
 
-
-    <div>
+    <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
         <div class="flex flex-col items-center mb-6">
             <h1 class="text-2xl font-bold">Booker List</h1>
             <p>Total number of bookers: ${bookerList.size()}</p>
@@ -37,5 +28,4 @@
         @endfor
     </div>
 </div>
-</body>
-</html>
+`)
