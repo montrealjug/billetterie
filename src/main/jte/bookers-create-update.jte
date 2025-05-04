@@ -5,7 +5,7 @@
 title = "${booker != null ? \"Add\" : \"Modify\"} Booker",
 content = @`
 
-<div class="min-h-screen flex flex-col items-center justify-center">
+<div class="flex flex-col items-center justify-center">
     <a href="/admin/bookers" class="text-blue text-gray w-full max-w-md">&lt;&lt;&lt; Back</a>
     <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
         @if(errorMessage != null)
