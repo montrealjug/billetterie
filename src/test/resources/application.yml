@@ -23,6 +23,11 @@ gg:
 
 # required for email configuration
 app:
+  admin:
+    actuator-password: actuator
+    admin-username: admin
+    admin-password: password
+    session-cookie-name: BILLETTERIE_SESSION
   mail:
     from:
       address: "from@test.org"

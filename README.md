@@ -97,3 +97,13 @@ openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:204
 ```
 
 then set the env. variable / secret `APP_RSA_KEY`
+
+### Configure security
+
+Set at least those environment variables:
+* `ACTUATOR_PASSWORD`, defaults to `actuator` 😱😉
+* `ADMIN_PASSWORD`, defaults to `password` 😱😉
+
+You can also set:
+* `ADMIN_USER`, defaults to `admin` to... set the `admin` username
+* `ADMIN_SESSION_COOKIE_NAME`, defaults to `BILLETTERIE_SESSION` to ... set the `admin` session cookie name
