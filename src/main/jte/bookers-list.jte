@@ -5,7 +5,7 @@
 
 @template.layouts.admin_layout(title = "Booker List",content = @`
 
-<div class="min-h-screen flex flex-col items-center justify-center">
+<div class="flex flex-col items-center justify-center">
 
     <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
         <div class="flex flex-col items-center mb-6">

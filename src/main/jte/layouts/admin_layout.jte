@@ -11,9 +11,9 @@
     <title>${title}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100">
-
-<nav class="shadow-md p-4 bg-[#f78c40] w-full absolute flex justify-between">
+<body class="bg-gray-100 flex flex-col min-h-screen justify-between">
+<header>
+<nav class="shadow-md p-4 bg-[#f78c40] w-full flex justify-between">
     <div>
         DEVOXX4KIDS Admin
     </div>
@@ -25,10 +25,10 @@
         <a href="/" class="hover:text-gray-700">Go to main website</a>
     </div>
 </nav>
-
-<div>
+</header>
+<main class="grow-1">
     ${content}
-</div>
-
+</main>
+<footer></footer>
 </body>
 </html>

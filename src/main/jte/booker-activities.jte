@@ -15,14 +15,14 @@
 @template.layouts.guest_layout(
 title = "Event Activities",
 content = @`
-<div class="min-h-screen flex flex-col items-center justify-center">
+<div class="flex flex-col items-center justify-center">
     @if(error != null)
         <div class="bg-red-500 text-white p-4 mb-4 rounded-md w-full max-w-4xl">
             ${error}
         </div>
     @endif
 
-    <div class="min-h-screen flex flex-col items-center justify-center">
+    <div class="flex flex-col items-center justify-center">
         @if(event != null)
             <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
                 <div class="bg-gray-100 p-4 rounded-md shadow">
@@ -89,8 +89,6 @@ content = @`
     </div>
 
 </div>
-`)
-
     <script>
         // Store booker email signature in a JavaScript variable
         const bookerEmailSignature = "${booker.getEmailSignature()}";
@@ -102,7 +100,7 @@ content = @`
             const modal = document.createElement("div");
             modal.id = "participant-modal";
             modal.className = "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50";
-
+    @raw
             modal.innerHTML = `
         <div class="bg-white rounded-lg shadow-md p-6 w-96">
             <h2 class="text-lg font-semibold text-gray-800 mb-4">Add Participant</h2>
@@ -128,6 +126,7 @@ content = @`
             </form>
         </div>
     `;
+    @endraw
 
             document.body.appendChild(modal);
 
@@ -213,4 +212,5 @@ content = @`
             }
         }
     </script>
+`)
 

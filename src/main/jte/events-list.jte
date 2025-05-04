@@ -7,7 +7,7 @@
 
 @template.layouts.admin_layout(title = "Event List", content = @`
 
-    <div class="min-h-screen flex flex-col items-center justify-center my-100">
+    <div class="flex flex-col items-center justify-center my-100">
         <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
             <!-- Create Event Button -->
             <div class="flex justify-between items-center mb-6">
@@ -92,95 +92,76 @@
             @endfor
         </div>
     </div>
-`)
     <script>
-@raw
-    async function deleteEvent(eventId) {
-        // Confirm the action with the user
-        if (confirm("Are you sure you want to delete this event?")) {
-            try {
-                // Send DELETE request to the server
-                const response = await fetch(`/admin/events/${eventId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                // Check if the deletion was successful
-                if (response.ok) {
-                    alert("Event deleted successfully!");
-                    // Optionally, remove the event from the DOM
-                    document.querySelector(`button[onclick="deleteEvent(${eventId})"]`).closest("div").parentElement.parentElement.remove();
-                } else {
-                    // Handle server error
-                    const errorData = await response.json();
-                    alert(`Failed to delete event: ${errorData.message || response.statusText}`);
+        async function deleteEvent(eventId) {
+            // Confirm the action with the user
+            if (confirm("Are you sure you want to delete this event?")) {
+                try {
+                    // Send DELETE request to the server
+                    @raw
+                    const response = await fetch(`/admin/events/${eventId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    @endraw
+                    // Check if the deletion was successful
+                    if (response.ok) {
+                        alert("Event deleted successfully!");
+                        // Optionally, remove the event from the DOM
+                        @raw
+                        document.querySelector(`button[onclick="deleteEvent(${eventId})"]`).closest("div").parentElement.parentElement.remove();
+                        @endraw
+                    } else {
+                        // Handle server error
+                        const errorData = await response.json();
+                        @raw
+                        alert(`Failed to delete event: ${errorData.message || response.statusText}`);
+                        @endraw
+                    }
+                } catch (error) {
+                    // Handle network errors
+                    console.error("Error deleting event:", error);
+                    alert("An error occurred while deleting the event. Please try again.");
                 }
-            } catch (error) {
-                // Handle network errors
-                console.error("Error deleting event:", error);
-                alert("An error occurred while deleting the event. Please try again.");
             }
         }
-    }
 
-    async function deleteActivity(eventId, activityId) {
-        // Confirm the action with the user
-        if (confirm("Are you sure you want to delete this activity?")) {
-            try {
-                // Send DELETE request to the server
-                const response = await fetch(`/admin/events/${eventId}/activities/${activityId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
+        async function deleteActivity(eventId, activityId) {
+            // Confirm the action with the user
+            if (confirm("Are you sure you want to delete this activity?")) {
+                try {
+                    // Send DELETE request to the server
+                    @raw
+                    const response = await fetch(`/admin/events/${eventId}/activities/${activityId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    @endraw
 
-                // Check if the deletion was successful
-                if (response.ok) {
-                    alert("Activity deleted successfully!");
-                    // Optionally, remove the activity from the DOM
-                    document.querySelector(`button[onclick="deleteActivity(${eventId}, ${activityId})"]`).closest("tr").remove();
-                } else {
-                    // Handle server error
-                    const errorData = await response.json();
-                    alert(`Failed to delete activity: ${errorData.message || response.statusText}`);
+                    // Check if the deletion was successful
+                    if (response.ok) {
+                        alert("Activity deleted successfully!");
+                        // Optionally, remove the activity from the DOM
+                        @raw
+                        document.querySelector(`button[onclick="deleteActivity(${eventId}, ${activityId})"]`).closest("tr").remove();
+                        @endraw
+                    } else {
+                        // Handle server error
+                        const errorData = await response.json();
+                        @raw
+                        alert(`Failed to delete activity: ${errorData.message || response.statusText}`);
+                        @endraw
+                    }
+                } catch (error) {
+                    // Handle network errors
+                    console.error("Error deleting activity:", error);
+                    alert("An error occurred while deleting the activity. Please try again.");
                 }
-            } catch (error) {
-                // Handle network errors
-                console.error("Error deleting activity:", error);
-                alert("An error occurred while deleting the activity. Please try again.");
             }
         }
-    }
-
-@endraw
-
-
-        <%--// Delete activity handler--%>
-        <%--function deleteActivity(eventId, activityId) {--%>
-        <%--    if (confirm("Are you sure you want to delete this activity?")) {--%>
-        <%--        console.log(`Activity with ID ${activityId} deleted in Event ID ${eventId}`);--%>
-        <%--        const activityRow = document.querySelector(--%>
-        <%--            `#activity-list-${eventId} button[onclick="deleteActivity(${eventId}, ${activityId})"]`--%>
-        <%--        ).closest("tr");--%>
-        <%--        activityRow.remove();--%>
-        <%--    }--%>
-        <%--}--%>
-
-        <%--// Delete event handler--%>
-        <%--function deleteEvent(eventId) {--%>
-        <%--    if (confirm("Are you sure you want to delete this event?")) {--%>
-        <%--        console.log(`Event with ID ${eventId} deleted`);--%>
-        <%--        const eventCard = document.querySelector(`button[onclick="deleteEvent(${eventId})"]`).closest("div");--%>
-        <%--        eventCard.remove();--%>
-        <%--    }--%>
-        <%--}--%>
-
-        // Create activity handler
-        <%--function createActivity(eventId) {--%>
-        <%--    console.log(`Create activity for Event ID ${eventId}`);--%>
-        <%--    // Redirect to a form or handle activity creation logic--%>
-        <%--}--%>
     </script>
+`)
