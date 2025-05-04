@@ -24,6 +24,9 @@
     <div>
         <a href="/" class="hover:text-gray-700">Go to main website</a>
     </div>
+    <div>
+        <a href="/admin/logout" class="hover:text-gray-700">Logout</a>
+    </div>
 </nav>
 </header>
 <main class="grow-1">

@@ -14,6 +14,15 @@ primary_region = 'yul'
   min_machines_running = 1
   max_machines_running = 1
   processes = ['app']
+  [[http_service.checks]]
+    grace_period = "40s"
+    interval = "1m0s"
+    method = "GET"
+    path = "/readyz"
+    timeout = "5s"
+    protocol = "http"
+    [http_service.checks.headers]
+      X-Forwarded-Proto = "https"
 
 [[vm]]
   memory = '1gb'

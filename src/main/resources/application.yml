@@ -43,8 +43,16 @@ management:
   endpoint:
     health:
       show-details: always
+      probes:
+        add-additional-paths: on
+        enabled: on
 
 app:
+  admin:
+    actuator-password: ${ACTUATOR_PASSWORD:actuator} # the user is hardcoded as `actuator`
+    admin-username: ${ADMIN_USER:admin}
+    admin-password: ${ADMIN_PASSWORD:password}
+    session-cookie-name: ${ADMIN_SESSION_COOKIE_NAME:BILLETTERIE_SESSION} # we name the cookie, for fun and to clean it
   mail:
     from:
       address: devoxx4kidsqc@montreal-jug.org
