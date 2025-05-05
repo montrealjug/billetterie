@@ -1,9 +1,13 @@
 @import org.montrealjug.billetterie.ui.PresentationEvent
 @import org.montrealjug.billetterie.ui.PresentationActivity
+@import org.montrealjug.billetterie.entity.Participant
 @import java.time.format.DateTimeFormatter
 @import java.util.List
+@import java.util.Map
 
 @param List<PresentationEvent> events
+@param Map<Long, List<Participant>> activityParticipants = null
+@param Map<Long, List<Participant>> activityWaitingParticipants = null
 
 @template.layouts.admin_layout(title = "Event List", content = @`
 
@@ -46,8 +50,8 @@
                         <tr class="bg-gray-200">
                             <th class="border border-gray-300 px-4 py-2 text-left">Title</th>
                             <th class="border border-gray-300 px-4 py-2 text-left">Description</th>
-                            <th class="border border-gray-300 px-4 py-2 text-left">Max Seats</th>
-                            <th class="border border-gray-300 px-4 py-2 text-left">Max Waiting</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Attendance</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Waiting line</th>
                             <th class="border border-gray-300 px-4 py-2 text-left">Start Time</th>
                             <th class="border border-gray-300 px-4 py-2 text-center">Actions</th>
                         </tr>
@@ -55,13 +59,26 @@
                         <tbody id="activity-list-1">
                         <!-- Example Activity Row -->
                         @for(PresentationActivity activity: event.activities())
+                            !{var regularParticipantsNumber = (activityParticipants != null && activityParticipants.containsKey(activity.id())) ? activityParticipants.get(activity.id()) : 0; }
+                            !{var waitingParticipantsNumber = (activityWaitingParticipants != null && activityWaitingParticipants.containsKey(activity.id())) ? activityWaitingParticipants.get(activity.id()) : 0; }
 
-
-                        <tr>
+                            <tr>
                             <td class="border border-gray-300 px-4 py-2">${activity.title()}</td>
                             <td class="border border-gray-300 px-4 py-2">${activity.description()}</td>
-                            <td class="border border-gray-300 px-4 py-2">${activity.maxParticipants()}</td>
-                            <td class="border border-gray-300 px-4 py-2">${activity.maxWaitingQueue()}</td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                @if(activityParticipants != null && activityParticipants.containsKey(activity.id()))
+                                    ${activityParticipants.get(activity.id()).size()}/${activity.maxParticipants()}
+                                @else
+                                    0/${activity.maxParticipants()}
+                                @endif
+                            </td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                @if(activityWaitingParticipants != null && activityWaitingParticipants.containsKey(activity.id()))
+                                    ${activityWaitingParticipants.get(activity.id()).size()}/${activity.maxWaitingQueue()}
+                                @else
+                                    0/${activity.maxWaitingQueue()}
+                                @endif
+                            </td>
 
                             <td class="border border-gray-300 px-4 py-2">${activity.time().format(DateTimeFormatter.ofPattern("H:mm a"))}</td>
                             <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
@@ -69,10 +86,61 @@
                                    class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
                                     Edit
                                 </a>
-                                <button onclick="deleteActivity(${event.id()}, ${activity.id()})"
+                                <button onclick="deleteActivity('${event.id()}', ${activity.id()})"
                                         class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
                                     Delete
                                 </button>
+                            </td>
+                        </tr>
+                        <!-- Participants Row -->
+                        <tr>
+                            <td colspan="6" class="border border-gray-300 px-4 py-2 bg-gray-50">
+                                <div class="text-sm font-semibold mb-2">Participants:</div>
+                                <ul class="list-disc pl-5" id="participants-list-${activity.id()}">
+                                    <!-- Regular participants -->
+                                    @if(activityParticipants != null && activityParticipants.containsKey(activity.id()) && !activityParticipants.get(activity.id()).isEmpty())
+                                        <div class="mb-2">
+                                            <span class="font-medium">Regular participants:</span>
+                                            @for(Participant participant : activityParticipants.get(activity.id()))
+                                                <li class="flex justify-between items-center mb-1">
+                                                    <span>${participant.getFirstName()} ${participant.getLastName()}, aged ${participant.getAge()} - Booker: <a href="http://localhost:8080/admin/bookers/${participant.getBooker().getEmail()}">${participant.getBooker().getFirstName()} ${participant.getBooker().getLastName()} (${participant.getBooker().getEmail()})</a></span>
+                                                    <div class="flex space-x-2">
+                                                        <button onclick="deleteParticipant(${participant.getId()})"
+                                                                data-activity-id="${activity.id()}"
+                                                                class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </li>
+                                            @endfor
+                                        </div>
+                                    @endif
+
+                                    <!-- Waiting participants -->
+                                    @if(activityWaitingParticipants != null && activityWaitingParticipants.containsKey(activity.id()) && !activityWaitingParticipants.get(activity.id()).isEmpty())
+                                        <div>
+                                            <span class="font-medium text-orange-600">Waiting list:</span>
+                                            @for(Participant participant : activityWaitingParticipants.get(activity.id()))
+                                                <li class="flex justify-between items-center mb-1 text-orange-600">
+                                                    <span>${participant.getFirstName()} ${participant.getLastName()}, aged ${participant.getAge()} - Booker: <a href="http://localhost:8080/admin/bookers/${participant.getBooker().getEmail()}" class="text-orange-800">${participant.getBooker().getFirstName()} ${participant.getBooker().getLastName()} (${participant.getBooker().getEmail()})</a> (waiting)</span>
+                                                    <div class="flex space-x-2">
+                                                        <button onclick="deleteParticipant(${participant.getId()})"
+                                                                data-activity-id="${activity.id()}"
+                                                                class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </li>
+                                            @endfor
+                                        </div>
+                                    @endif
+
+                                    <!-- No participants message -->
+                                    @if((activityParticipants == null || !activityParticipants.containsKey(activity.id()) || activityParticipants.get(activity.id()).isEmpty()) && 
+                                        (activityWaitingParticipants == null || !activityWaitingParticipants.containsKey(activity.id()) || activityWaitingParticipants.get(activity.id()).isEmpty()))
+                                        <li>No participants yet</li>
+                                    @endif
+                                </ul>
                             </td>
                         </tr>
                         @endfor
@@ -163,5 +231,41 @@
                 }
             }
         }
+
+        async function deleteParticipant(participantId) {
+            if (confirm("Are you sure you want to delete this participant?")) {
+                try {
+                    // Get the activity ID from the data attribute
+                    const activityId = event.target.getAttribute('data-activity-id');
+
+                    // Send DELETE request to the server
+                    @raw
+                    const response = await fetch(`/admin/activities/${activityId}/participants/${participantId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                            });
+                    @endraw
+
+
+                    if (response.ok) {
+                        alert("Participant deleted successfully!");
+                        // Reload the page to show updated data
+                        window.location.reload();
+                    } else {
+                        @raw
+                        const errorData = await response.json();
+                        alert(`Failed to delete participant: ${errorData.message || response.statusText}`);
+                        @endraw
+
+                    }
+                } catch (error) {
+                    console.error("Error deleting participant:", error);
+                    alert("An error occurred while deleting the participant. Please try again.");
+                }
+            }
+        }
+
     </script>
 `)

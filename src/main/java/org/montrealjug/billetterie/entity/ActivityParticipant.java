@@ -27,6 +27,9 @@ public class ActivityParticipant implements Comparable<ActivityParticipant> {
     @Column(nullable = false, updatable = false)
     private Instant registrationTime = Instant.now();
 
+    @Column(nullable = false)
+    private boolean isWaiting = false;
+
     public ActivityParticipantKey getActivityParticipantKey() {
         return activityParticipantKey;
     }
@@ -57,6 +60,14 @@ public class ActivityParticipant implements Comparable<ActivityParticipant> {
 
     public void setRegistrationTime(Instant registrationTime) {
         this.registrationTime = registrationTime;
+    }
+
+    public boolean isWaiting() {
+        return isWaiting;
+    }
+
+    public void setWaiting(boolean waiting) {
+        isWaiting = waiting;
     }
 
     @Override

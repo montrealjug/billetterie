@@ -10,4 +10,6 @@ public record PresentationActivity(
         @NotBlank String description,
         int maxParticipants,
         int maxWaitingQueue,
+        int currentParticipants,
+        int currentWaitingParticipants,
         LocalTime time) {}

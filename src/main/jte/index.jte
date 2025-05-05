@@ -45,8 +45,8 @@ content = @`
                             <tr class="bg-gray-200">
                                 <th class="border border-gray-300 px-4 py-2 text-left">Title</th>
                                 <th class="border border-gray-300 px-4 py-2 text-left">Description</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Max Seats</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Max Waiting</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Attendance</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Waiting line</th>
                                 <th class="border border-gray-300 px-4 py-2 text-left">Start Time</th>
                             </tr>
                             </thead>
@@ -58,8 +58,8 @@ content = @`
                                 <tr>
                                     <td class="border border-gray-300 px-4 py-2">${activity.title()}</td>
                                     <td class="border border-gray-300 px-4 py-2">${activity.description()}</td>
-                                    <td class="border border-gray-300 px-4 py-2">${activity.maxParticipants()}</td>
-                                    <td class="border border-gray-300 px-4 py-2">${activity.maxWaitingQueue()}</td>
+                                    <td class="border border-gray-300 px-4 py-2">${activity.currentParticipants()}/${activity.maxParticipants()}</td>
+                                    <td class="border border-gray-300 px-4 py-2">${activity.currentWaitingParticipants()}/${activity.maxWaitingQueue()}</td>
 
                                     <td class="border border-gray-300 px-4 py-2">${activity.time().format(DateTimeFormatter.ofPattern("H:mm a"))}</td>
                                 </tr>

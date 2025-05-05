@@ -19,7 +19,7 @@ public class Activity {
     private int maxParticipants;
     private int maxWaitingQueue;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "activity")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "activity", orphanRemoval = true)
     private Set<ActivityParticipant> participants = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
