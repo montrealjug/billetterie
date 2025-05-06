@@ -8,7 +8,6 @@
 title = "${event != null ? \"Create\" : \"Update\"} Event" ,
 content = @`
 <div class="flex flex-col items-center justify-center">
-    <a href="/admin/events" class="text-blue text-gray w-full max-w-md">&lt;&lt;&lt; Back</a>
     <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
 
         @if(errorMessage != null)
@@ -51,11 +50,14 @@ content = @`
                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none">
             </div>
             <!-- Submit Button -->
-            <div class="text-center">
+            <div class="flex justify-center gap-2">
                 <button type="submit"
                         class="bg-blue-500 text-white font-medium px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
                     ${event != null ? "Update" : "Create"} Event
                 </button>
+                <button type="button"
+                        class="bg-red-500 text-white font-medium px-4 py-2 rounded-md hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300"
+                        onclick="window.location.href = '/admin/events';">Cancel</button>
             </div>
         </form>
         @endif

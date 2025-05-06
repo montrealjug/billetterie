@@ -21,3 +21,10 @@ updates:
       third-parties:
         exclude-patterns:
           - "org.springframework.boot*"
+  - package-ecosystem: "npm"
+    directory: "/src/main/node"
+    schedule:
+      interval: "weekly"
+    groups:
+      tailwind:
+        dependency-type: development

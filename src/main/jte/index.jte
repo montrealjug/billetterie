@@ -9,7 +9,7 @@
 title = "Event List",
 content = @`
 
-<div class="flex flex-col items-center justify-center">
+<div class="flex flex-col items-center justify-center h-full">
     @if(error != null)
         <div id="main-error-message" class="bg-red-500 text-white p-4 mb-4 rounded-md w-full max-w-4xl">
             ${error}
@@ -74,7 +74,7 @@ content = @`
                 <br>
                 <div class="flex justify-end">
                     <button id="register-button" onclick="displayRegistrationModal()"
-                            class="bg-[#ee7c2a] text-white px-3 py-2 rounded border hover:opacity-80 focus:outline-none focus:ring focus:ring-orange-300">
+                            class="bg-d4k-orange text-white px-3 py-2 rounded border hover:opacity-80 focus:outline-none focus:ring focus:ring-orange-300">
                         Register
                     </button>
                 </div>
@@ -101,7 +101,7 @@ content = @`
             // Create the modal elements
             const modal = document.createElement("div");
             modal.id = "registration-modal";
-            modal.className = "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50";
+            modal.className = "fixed inset-0 flex items-center justify-center bg-black/50 z-50";
             @raw
             modal.innerHTML = `
             <div class="bg-white rounded-lg shadow-md p-6 w-96">
@@ -119,7 +119,7 @@ content = @`
                     <p id="error-message" class="text-red-500 text-sm hidden"></p>
                     <div class="flex justify-end gap-2">
                         <button type="button" onclick="closeModal()" class="bg-gray-300 text-gray-700 px-3 py-1 rounded hover:bg-gray-400 focus:outline-none focus:ring">Cancel</button>
-                        <button type="submit" class="bg-[#ee7c2a] text-white px-3 py-1 rounded hover:opacity-80 focus:outline-none focus:ring focus:ring-orange-300">Submit</button>
+                        <button type="submit" class="bg-d4k-orange text-white px-3 py-1 rounded hover:opacity-80 focus:outline-none focus:ring focus:ring-orange-300">Submit</button>
                     </div>
                 </form>
             </div>

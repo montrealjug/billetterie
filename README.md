@@ -32,6 +32,27 @@ or
 ```
 This can also be done in your `IDE` configuration.
 
+### Tailwind build integration
+
+We use `tailwind` for our `css`.  
+
+***Tailwind build is disabled for now, to speed dev.***
+
+***To enable it:***
+- ***remove the `skip` tag in the `frontend-maven-plugin` in the `pom.xml`***
+- ***replace the tags in the `admin_layout.jte` and `guest_layout.jte` by the commented one***
+
+
+The generation of the `main.css` file is handled by the `frontend-maven-plugin` during the build.
+
+As explained [in the documentation of the plugin](https://github.com/eirslett/frontend-maven-plugin/blob/master/README.md#what-is-this-plugin-not-meant-to-do), it is focused on the build process, not on the `dev` experience. Especially, it is not possible to use it to launch tasks in `watch` mode (maven will simply stop the process).
+To run `tailwind` in `watch` mode during dev, you have to use a dedicated `shell` and launch, from the project root directory:
+```shell
+npm --prefix src/main/tailwind run watch
+```
+
+Coupled with `spring-boot-dev-tools`, and our `local` profile this will update generated `css` on any changes in the templates, making the changes visible in the browser on refresh. 
+
 ### Issues you could encounter
 
 #### Spotless format

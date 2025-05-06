@@ -20,6 +20,11 @@ gg:
 spring:
   mail:
     test-connection: off
+  web:
+    resources:
+      static-locations: file:src/main/resources/static/
+      cache:
+        period: 0
 app:
   mail:
     mode: no-op
