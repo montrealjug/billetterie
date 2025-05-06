@@ -19,6 +19,9 @@ public class Utils {
                                     activity.getDescription(),
                                     activity.getMaxParticipants(),
                                     activity.getMaxWaitingQueue(),
+                                    activity.getWaitingParticipants(),
+                                    activity.getNonWaitingParticipants(),
+                                    activity.getRegistrationStatus(),
                                     activity.getStartTime().toLocalTime());
                     indexActivities.add(indexActivity);
                 });

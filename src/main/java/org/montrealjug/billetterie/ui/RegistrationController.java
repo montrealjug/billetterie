@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.ui;
 
-import static java.util.stream.Collectors.toList;
 import static org.montrealjug.billetterie.ui.Utils.toIndexActivities;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,25 +9,25 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 import org.montrealjug.billetterie.email.EmailModel.Email;
 import org.montrealjug.billetterie.email.EmailService;
-import org.montrealjug.billetterie.entity.*;
+import org.montrealjug.billetterie.entity.Activity;
+import org.montrealjug.billetterie.entity.ActivityParticipant;
+import org.montrealjug.billetterie.entity.Booker;
+import org.montrealjug.billetterie.entity.Participant;
 import org.montrealjug.billetterie.exception.EntityNotFoundException;
-import org.montrealjug.billetterie.repository.*;
+import org.montrealjug.billetterie.repository.ActivityRepository;
+import org.montrealjug.billetterie.repository.BookerRepository;
+import org.montrealjug.billetterie.repository.EventRepository;
+import org.montrealjug.billetterie.repository.ParticipantRepository;
 import org.montrealjug.billetterie.service.SignatureService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class RegistrationController {
@@ -153,12 +152,21 @@ public class RegistrationController {
                                         return participantRepository.save(participantToCreate);
                                     });
 
+            // Check if both regular spots and waiting queue are full
+            if (activity.getRegistrationStatus().equals(Activity.RegistrationStatus.CLOSED)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(
+                                "{\"message\":\"This activity is full and the waiting queue is also"
+                                        + " full\"}");
+            }
+
             // Create and save the ActivityParticipant entity
             ActivityParticipant activityParticipant = new ActivityParticipant();
             activityParticipant.setActivity(activity);
             activityParticipant.setParticipant(participant);
             activityParticipant.getActivityParticipantKey().setActivityId(activity.getId());
             activityParticipant.getActivityParticipantKey().setParticipantId(participant.getId());
+
             activity.getParticipants().add(activityParticipant);
 
             activityRepository.save(activity);
@@ -205,39 +213,9 @@ public class RegistrationController {
                             event.isActive(),
                             event.getImagePath());
 
-            // Create a map of activity ID to participants for the current booker
-            Map<Long, List<Participant>> activityParticipantsForBooker = new HashMap<>();
-
-            // Create a map of activity ID to total number of participants
-            Map<Long, Integer> activityTotalParticipants = new HashMap<>();
-
-            // For each activity in the event
-            event.getActivities()
-                    .forEach(
-                            activity -> {
-                                // Get the participants for this activity and this booker
-                                List<Participant> participants =
-                                        activity.getParticipants().stream()
-                                                .map(ActivityParticipant::getParticipant)
-                                                .filter(
-                                                        participant ->
-                                                                participant
-                                                                        .getBooker()
-                                                                        .equals(booker))
-                                                .collect(toList());
-
-                                // Add the participants to the map
-                                activityParticipantsForBooker.put(activity.getId(), participants);
-                                // Add the total number of participants to the map
-                                activityTotalParticipants.put(
-                                        activity.getId(), activity.getParticipants().size());
-                            });
-
             // Add attributes to model
             model.addAttribute("event", presentationEvent);
             model.addAttribute("booker", booker);
-            model.addAttribute("activityParticipants", activityParticipantsForBooker);
-            model.addAttribute("activityTotalParticipants", activityTotalParticipants);
 
             // Return booker-activities template
             return "booker-activities";
@@ -276,5 +254,33 @@ public class RegistrationController {
         return p.getLastName().equalsIgnoreCase(participantSub.lastName())
                 && p.getFirstName().equalsIgnoreCase(participantSub.firstName())
                 && p.getYearOfBirth() == participantSub.yearOfBirth();
+    }
+
+    @DeleteMapping("/admin/activities/{activityId}/participants/{participantId}")
+    public ResponseEntity<?> deleteParticipant(
+            @PathVariable Long activityId, @PathVariable Long participantId) {
+        try {
+            Activity activity =
+                    activityRepository
+                            .findById(activityId)
+                            .orElseThrow(() -> new EntityNotFoundException("Activity not found"));
+
+            activity.getParticipants()
+                    .removeIf(
+                            activityParticipant ->
+                                    activityParticipant.getParticipant().getId() == participantId);
+
+            // Save the updated activity with merge to ensure the removal is persisted
+            activityRepository.save(activity);
+
+            // Return success response
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            LOGGER.severe("Error deleting participant from activity: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(
+                            "{\"message\":\"An error occurred while deleting the participant from"
+                                    + " the activity\"}");
+        }
     }
 }

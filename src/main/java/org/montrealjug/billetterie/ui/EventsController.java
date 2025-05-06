@@ -37,6 +37,7 @@ public class EventsController {
     public String events(Model model) {
         List<PresentationEvent> presentationEvents = new ArrayList<>();
         Iterable<Event> events = this.eventRepository.findAll();
+
         events.forEach(
                 event -> {
                     PresentationEvent presentationEvent =
@@ -50,6 +51,7 @@ public class EventsController {
                                     event.getImagePath());
                     presentationEvents.add(presentationEvent);
                 });
+
         model.addAttribute("events", presentationEvents);
         return "events-list";
     }
@@ -149,6 +151,7 @@ public class EventsController {
         PresentationActivity presentationActivity;
         if (optionalActivity.isPresent()) {
             Activity activity = optionalActivity.get();
+
             presentationActivity =
                     new PresentationActivity(
                             activity.getId(),
@@ -156,6 +159,9 @@ public class EventsController {
                             activity.getDescription(),
                             activity.getMaxParticipants(),
                             activity.getMaxWaitingQueue(),
+                            activity.getWaitingParticipants(),
+                            activity.getNonWaitingParticipants(),
+                            activity.getRegistrationStatus(),
                             activity.getStartTime().toLocalTime());
         } else {
             throw new EntityNotFoundException(
@@ -176,18 +182,30 @@ public class EventsController {
 
         if (optionalActivity.isPresent()) {
             Activity activity = optionalActivity.get();
-            activity.setTitle(presentationActivity.title());
-            activity.setDescription(presentationActivity.description());
-            activity.setMaxParticipants(presentationActivity.maxParticipants());
-            activity.setMaxWaitingQueue(presentationActivity.maxWaitingQueue());
+
+            PresentationActivity fullActivity =
+                    new PresentationActivity(
+                            presentationActivity.id(),
+                            presentationActivity.title(),
+                            presentationActivity.description(),
+                            presentationActivity.maxParticipants(),
+                            presentationActivity.maxWaitingQueue(),
+                            activity.getWaitingParticipants(),
+                            activity.getNonWaitingParticipants(),
+                            activity.getRegistrationStatus(),
+                            presentationActivity.time());
+
+            activity.setTitle(fullActivity.title());
+            activity.setDescription(fullActivity.description());
+            activity.setMaxParticipants(fullActivity.maxParticipants());
+            activity.setMaxWaitingQueue(fullActivity.maxWaitingQueue());
 
             eventRepository
                     .findById(eventId)
                     .ifPresent(
                             event -> {
                                 LocalDate date = event.getDate();
-                                LocalDateTime localDateTime =
-                                        date.atTime(presentationActivity.time());
+                                LocalDateTime localDateTime = date.atTime(fullActivity.time());
                                 activity.setStartTime(localDateTime);
                             });
 
@@ -207,19 +225,33 @@ public class EventsController {
     public ResponseEntity<Void> saveActivity(
             @Valid PresentationActivity activity, Model model, @PathVariable final Long id) {
 
+        // For new activities, we need to create a PresentationActivity with the new fields
+        // Since this is a new activity, currentParticipants and currentWaitingParticipants are 0
+        PresentationActivity fullActivity =
+                new PresentationActivity(
+                        activity.id(),
+                        activity.title(),
+                        activity.description(),
+                        activity.maxParticipants(),
+                        activity.maxWaitingQueue(),
+                        Collections.emptyList(),
+                        Collections.emptyList(),
+                        Activity.RegistrationStatus.OPEN,
+                        activity.time());
+
         Optional<Event> byId = eventRepository.findById(id);
 
         byId.ifPresentOrElse(
                 event -> {
                     Activity entity = new Activity();
-                    entity.setDescription(activity.description());
-                    entity.setTitle(activity.title());
-                    entity.setMaxParticipants(activity.maxParticipants());
-                    entity.setMaxWaitingQueue(activity.maxWaitingQueue());
+                    entity.setDescription(fullActivity.description());
+                    entity.setTitle(fullActivity.title());
+                    entity.setMaxParticipants(fullActivity.maxParticipants());
+                    entity.setMaxWaitingQueue(fullActivity.maxWaitingQueue());
                     entity.setEvent(event);
 
                     LocalDate date = event.getDate();
-                    LocalDateTime localDateTime = date.atTime(activity.time());
+                    LocalDateTime localDateTime = date.atTime(fullActivity.time());
 
                     entity.setStartTime(localDateTime);
                     event.getActivities().add(entity);

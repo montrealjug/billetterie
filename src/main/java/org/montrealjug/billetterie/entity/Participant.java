@@ -2,6 +2,7 @@
 package org.montrealjug.billetterie.entity;
 
 import jakarta.persistence.*;
+import java.time.Year;
 import java.util.Objects;
 
 @Entity
@@ -56,6 +57,11 @@ public class Participant {
 
     public void setBooker(Booker booker) {
         this.booker = booker;
+    }
+
+    @Transient
+    public int getAge() {
+        return Year.now().getValue() - yearOfBirth;
     }
 
     @Override

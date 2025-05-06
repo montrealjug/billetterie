@@ -3,9 +3,7 @@ package org.montrealjug.billetterie.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 public class Activity {
@@ -19,8 +17,8 @@ public class Activity {
     private int maxParticipants;
     private int maxWaitingQueue;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "activity")
-    private Set<ActivityParticipant> participants = new HashSet<>();
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "activity", orphanRemoval = true)
+    private SortedSet<ActivityParticipant> participants = new TreeSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Event event;
@@ -86,7 +84,47 @@ public class Activity {
     }
 
     public void setParticipants(Set<ActivityParticipant> participants) {
-        this.participants = participants;
+        if (participants instanceof SortedSet<ActivityParticipant> sortedParticipants) {
+            this.participants = sortedParticipants;
+        } else {
+            this.participants = new TreeSet<>(participants);
+        }
+    }
+
+    @Transient
+    public List<ActivityParticipant> getNonWaitingParticipants() {
+        // ensure that `ActivityParticipant` are lazy-load if needed
+        return this.getParticipants().stream().limit(this.maxParticipants).toList();
+    }
+
+    @Transient
+    public List<ActivityParticipant> getWaitingParticipants() {
+        // ensure that `ActivityParticipant` are lazy-load if needed
+        return this.getParticipants().stream()
+                .skip(this.maxParticipants)
+                .limit(this.maxWaitingQueue)
+                .toList();
+    }
+
+    public enum RegistrationStatus {
+        OPEN,
+        WAITING_LIST,
+        CLOSED
+    }
+
+    @Transient
+    public RegistrationStatus getRegistrationStatus() {
+        // ensure that we will lazy-load ActivityParticipant if needed
+        var nbParticipants = getParticipants().size();
+        final RegistrationStatus registrationStatus;
+        if (nbParticipants <= this.maxParticipants) {
+            registrationStatus = RegistrationStatus.OPEN;
+        } else if (nbParticipants <= this.maxParticipants + this.maxWaitingQueue) {
+            registrationStatus = RegistrationStatus.WAITING_LIST;
+        } else {
+            registrationStatus = RegistrationStatus.CLOSED;
+        }
+        return registrationStatus;
     }
 
     @Override
