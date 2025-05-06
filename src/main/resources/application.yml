@@ -28,6 +28,8 @@ spring:
     test-connection: off
   messages:
     fallback-to-system-locale: false
+  mvc:
+    static-path-pattern: /static/**
   profiles:
     group:
       local-mail: local,mailhog
