@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.montrealjug.billetterie.entity.Activity;
-import org.montrealjug.billetterie.entity.ActivityParticipant;
 
 public class Utils {
 
@@ -13,20 +12,6 @@ public class Utils {
         List<PresentationActivity> indexActivities = new ArrayList<>();
         activities.forEach(
                 activity -> {
-                    // Count regular participants
-                    int regularParticipants =
-                            (int)
-                                    activity.getParticipants().stream()
-                                            .filter(p -> !p.isWaiting())
-                                            .count();
-
-                    // Count waiting participants
-                    int waitingParticipants =
-                            (int)
-                                    activity.getParticipants().stream()
-                                            .filter(ActivityParticipant::isWaiting)
-                                            .count();
-
                     PresentationActivity indexActivity =
                             new PresentationActivity(
                                     activity.getId(),
@@ -34,8 +19,9 @@ public class Utils {
                                     activity.getDescription(),
                                     activity.getMaxParticipants(),
                                     activity.getMaxWaitingQueue(),
-                                    regularParticipants,
-                                    waitingParticipants,
+                                    activity.getWaitingParticipants(),
+                                    activity.getNonWaitingParticipants(),
+                                    activity.getRegistrationStatus(),
                                     activity.getStartTime().toLocalTime());
                     indexActivities.add(indexActivity);
                 });

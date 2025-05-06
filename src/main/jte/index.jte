@@ -53,13 +53,11 @@ content = @`
                             <tbody id="activity-list-1">
                             <!-- Example Activity Row -->
                             @for(PresentationActivity activity: event.activities())
-
-
                                 <tr>
                                     <td class="border border-gray-300 px-4 py-2">${activity.title()}</td>
                                     <td class="border border-gray-300 px-4 py-2">${activity.description()}</td>
-                                    <td class="border border-gray-300 px-4 py-2">${activity.currentParticipants()}/${activity.maxParticipants()}</td>
-                                    <td class="border border-gray-300 px-4 py-2">${activity.currentWaitingParticipants()}/${activity.maxWaitingQueue()}</td>
+                                    <td class="border border-gray-300 px-4 py-2">${activity.participants().size()}/${activity.maxParticipants()}</td>
+                                    <td class="border border-gray-300 px-4 py-2">${activity.waitingParticipants().size()}/${activity.maxWaitingQueue()}</td>
 
                                     <td class="border border-gray-300 px-4 py-2">${activity.time().format(DateTimeFormatter.ofPattern("H:mm a"))}</td>
                                 </tr>

@@ -1,13 +1,10 @@
+@import org.montrealjug.billetterie.entity.ActivityParticipant
 @import org.montrealjug.billetterie.ui.PresentationEvent
 @import org.montrealjug.billetterie.ui.PresentationActivity
-@import org.montrealjug.billetterie.entity.Participant
 @import java.time.format.DateTimeFormatter
 @import java.util.List
-@import java.util.Map
 
 @param List<PresentationEvent> events
-@param Map<Long, List<Participant>> activityParticipants = null
-@param Map<Long, List<Participant>> activityWaitingParticipants = null
 
 @template.layouts.admin_layout(title = "Event List", content = @`
 
@@ -59,25 +56,17 @@
                         <tbody id="activity-list-1">
                         <!-- Example Activity Row -->
                         @for(PresentationActivity activity: event.activities())
-                            !{var regularParticipantsNumber = (activityParticipants != null && activityParticipants.containsKey(activity.id())) ? activityParticipants.get(activity.id()) : 0; }
-                            !{var waitingParticipantsNumber = (activityWaitingParticipants != null && activityWaitingParticipants.containsKey(activity.id())) ? activityWaitingParticipants.get(activity.id()) : 0; }
+                            !{var regularParticipantsNumber = activity.participants().size(); }
+                            !{var waitingParticipantsNumber = activity.waitingParticipants().size(); }
 
                             <tr>
                             <td class="border border-gray-300 px-4 py-2">${activity.title()}</td>
                             <td class="border border-gray-300 px-4 py-2">${activity.description()}</td>
                             <td class="border border-gray-300 px-4 py-2">
-                                @if(activityParticipants != null && activityParticipants.containsKey(activity.id()))
-                                    ${activityParticipants.get(activity.id()).size()}/${activity.maxParticipants()}
-                                @else
-                                    0/${activity.maxParticipants()}
-                                @endif
+                                ${regularParticipantsNumber}/${activity.maxParticipants()}
                             </td>
                             <td class="border border-gray-300 px-4 py-2">
-                                @if(activityWaitingParticipants != null && activityWaitingParticipants.containsKey(activity.id()))
-                                    ${activityWaitingParticipants.get(activity.id()).size()}/${activity.maxWaitingQueue()}
-                                @else
-                                    0/${activity.maxWaitingQueue()}
-                                @endif
+                                ${waitingParticipantsNumber}/${activity.maxParticipants()}
                             </td>
 
                             <td class="border border-gray-300 px-4 py-2">${activity.time().format(DateTimeFormatter.ofPattern("H:mm a"))}</td>
@@ -98,10 +87,11 @@
                                 <div class="text-sm font-semibold mb-2">Participants:</div>
                                 <ul class="list-disc pl-5" id="participants-list-${activity.id()}">
                                     <!-- Regular participants -->
-                                    @if(activityParticipants != null && activityParticipants.containsKey(activity.id()) && !activityParticipants.get(activity.id()).isEmpty())
+                                    @if(regularParticipantsNumber > 0)
                                         <div class="mb-2">
                                             <span class="font-medium">Regular participants:</span>
-                                            @for(Participant participant : activityParticipants.get(activity.id()))
+                                            @for(ActivityParticipant activityParticipant : activity.participants())
+                                                !{var participant = activityParticipant.getParticipant(); }
                                                 <li class="flex justify-between items-center mb-1">
                                                     <span>${participant.getFirstName()} ${participant.getLastName()}, aged ${participant.getAge()} - Booker: <a href="http://localhost:8080/admin/bookers/${participant.getBooker().getEmail()}">${participant.getBooker().getFirstName()} ${participant.getBooker().getLastName()} (${participant.getBooker().getEmail()})</a></span>
                                                     <div class="flex space-x-2">
@@ -117,10 +107,11 @@
                                     @endif
 
                                     <!-- Waiting participants -->
-                                    @if(activityWaitingParticipants != null && activityWaitingParticipants.containsKey(activity.id()) && !activityWaitingParticipants.get(activity.id()).isEmpty())
+                                    @if(waitingParticipantsNumber > 0)
                                         <div>
                                             <span class="font-medium text-orange-600">Waiting list:</span>
-                                            @for(Participant participant : activityWaitingParticipants.get(activity.id()))
+                                            @for(ActivityParticipant activityParticipant : activity.waitingParticipants())
+                                                !{var participant = activityParticipant.getParticipant(); }
                                                 <li class="flex justify-between items-center mb-1 text-orange-600">
                                                     <span>${participant.getFirstName()} ${participant.getLastName()}, aged ${participant.getAge()} - Booker: <a href="http://localhost:8080/admin/bookers/${participant.getBooker().getEmail()}" class="text-orange-800">${participant.getBooker().getFirstName()} ${participant.getBooker().getLastName()} (${participant.getBooker().getEmail()})</a> (waiting)</span>
                                                     <div class="flex space-x-2">
@@ -136,8 +127,7 @@
                                     @endif
 
                                     <!-- No participants message -->
-                                    @if((activityParticipants == null || !activityParticipants.containsKey(activity.id()) || activityParticipants.get(activity.id()).isEmpty()) && 
-                                        (activityWaitingParticipants == null || !activityWaitingParticipants.containsKey(activity.id()) || activityWaitingParticipants.get(activity.id()).isEmpty()))
+                                    @if(regularParticipantsNumber == 0 )
                                         <li>No participants yet</li>
                                     @endif
                                 </ul>

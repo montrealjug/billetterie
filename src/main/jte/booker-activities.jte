@@ -1,18 +1,13 @@
+@import org.montrealjug.billetterie.entity.Activity
+@import org.montrealjug.billetterie.entity.ActivityParticipant
 @import org.montrealjug.billetterie.ui.PresentationEvent
 @import org.montrealjug.billetterie.ui.PresentationActivity
 @import org.montrealjug.billetterie.entity.Booker
-@import org.montrealjug.billetterie.entity.Participant
 @import java.time.format.DateTimeFormatter
-@import java.util.List
-@import java.util.Map
 
 @param PresentationEvent event = null
 @param Booker booker = null
 @param String error = null
-@param Map<Long, List<Participant>> activityParticipants = null
-@param Map<Long, List<Participant>> activityWaitingParticipants = null
-@param Map<Long, Integer> participantsNumberByActivityId = null
-@param Map<Long, Integer> waitingParticipantsNumberByActivityId = null
 
 @template.layouts.guest_layout(
 title = "Event Activities",
@@ -52,8 +47,8 @@ content = @`
                             <tbody id="activity-list-1">
                             <!-- Activities Rows -->
                             @for(PresentationActivity activity: event.activities())
-                                !{var regularParticipantsNumber = (participantsNumberByActivityId != null && participantsNumberByActivityId.containsKey(activity.id())) ? participantsNumberByActivityId.get(activity.id()) : 0; }
-                                !{var waitingParticipantsNumber = (waitingParticipantsNumberByActivityId != null && waitingParticipantsNumberByActivityId.containsKey(activity.id())) ? waitingParticipantsNumberByActivityId.get(activity.id()) : 0; }
+                                !{var regularParticipantsNumber = activity.participants().size(); }
+                                !{var waitingParticipantsNumber = activity.waitingParticipants().size(); }
 
                                 <tr>
                                     <td class="border border-gray-300 px-4 py-2">${activity.title()}</td>
@@ -66,7 +61,7 @@ content = @`
                                     </td>
                                     <td class="border border-gray-300 px-4 py-2">${activity.time().format(DateTimeFormatter.ofPattern("H:mm a"))}</td>
                                     <td class="border border-gray-300 px-4 py-2">
-                                        @if(regularParticipantsNumber == activity.maxParticipants() && waitingParticipantsNumber == activity.maxWaitingQueue())
+                                        @if(activity.registrationStatus().equals(Activity.RegistrationStatus.CLOSED))
                                             <button disabled
                                                     class="bg-gray-400 text-white px-3 py-1 rounded cursor-not-allowed">
                                                 Activity Full
@@ -79,7 +74,7 @@ content = @`
                                         @endif
                                     </td>
                                 </tr>
-                                <tr id="participants-container-${activity.id()}" class="${(activityParticipants != null && activityParticipants.containsKey(activity.id()) && !activityParticipants.get(activity.id()).isEmpty()) || (activityWaitingParticipants != null && activityWaitingParticipants.containsKey(activity.id()) && !activityWaitingParticipants.get(activity.id()).isEmpty()) ? "" : "hidden"}">
+                                <tr id="participants-container-${activity.id()}" class="${activity.participants().isEmpty() ? "hidden" : ""}">
                                     <td colspan="6" class="border border-gray-300 px-4 py-2 bg-gray-50">
                                         <div class="text-sm font-semibold mb-2">Participants:</div>
                                         <ul id="participants-list-${activity.id()}" class="list-disc pl-5">
@@ -87,7 +82,8 @@ content = @`
                                             @if(regularParticipantsNumber != 0)
                                                 <div class="mb-2">
                                                     <span class="font-medium">Regular participants:</span>
-                                                    @for(Participant participant : activityParticipants.get(activity.id()))
+                                                    @for(ActivityParticipant activityParticipant : activity.participants())
+                                                        !{var participant = activityParticipant.getParticipant(); }
                                                         <li>${participant.getFirstName()} ${participant.getLastName()}, born in ${participant.getYearOfBirth()}</li>
                                                     @endfor
                                                 </div>
@@ -97,7 +93,8 @@ content = @`
                                             @if(waitingParticipantsNumber != 0)
                                                 <div>
                                                     <span class="font-medium text-orange-600">Waiting list:</span>
-                                                    @for(Participant participant : activityWaitingParticipants.get(activity.id()))
+                                                    @for(ActivityParticipant activityParticipant : activity.waitingParticipants())
+                                                        !{var participant = activityParticipant.getParticipant(); }
                                                         <li class="text-orange-600">${participant.getFirstName()} ${participant.getLastName()}, born in ${participant.getYearOfBirth()} (waiting)</li>
                                                     @endfor
                                                 </div>

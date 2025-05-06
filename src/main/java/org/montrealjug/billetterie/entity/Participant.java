@@ -59,6 +59,7 @@ public class Participant {
         this.booker = booker;
     }
 
+    @Transient
     public int getAge() {
         return Year.now().getValue() - yearOfBirth;
     }

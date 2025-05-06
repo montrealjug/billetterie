@@ -9,9 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import org.montrealjug.billetterie.entity.Activity;
-import org.montrealjug.billetterie.entity.ActivityParticipant;
 import org.montrealjug.billetterie.entity.Event;
-import org.montrealjug.billetterie.entity.Participant;
 import org.montrealjug.billetterie.exception.EntityNotFoundException;
 import org.montrealjug.billetterie.exception.RedirectableNotFoundException;
 import org.montrealjug.billetterie.repository.ActivityRepository;
@@ -40,10 +38,6 @@ public class EventsController {
         List<PresentationEvent> presentationEvents = new ArrayList<>();
         Iterable<Event> events = this.eventRepository.findAll();
 
-        // Create maps for regular and waiting participants
-        Map<Long, List<Participant>> activityParticipants = new HashMap<>();
-        Map<Long, List<Participant>> activityWaitingParticipants = new HashMap<>();
-
         events.forEach(
                 event -> {
                     PresentationEvent presentationEvent =
@@ -56,33 +50,9 @@ public class EventsController {
                                     event.isActive(),
                                     event.getImagePath());
                     presentationEvents.add(presentationEvent);
-
-                    // For each activity, get its regular and waiting participants
-                    event.getActivities()
-                            .forEach(
-                                    activity -> {
-                                        // Regular participants (not waiting)
-                                        List<Participant> participants =
-                                                activity.getParticipants().stream()
-                                                        .filter(ap -> !ap.isWaiting())
-                                                        .map(ActivityParticipant::getParticipant)
-                                                        .toList();
-                                        activityParticipants.put(activity.getId(), participants);
-
-                                        // Waiting participants
-                                        List<Participant> waitingParticipants =
-                                                activity.getParticipants().stream()
-                                                        .filter(ActivityParticipant::isWaiting)
-                                                        .map(ActivityParticipant::getParticipant)
-                                                        .toList();
-                                        activityWaitingParticipants.put(
-                                                activity.getId(), waitingParticipants);
-                                    });
                 });
 
         model.addAttribute("events", presentationEvents);
-        model.addAttribute("activityParticipants", activityParticipants);
-        model.addAttribute("activityWaitingParticipants", activityWaitingParticipants);
         return "events-list";
     }
 
@@ -181,16 +151,6 @@ public class EventsController {
         PresentationActivity presentationActivity;
         if (optionalActivity.isPresent()) {
             Activity activity = optionalActivity.get();
-            // Count regular participants
-            int regularParticipants =
-                    (int) activity.getParticipants().stream().filter(p -> !p.isWaiting()).count();
-
-            // Count waiting participants
-            int waitingParticipants =
-                    (int)
-                            activity.getParticipants().stream()
-                                    .filter(ActivityParticipant::isWaiting)
-                                    .count();
 
             presentationActivity =
                     new PresentationActivity(
@@ -199,8 +159,9 @@ public class EventsController {
                             activity.getDescription(),
                             activity.getMaxParticipants(),
                             activity.getMaxWaitingQueue(),
-                            regularParticipants,
-                            waitingParticipants,
+                            activity.getWaitingParticipants(),
+                            activity.getNonWaitingParticipants(),
+                            activity.getRegistrationStatus(),
                             activity.getStartTime().toLocalTime());
         } else {
             throw new EntityNotFoundException(
@@ -222,18 +183,6 @@ public class EventsController {
         if (optionalActivity.isPresent()) {
             Activity activity = optionalActivity.get();
 
-            // For existing activities, we need to create a PresentationActivity with the new fields
-            // Count regular participants
-            int regularParticipants =
-                    (int) activity.getParticipants().stream().filter(p -> !p.isWaiting()).count();
-
-            // Count waiting participants
-            int waitingParticipants =
-                    (int)
-                            activity.getParticipants().stream()
-                                    .filter(ActivityParticipant::isWaiting)
-                                    .count();
-
             PresentationActivity fullActivity =
                     new PresentationActivity(
                             presentationActivity.id(),
@@ -241,8 +190,9 @@ public class EventsController {
                             presentationActivity.description(),
                             presentationActivity.maxParticipants(),
                             presentationActivity.maxWaitingQueue(),
-                            regularParticipants,
-                            waitingParticipants,
+                            activity.getWaitingParticipants(),
+                            activity.getNonWaitingParticipants(),
+                            activity.getRegistrationStatus(),
                             presentationActivity.time());
 
             activity.setTitle(fullActivity.title());
@@ -284,8 +234,9 @@ public class EventsController {
                         activity.description(),
                         activity.maxParticipants(),
                         activity.maxWaitingQueue(),
-                        0, // currentParticipants
-                        0, // currentWaitingParticipants
+                        Collections.emptyList(),
+                        Collections.emptyList(),
+                        Activity.RegistrationStatus.OPEN,
                         activity.time());
 
         Optional<Event> byId = eventRepository.findById(id);

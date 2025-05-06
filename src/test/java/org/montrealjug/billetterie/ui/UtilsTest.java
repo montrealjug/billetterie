@@ -26,11 +26,10 @@ public class UtilsTest {
 
         Set<ActivityParticipant> participants = new HashSet<>();
 
-        // Add 3 regular participants
-        for (int i = 0; i < 3; i++) {
+        // Add 10 regular participants
+        for (int i = 0; i < 10; i++) {
             ActivityParticipant ap = new ActivityParticipant();
             ap.setActivity(activity);
-            ap.setWaiting(false);
 
             // Set a unique participant ID for each participant
             ActivityParticipantKey key = new ActivityParticipantKey();
@@ -45,7 +44,6 @@ public class UtilsTest {
         for (int i = 0; i < 2; i++) {
             ActivityParticipant ap = new ActivityParticipant();
             ap.setActivity(activity);
-            ap.setWaiting(true);
 
             // Set a unique participant ID for each participant
             ActivityParticipantKey key = new ActivityParticipantKey();
@@ -66,13 +64,15 @@ public class UtilsTest {
 
         // Assert
         assertThat(result).hasSize(1);
-        var presentationActivity = result.get(0);
+        var presentationActivity = result.getFirst();
         assertThat(presentationActivity.id()).isEqualTo(1L);
         assertThat(presentationActivity.title()).isEqualTo("Test Activity");
         assertThat(presentationActivity.description()).isEqualTo("Test Description");
         assertThat(presentationActivity.maxParticipants()).isEqualTo(10);
         assertThat(presentationActivity.maxWaitingQueue()).isEqualTo(5);
-        assertThat(presentationActivity.currentParticipants()).isEqualTo(3);
-        assertThat(presentationActivity.currentWaitingParticipants()).isEqualTo(2);
+        assertThat(presentationActivity.participants().size()).isEqualTo(10);
+        assertThat(presentationActivity.waitingParticipants().size()).isEqualTo(2);
+        assertThat(presentationActivity.registrationStatus())
+                .isEqualTo(Activity.RegistrationStatus.WAITING_LIST);
     }
 }
