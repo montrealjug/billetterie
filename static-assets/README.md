@@ -18,14 +18,16 @@ The [`index.html`](./index.html) is just a short presentation of this project, w
 - to the app itself
 - to the Devoxx4Kids Québec page on the devoxx4kids.org
 
-## How to associate an Image with an Event
+## How to associate an Image with an Event or an Activity
 
 1. Create an `Event` in the app, as an `admin` with the dedicated form
-2. After the creation, in the `event-list` view, find the conventional `image path`
+2. After the creation, in the `event-list` view, find the conventional `image path` in light gray under the `Event` date
 3. Create a `PR` to add the expected `image` in this `static-assets` directory at the designated path
 4. Wait for the deployment to happen, your image will eventually be available
 
 You can create as many images as you want in one `PR`.
+
+The same logic can be followed for `Activity`, the conventional `image path` is in light gray under the `Activity` title.
 
 ## How to deal with missing images (not defined or waiting for a deployment to happen)
 

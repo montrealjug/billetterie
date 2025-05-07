@@ -136,4 +136,13 @@ public class Activity {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    @Transient
+    public String getImagePath() {
+        if (this.id != 0) {
+            return "img/activity/%d.png".formatted(this.id);
+        } else {
+            return "";
+        }
+    }
 }

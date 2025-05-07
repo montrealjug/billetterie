@@ -14,7 +14,7 @@ import org.montrealjug.billetterie.entity.ActivityParticipantKey;
 public class UtilsTest {
 
     @Test
-    void toIndexActivities_should_count_participants_and_waiting_participants() {
+    void toPresentationActivities_should_count_participants_and_waiting_participants() {
         // Arrange
         Activity activity = new Activity();
         activity.setId(1L);
@@ -60,7 +60,7 @@ public class UtilsTest {
         activities.add(activity);
 
         // Act
-        var result = Utils.toIndexActivities(activities);
+        var result = Utils.toPresentationActivities(activities);
 
         // Assert
         assertThat(result).hasSize(1);

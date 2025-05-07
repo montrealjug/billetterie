@@ -54,7 +54,16 @@ content = @`
                             <!-- Example Activity Row -->
                             @for(PresentationActivity activity: event.activities())
                                 <tr>
-                                    <td class="border border-gray-300 px-4 py-2">${activity.title()}</td>
+                                    <td class="border border-gray-300 px-4 py-2 align-middle">
+                                        <span class="inline-block w-8 h-8 mr-2">
+                                            @template.layouts.image_with_fallback(
+                                                entityType = "activity",
+                                                cssClass = "inline-block object-cover object-center size-full rounded-lg",
+                                                id = activity.id()
+                                            )
+                                        </span>
+                                        ${activity.title()}
+                                    </td>
                                     <td class="border border-gray-300 px-4 py-2">${activity.description()}</td>
                                     <td class="border border-gray-300 px-4 py-2">${activity.participants().size()}/${activity.maxParticipants()}</td>
                                     <td class="border border-gray-300 px-4 py-2">${activity.waitingParticipants().size()}/${activity.maxWaitingQueue()}</td>
