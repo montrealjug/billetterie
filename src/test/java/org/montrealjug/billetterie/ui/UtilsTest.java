@@ -72,7 +72,6 @@ public class UtilsTest {
         assertThat(presentationActivity.maxWaitingQueue()).isEqualTo(5);
         assertThat(presentationActivity.participants().size()).isEqualTo(10);
         assertThat(presentationActivity.waitingParticipants().size()).isEqualTo(2);
-        assertThat(presentationActivity.registrationStatus())
-                .isEqualTo(Activity.RegistrationStatus.WAITING_LIST);
+        assertThat(presentationActivity.registrationStatus()).isEqualTo(Activity.RegistrationStatus.WAITING_LIST);
     }
 }

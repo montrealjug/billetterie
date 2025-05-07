@@ -19,11 +19,14 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class ActivityRepositoryTest {
 
-    @Autowired EventRepository eventRepository;
+    @Autowired
+    EventRepository eventRepository;
 
-    @Autowired BookerRepository bookerRepository;
+    @Autowired
+    BookerRepository bookerRepository;
 
-    @Autowired ActivityRepository activityRepository;
+    @Autowired
+    ActivityRepository activityRepository;
 
     @Test
     void registration_of_activity_participants_should_be_ordered_by_registration_time() {
@@ -40,10 +43,7 @@ public class ActivityRepositoryTest {
         firstBooker.getParticipants().add(firstPart);
         firstBooker = bookerRepository.save(firstBooker);
         // jpa does not set the @Id in the associated entity, inefficient, but we're in a test 🤷
-        firstBooker.getParticipants().stream()
-                .findFirst()
-                .map(Participant::getId)
-                .ifPresent(firstPart::setId);
+        firstBooker.getParticipants().stream().findFirst().map(Participant::getId).ifPresent(firstPart::setId);
         // as we have a Set and @Id will be set after persistence,
         // we can't add multiple new Participant to a Booker in one shot
         var secondPart = new Participant();
@@ -53,11 +53,13 @@ public class ActivityRepositoryTest {
         firstBooker.getParticipants().add(secondPart);
         firstBooker = bookerRepository.save(firstBooker);
         // jpa does not set the @Id in the associated entity, inefficient, but we're in a test 🤷
-        firstBooker.getParticipants().stream()
-                .filter(p -> p.getId() != firstPart.getId())
-                .findFirst()
-                .map(Participant::getId)
-                .ifPresent(secondPart::setId);
+        firstBooker
+            .getParticipants()
+            .stream()
+            .filter(p -> p.getId() != firstPart.getId())
+            .findFirst()
+            .map(Participant::getId)
+            .ifPresent(secondPart::setId);
 
         // create second Booker with 1 Participant
         var secondBooker = new Booker();
@@ -72,10 +74,7 @@ public class ActivityRepositoryTest {
         secondBooker.getParticipants().add(thirdPart);
         secondBooker = bookerRepository.save(secondBooker);
         // jpa does not set the @Id in the associated entity, inefficient, but we're in a test 🤷
-        secondBooker.getParticipants().stream()
-                .findFirst()
-                .map(Participant::getId)
-                .ifPresent(thirdPart::setId);
+        secondBooker.getParticipants().stream().findFirst().map(Participant::getId).ifPresent(thirdPart::setId);
 
         // create the Event
         var event = new Event();
@@ -116,14 +115,15 @@ public class ActivityRepositoryTest {
 
         var savedActivity = activityRepository.findById(activity.getId());
         assertThat(savedActivity).isPresent();
-        var participantIdList =
-                savedActivity.get().getParticipants().stream()
-                        .sorted() // `natural` sorting, using `ActivityParticipant#compareTo`
-                        .map(ActivityParticipant::getParticipant)
-                        .map(Participant::getId)
-                        .toList();
+        var participantIdList = savedActivity
+            .get()
+            .getParticipants()
+            .stream()
+            .sorted() // `natural` sorting, using `ActivityParticipant#compareTo`
+            .map(ActivityParticipant::getParticipant)
+            .map(Participant::getId)
+            .toList();
 
-        assertThat(participantIdList)
-                .containsExactly(thirdPart.getId(), firstPart.getId(), secondPart.getId());
+        assertThat(participantIdList).containsExactly(thirdPart.getId(), firstPart.getId(), secondPart.getId());
     }
 }

@@ -67,11 +67,10 @@ public class SignatureService {
         String rsaKeyPem = properties.rsaKey();
 
         // Remove PEM headers and newlines
-        String privateKeyContent =
-                rsaKeyPem
-                        .replace("-----BEGIN PRIVATE KEY-----", "")
-                        .replace("-----END PRIVATE KEY-----", "")
-                        .replaceAll("\\s", "");
+        String privateKeyContent = rsaKeyPem
+            .replace("-----BEGIN PRIVATE KEY-----", "")
+            .replace("-----END PRIVATE KEY-----", "")
+            .replaceAll("\\s", "");
 
         // Decode the Base64 encoded key
         byte[] privateKeyBytes = Base64.getDecoder().decode(privateKeyContent);

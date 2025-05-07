@@ -7,6 +7,7 @@ import java.util.*;
 
 @Entity
 public class Activity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -100,16 +101,13 @@ public class Activity {
     @Transient
     public List<ActivityParticipant> getWaitingParticipants() {
         // ensure that `ActivityParticipant` are lazy-load if needed
-        return this.getParticipants().stream()
-                .skip(this.maxParticipants)
-                .limit(this.maxWaitingQueue)
-                .toList();
+        return this.getParticipants().stream().skip(this.maxParticipants).limit(this.maxWaitingQueue).toList();
     }
 
     public enum RegistrationStatus {
         OPEN,
         WAITING_LIST,
-        CLOSED
+        CLOSED,
     }
 
     @Transient

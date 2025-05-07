@@ -4,6 +4,7 @@ package org.montrealjug.billetterie.exception;
 import org.springframework.http.HttpStatus;
 
 public class RequestException extends RuntimeException {
+
     private String message;
     private HttpStatus httpStatus;
     private String viewName;

@@ -9,7 +9,9 @@ import java.util.Set;
 
 @Entity
 public class Booker {
-    @Id private String email;
+
+    @Id
+    private String email;
 
     private String firstName;
     private String lastName;

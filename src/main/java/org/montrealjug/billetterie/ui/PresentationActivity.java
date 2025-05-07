@@ -8,12 +8,13 @@ import org.montrealjug.billetterie.entity.Activity;
 import org.montrealjug.billetterie.entity.ActivityParticipant;
 
 public record PresentationActivity(
-        Long id,
-        @NotBlank String title,
-        @NotBlank String description,
-        int maxParticipants,
-        int maxWaitingQueue,
-        List<ActivityParticipant> waitingParticipants,
-        List<ActivityParticipant> participants,
-        Activity.RegistrationStatus registrationStatus,
-        LocalTime time) {}
+    Long id,
+    @NotBlank String title,
+    @NotBlank String description,
+    int maxParticipants,
+    int maxWaitingQueue,
+    List<ActivityParticipant> waitingParticipants,
+    List<ActivityParticipant> participants,
+    Activity.RegistrationStatus registrationStatus,
+    LocalTime time
+) {}

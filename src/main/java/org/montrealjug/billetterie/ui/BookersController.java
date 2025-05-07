@@ -37,15 +37,10 @@ public class BookersController {
     public String bookers(Model model) {
         Iterable<Booker> bookers = bookerRepository.findAll();
 
-        List<PresentationBooker> presentationBookers =
-                StreamSupport.stream(bookers.spliterator(), false)
-                        .map(
-                                booker ->
-                                        new PresentationBooker(
-                                                booker.getFirstName(),
-                                                booker.getLastName(),
-                                                booker.getEmail()))
-                        .toList();
+        List<PresentationBooker> presentationBookers = StreamSupport
+            .stream(bookers.spliterator(), false)
+            .map(booker -> new PresentationBooker(booker.getFirstName(), booker.getLastName(), booker.getEmail()))
+            .toList();
 
         model.addAttribute("bookerList", presentationBookers);
 
@@ -53,8 +48,7 @@ public class BookersController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Void> addBooker(@Valid PresentationBooker booker, Model model)
-            throws Exception {
+    public ResponseEntity<Void> addBooker(@Valid PresentationBooker booker, Model model) throws Exception {
         Booker bookerEntity = new Booker();
 
         String email = booker.email().toLowerCase();
@@ -71,9 +65,7 @@ public class BookersController {
 
         bookerRepository.save(bookerEntity);
 
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("/admin/bookers"))
-                .build();
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create("/admin/bookers")).build();
     }
 
     @GetMapping("add-booker")
@@ -86,14 +78,15 @@ public class BookersController {
         Optional<Booker> optionalBooker = this.bookerRepository.findById(email);
 
         if (optionalBooker.isEmpty()) {
-            throw new EntityNotFoundException(
-                    "Booker with email " + email + " not found", "bookers-create-update");
+            throw new EntityNotFoundException("Booker with email " + email + " not found", "bookers-create-update");
         }
 
         Booker booker = optionalBooker.get();
-        PresentationBooker presentationBooker =
-                new PresentationBooker(
-                        booker.getFirstName(), booker.getLastName(), booker.getEmail());
+        PresentationBooker presentationBooker = new PresentationBooker(
+            booker.getFirstName(),
+            booker.getLastName(),
+            booker.getEmail()
+        );
         model.addAttribute("booker", presentationBooker);
 
         return "bookers-create-update";
@@ -101,12 +94,17 @@ public class BookersController {
 
     @PostMapping("{email}")
     public ResponseEntity<Void> updateBooker(
-            Model model, @PathVariable String email, @Valid PresentationBooker presentationBooker) {
+        Model model,
+        @PathVariable String email,
+        @Valid PresentationBooker presentationBooker
+    ) {
         Optional<Booker> optionalBooker = bookerRepository.findById(email);
 
         if (optionalBooker.isEmpty()) {
             throw new RedirectableNotFoundException(
-                    "Booker with email " + email + " not found", "/admin/bookers/" + email);
+                "Booker with email " + email + " not found",
+                "/admin/bookers/" + email
+            );
         }
 
         Booker booker = optionalBooker.get();
@@ -132,8 +130,6 @@ public class BookersController {
         bookerRepository.save(booker);
 
         // return to the new email as url path variable if changed
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("/admin/bookers"))
-                .build();
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create("/admin/bookers")).build();
     }
 }

@@ -25,15 +25,15 @@ public class IndexController {
 
         if (optionalEvent.isPresent()) {
             Event event = optionalEvent.get();
-            PresentationEvent presentationEvent =
-                    new PresentationEvent(
-                            event.getId(),
-                            event.getTitle(),
-                            event.getDescription(),
-                            event.getDate(),
-                            toIndexActivities(event.getActivities()),
-                            event.isActive(),
-                            event.getImagePath());
+            PresentationEvent presentationEvent = new PresentationEvent(
+                event.getId(),
+                event.getTitle(),
+                event.getDescription(),
+                event.getDate(),
+                toIndexActivities(event.getActivities()),
+                event.isActive(),
+                event.getImagePath()
+            );
             model.addAttribute("event", presentationEvent);
         }
 

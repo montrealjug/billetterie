@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 interface EmailSender {
-
     Logger LOGGER = LoggerFactory.getLogger(EmailSender.class.getName());
 
     void send(EmailToSend emailToSend) throws MessagingException;
