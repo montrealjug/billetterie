@@ -4,8 +4,13 @@ A webapp to manage the ticketing for a Devoxx4Kids event
 
 ## See it in action
 
-https://billetterie.fly.dev/
+https://billetterie.devoxx4kids.montreal-jug.org
 
+or
+
+https://billetterie.devoxx4kids.montrealjug.org
+
+because, well, we can't decide which domain to use 🤷
 
 ## Run the app in development
 
