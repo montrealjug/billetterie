@@ -192,6 +192,7 @@
 							<content>// SPDX-License-Identifier: Apache-2.0</content>
 						</licenseHeader>
 					</java>
+					<skip>${env.SKIP_SPOTLESS}</skip>
 				</configuration>
 			</plugin>
 			<plugin>

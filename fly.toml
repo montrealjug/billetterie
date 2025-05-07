@@ -38,6 +38,7 @@ builder = "paketobuildpacks/builder-noble-java-tiny"
 #BP_NATIVE_IMAGE="true"
 #BP_JVM_CDS_ENABLED="true"
 #BP_SPRING_AOT_ENABLED="true"
+SKIP_SPOTLESS=true
 BP_JVM_VERSION="21"
 # this is for the prettier plugin, that uses node / npm
 # the node installation will be coming from the frontend-plugin, and since it executes first, prettier will reuse it
