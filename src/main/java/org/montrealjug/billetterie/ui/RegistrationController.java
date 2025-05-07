@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.ui;
 
-import static org.montrealjug.billetterie.ui.Utils.toIndexActivities;
+import static org.montrealjug.billetterie.ui.Utils.toPresentationActivities;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -208,7 +208,7 @@ public class RegistrationController {
                 event.getTitle(),
                 event.getDescription(),
                 event.getDate(),
-                toIndexActivities(event.getActivities()),
+                toPresentationActivities(event.getActivities()),
                 event.isActive(),
                 event.getImagePath()
             );
@@ -228,7 +228,7 @@ public class RegistrationController {
                     event.getTitle(),
                     event.getDescription(),
                     event.getDate(),
-                    toIndexActivities(event.getActivities()),
+                    toPresentationActivities(event.getActivities()),
                     event.isActive(),
                     event.getImagePath()
                 );

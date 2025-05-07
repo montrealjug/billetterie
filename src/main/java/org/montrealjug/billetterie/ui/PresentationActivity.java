@@ -16,5 +16,6 @@ public record PresentationActivity(
     List<ActivityParticipant> waitingParticipants,
     List<ActivityParticipant> participants,
     Activity.RegistrationStatus registrationStatus,
-    LocalTime time
+    LocalTime time,
+    String imagePath
 ) {}

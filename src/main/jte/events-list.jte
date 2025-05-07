@@ -26,7 +26,7 @@
                         <h2 class="text-lg font-semibold text-gray-700">${event.title()} - ${event.active() ? "Active" : "Not Active"}</h2>
                         <p class="text-gray-600">${event.description()}</p>
                         <p class="text-gray-500 text-sm mt-1">${event.date().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))}</p>
-                        <p class="text-gray-500 text-sm mt-1">image path: ${event.imagePath()}</p>
+                        <p class="text-gray-500 text-sm mt-1">${event.imagePath()}</p>
                     </div>
                     <div class="flex space-x-2 mt-4 md:mt-0">
                         <a href="/admin/events/${event.id()}"
@@ -60,7 +60,10 @@
                             !{var waitingParticipantsNumber = activity.waitingParticipants().size(); }
 
                             <tr>
-                            <td class="border border-gray-300 px-4 py-2">${activity.title()}</td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                ${activity.title()}
+                                <span class="block mt-1 text-sm text-gray-500 text-no-wrap whitespace-nowrap">${activity.imagePath()}</span>
+                            </td>
                             <td class="border border-gray-300 px-4 py-2">${activity.description()}</td>
                             <td class="border border-gray-300 px-4 py-2">
                                 ${regularParticipantsNumber}/${activity.maxParticipants()}
