@@ -33,6 +33,9 @@
 		<jsoup.version>1.20.1</jsoup.version>
 		<jte.version>3.2.1</jte.version>
 		<spotless.version>2.44.4</spotless.version>
+		<!-- tailwind processor stack -->
+		<node.version>v22.15.0</node.version>
+		<frontend-maven-plugin.version>1.15.1</frontend-maven-plugin.version>
     </properties>
 	<dependencies>
 		<dependency>
@@ -188,6 +191,49 @@
 							<content>// SPDX-License-Identifier: Apache-2.0</content>
 						</licenseHeader>
 					</java>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<version>${frontend-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>install node and npm</id>
+						<goals>
+							<goal>install-node-and-npm</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<nodeVersion>${node.version}</nodeVersion>
+						</configuration>
+					</execution>
+					<execution>
+						<id>npm install</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<arguments>install</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>npm build</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<arguments>run build</arguments>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<nodeVersion>${node.version}</nodeVersion>
+					<workingDirectory>src/main/tailwind</workingDirectory>
+					<installDirectory>target</installDirectory>
+					<skip>true</skip>
 				</configuration>
 			</plugin>
 		</plugins>

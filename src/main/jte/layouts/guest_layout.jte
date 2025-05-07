@@ -9,7 +9,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- replace the tailwind tags with the following when tailwind build is activated -->
+    <!-- link rel="stylesheet" href="/static/main.css" /-->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-d4k-orange: #f0690a;
+        }
+    </style>
     <!-- favicons and co. -->
     <link rel="icon" type="image/png" href="/static/favicons/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/static/favicons/favicon.svg" />
@@ -17,28 +24,32 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/static/favicons/apple-touch-icon.png" />
     <link rel="manifest" href="/static/favicons/site.webmanifest" />
 </head>
-<body class="bg-gray-100 flex flex-col min-h-screen justify-between">
-<header>
-<nav class="shadow-md p-4 bg-[#f78c40] w-full flex justify-between items-center">
+<body class="bg-gray-100 flex flex-col h-screen justify-between">
+<header class="shadow-md p-4 bg-d4k-orange w-full flex justify-between items-center text-white">
     <img
         src="https://www.devoxx4kids.org/quebec/wp-content/uploads/sites/12/2014/06/D4K_QUEBEC_1000px.png"
         alt="Devoxx4Kids Québec logo"
-        class="max-h-24 bg-white rounded-lg p-2 shadow-lg"
+        class="max-h-20 bg-white rounded-lg p-2 shadow-lg"
     />
-    <p class="grow-1 text-white text-3xl font-bold text-shadow-lg">La Billetterie Devoxx4kids Québec</p>
-    <a href="/admin/events">TMP: Go to Admin page</a>
-</nav>
+    <p class="grow-1 text-3xl font-bold pl-5 text-shadow-xs">Billetterie Devoxx4Kids Québec</p>
+    <nav>
+        <ul>
+            <li>
+                <a class="shadow-2xs font-semibold p-3 rounded-md border-2 border-white hover:bg-white hover:text-d4k-orange"
+                   href="/admin/events">Admin</a>
+            </li>
+        </ul>
+    </nav>
 </header>
-<main class="grow-1">
+<main class="grow-1 justify-start overflow-y-auto p-4 flex flex-col">
     ${content}
 </main>
-<footer>
-    <div>
-        <ul class="flex space-x-10 justify-center">
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms and Conditions</a></li>
-        </ul>
-    </div>
+<footer class="bg-white p-4 flex justify-between text-gray-500 text-sm">
+    <span>&copy;&nbsp;${java.time.LocalDate.now().getYear()}&nbsp;Devoxx4Kids Québec</span>
+    <ul class="flex space-x-10 justify-center">
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms and Conditions</a></li>
+    </ul>
 </footer>
 </body>
 </html>

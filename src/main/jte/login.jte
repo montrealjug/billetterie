@@ -1,52 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
-<main>
-  <div class="min-h-screen flex items-center justify-center">
-    <div class="max-w-md w-full space-y-8">
-      <div>
+@template.layouts.guest_layout(title = "Admin Login", content = @`
+  <div class="flex items-center justify-center">
+    <form class="max-w-md w-full rounded bg-white p-8 shadow-md space-y-8" action="/admin/login" method="POST">
+      <fieldset class="space-y-8 bg-gray-100 p-4 rounded-md shadow">
         <h1 class="text-center text-3xl font-bold">Sign in to access Admin</h1>
+        <label for="username" class="hidden">Username:</label>
+        <input type="text"
+               name="username"
+               required
+               id="username"
+               class="rounded-md w-full px-3 py-2 border border-gray-400 bg-white"
+               placeholder="Username">
+        <label for="password" class="hidden">Password:</label>
+        <input type="password"
+               name="password"
+               required
+               id="password"
+               class="rounded-md w-full px-3 py-2 border border-gray-400 bg-white"
+               placeholder="Password">
+      </fieldset>
+      <div class="flex justify-between">
+        <button type="submit"
+                class="w-36 text-white bg-d4k-orange px-3 py-2 rounded hover:bg-orange-600 focus:outline-none focus:ring focus:ring-orange-600">
+          Login
+        </button>
+        <button type="button"
+                onclick="window.location.href = '/';"
+                class="w-36 text-white bg-red-500 hover:bg-red-600 px-3 py-2 rounded focus:outline-none focus:ring focus:ring-red-300">
+          Cancel
+        </button>
       </div>
-
-      <form class="mt-8 space-y-6" action="/admin/login" method="POST">
-        <div>
-          <label for="username" class="hidden">Username:</label>
-          <input type="text"
-                 name="username"
-                 required
-                 id="username"
-                 class="appearance-none rounded-md relative block w-full px-3 py-2 border"
-                 placeholder="Username">
-        </div>
-        <div>
-          <label for="password" class="hidden">Password:</label>
-          <input type="password"
-                 name="password"
-                 required
-                 id="password"
-                 class="appearance-none rounded-md relative block w-full px-3 py-2 border"
-                 placeholder="Password">
-        </div>
-        <div class="flex justify-between">
-          <button type="submit"
-                  class="group relative w-48 flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
-            Login
-          </button>
-          <button type="button"
-                  onclick="window.location.href = '/';"
-                  class="group relative w-48 flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">
-            Cancel
-          </button>
-        </div>
-      </form>
-    </div>
+    </form>
   </div>
-</main>
-</body>
-</html>
+`)

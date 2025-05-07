@@ -1,0 +1,15 @@
+{
+  "name": "spring-mvc-tailwind-processor-chain",
+  "version": "1.0.0",
+  "description": "Tailwind processor chain for a Spring MVC project",
+  "scripts": {
+    "build": "npx @tailwindcss/cli -i ./style.css -o ../resources/static/main.css --minify",
+    "watch": "npx @tailwindcss/cli --watch -i ./style.css -o ../resources/static/main.css --minify"
+  },
+  "author": "montrealjug",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@tailwindcss/cli": "4.1.5",
+    "tailwindcss": "4.1.5"
+  }
+}

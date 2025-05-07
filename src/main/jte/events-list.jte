@@ -8,7 +8,7 @@
 
 @template.layouts.admin_layout(title = "Event List", content = @`
 
-    <div class="flex flex-col items-center justify-center my-100">
+    <div class="flex flex-col items-center justify-center">
         <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
             <!-- Create Event Button -->
             <div class="flex justify-between items-center mb-6">
@@ -231,11 +231,11 @@
                     // Send DELETE request to the server
                     @raw
                     const response = await fetch(`/admin/activities/${activityId}/participants/${participantId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                            });
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
                     @endraw
 
 

@@ -68,7 +68,7 @@ content = @`
                                             </button>
                                         @else
                                             <button onclick="displayParticipantModal(${activity.id()})" 
-                                                    class="bg-[#e16309] text-white px-3 py-1 rounded hover:opacity-80 focus:outline-none focus:ring focus:ring-orange-300">
+                                                    class="bg-d4k-orange text-white px-3 py-1 rounded hover:opacity-80 focus:outline-none focus:ring focus:ring-orange-300">
                                                 Add participant
                                             </button>
                                         @endif
@@ -128,7 +128,7 @@ content = @`
             // Create the modal elements
             const modal = document.createElement("div");
             modal.id = "participant-modal";
-            modal.className = "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50";
+            modal.className = "fixed inset-0 flex items-center justify-center bg-black/50 z-50";
     @raw
             modal.innerHTML = `
         <div class="bg-white rounded-lg shadow-md p-6 w-96">
@@ -150,7 +150,7 @@ content = @`
                 <div id="error-message" class="text-red-500 text-sm hidden"></div>
                 <div class="flex justify-end gap-2">
                     <button type="button" onclick="closeModal()" class="bg-gray-300 text-gray-700 px-3 py-1 rounded hover:bg-gray-400 focus:outline-none focus:ring">Cancel</button>
-                    <button type="submit" class="bg-[#ee7c2a] text-white px-3 py-1 rounded hover:opacity-80 focus:outline-none focus:ring focus:ring-blue-300">Submit</button>
+                    <button type="submit" class="bg-d4k-orange text-white px-3 py-1 rounded hover:opacity-80 focus:outline-none focus:ring focus:ring-blue-300">Submit</button>
                 </div>
             </form>
         </div>
