@@ -38,6 +38,7 @@ builder = "paketobuildpacks/builder-noble-java-tiny"
 #BP_NATIVE_IMAGE="true"
 #BP_JVM_CDS_ENABLED="true"
 #BP_SPRING_AOT_ENABLED="true"
+SKIP_SPOTLESS=true
 BP_JVM_VERSION="21"
 #JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=-1'
 #CDS_TRAINING_JAVA_TOOL_OPTIONS="-Dspring.jpa.hibernate.ddl-auto=none -Dhibernate.dialect=org.hibernate.dialect.PostgreSQLDialect"
