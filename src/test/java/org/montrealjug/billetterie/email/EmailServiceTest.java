@@ -17,13 +17,17 @@ import org.montrealjug.billetterie.email.EmailModel.EmailToSend;
 @ExtendWith(MockitoExtension.class)
 class EmailServiceTest {
 
-    @Mock SmtpEmailSender emailSender;
+    @Mock
+    SmtpEmailSender emailSender;
 
-    @Mock EmailWriter emailWriter;
+    @Mock
+    EmailWriter emailWriter;
 
-    @Mock Email email;
+    @Mock
+    Email email;
 
-    @Mock EmailToSend emailToSend;
+    @Mock
+    EmailToSend emailToSend;
 
     EmailService emailService;
 
@@ -33,8 +37,7 @@ class EmailServiceTest {
     }
 
     @Test
-    void sendEmail_should_call_emailSender_send_with_the_result_of_emailWriter_write()
-            throws Exception {
+    void sendEmail_should_call_emailSender_send_with_the_result_of_emailWriter_write() throws Exception {
         when(emailWriter.write(email)).thenReturn(emailToSend);
 
         emailService.sendEmail(email);

@@ -74,10 +74,10 @@ public class ActivityParticipant implements Comparable<ActivityParticipant> {
 
     @Override
     public int compareTo(ActivityParticipant o) {
-        var activityComp =
-                Long.compare(
-                        this.activityParticipantKey.getActivityId(),
-                        o.activityParticipantKey.getActivityId());
+        var activityComp = Long.compare(
+            this.activityParticipantKey.getActivityId(),
+            o.activityParticipantKey.getActivityId()
+        );
         if (activityComp == 0) {
             return this.registrationTime.compareTo(o.registrationTime);
         } else {

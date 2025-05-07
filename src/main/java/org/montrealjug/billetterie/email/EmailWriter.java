@@ -20,8 +20,7 @@ class EmailWriter {
 
     EmailToSend write(Email email) {
         var emailType = email.type();
-        var subject =
-                this.messageSource.getMessage(emailType.subjectKey(), null, Locale.CANADA_FRENCH);
+        var subject = this.messageSource.getMessage(emailType.subjectKey(), null, Locale.CANADA_FRENCH);
         var plainText = this.writeTemplate(emailType.plainTextTemplate(), email);
         var htmlText = this.writeTemplate(emailType.htmlTextTemplate(), email);
         return new EmailToSend(email.to(), subject, plainText, htmlText);

@@ -18,13 +18,14 @@ import org.montrealjug.billetterie.config.BilletterieProperties;
 
 class SignatureServiceTest {
 
-    @Mock private BilletterieProperties properties;
+    @Mock
+    private BilletterieProperties properties;
 
     private SignatureService signatureService;
 
     // Test RSA key pair (only for testing)
     private static final String TEST_PRIVATE_KEY =
-            """
+        """
             -----BEGIN PRIVATE KEY-----
             MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC1Ni7AvSg7afrp
             doa4mkstme3qKfOXvIm52RoHkE+24nyipe7mjTS1ysRgEMRKXiSgW0K+mFFHiCDP
@@ -57,7 +58,7 @@ class SignatureServiceTest {
 
     // Corresponding public key for verification (only for testing)
     private static final String TEST_PUBLIC_KEY =
-            """
+        """
             MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtTYuwL0oO2n66XaGuJpL\
             LZnt6inzl7yJudkaB5BPtuJ8oqXu5o00tcrEYBDESl4koFtCvphRR4ggz0aSJWT9\
             hSMBTkCXnrYxJVtEpNIZL7423p3uXSFyjVgmZfM9weJMxVdHXmyJKBQvbYs2EPAV\

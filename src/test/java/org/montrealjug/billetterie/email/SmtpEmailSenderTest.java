@@ -36,22 +36,22 @@ class SmtpEmailSenderTest {
     private static final EmailToSend TEST_DATA = testData();
     private static final EmailProperties EMAIL_PROPERTIES = EmailTestHelper.emailProperties();
 
-    @Mock JavaMailSender javaMailSender;
+    @Mock
+    JavaMailSender javaMailSender;
 
-    @Mock MimeMessage mimeMessage;
+    @Mock
+    MimeMessage mimeMessage;
 
     SmtpEmailSender emailSender;
 
     @BeforeEach
     void setUp() {
-        when(javaMailSender.createMimeMessage())
-                .thenReturn(mimeMessage)
-                .thenReturn(mock(MimeMessage.class));
+        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage).thenReturn(mock(MimeMessage.class));
         doNothing().when(javaMailSender).send(same(mimeMessage));
         lenient()
-                .doThrow(new IllegalArgumentException("unexpected message send!"))
-                .when(javaMailSender)
-                .send(not(same(mimeMessage)));
+            .doThrow(new IllegalArgumentException("unexpected message send!"))
+            .when(javaMailSender)
+            .send(not(same(mimeMessage)));
         this.emailSender = new SmtpEmailSender(javaMailSender, EMAIL_PROPERTIES);
     }
 
@@ -64,8 +64,8 @@ class SmtpEmailSenderTest {
         assertThat(javaMailSender.createMimeMessage()).isNotNull().isNotSameAs(mimeMessage);
         // calling send with another message than our mock should throw expected Exception
         assertThatThrownBy(() -> this.javaMailSender.send(mock(MimeMessage.class)))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("unexpected message send!");
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("unexpected message send!");
         // calling send with our mock message should not throw any Exception
         assertThatCode(() -> this.javaMailSender.send(mimeMessage)).doesNotThrowAnyException();
     }
@@ -153,8 +153,7 @@ class SmtpEmailSenderTest {
         var textPlainPart = alternativeContentPart.getBodyPart(0);
         // our `textPlainPart` should have a dataHandler with contentType `text/plain;
         // charset=UTF-8`
-        assertThat(textPlainPart.getDataHandler().getContentType())
-                .isEqualTo("text/plain; charset=UTF-8");
+        assertThat(textPlainPart.getDataHandler().getContentType()).isEqualTo("text/plain; charset=UTF-8");
         // our `textPlainPart` should contain our text plain content
         assertThat(textPlainPart.getContent()).isEqualTo(TEST_DATA.plainText());
         // the second part of our `alternativeContentPart` should be our `htmlPart`

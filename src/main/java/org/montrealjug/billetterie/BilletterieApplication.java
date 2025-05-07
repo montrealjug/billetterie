@@ -11,7 +11,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 public class BilletterieApplication {
 
     public static void main(String[] args) {
-
         SpringApplication.run(BilletterieApplication.class, args);
     }
 }

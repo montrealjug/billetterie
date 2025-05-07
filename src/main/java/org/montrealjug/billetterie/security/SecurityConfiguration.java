@@ -40,15 +40,12 @@ public class SecurityConfiguration {
     @Order(0)
     SecurityFilterChain actuatorBasicAuth(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .securityMatchers(
-                        securityMatcher -> securityMatcher.requestMatchers("/actuator/**"))
-                .authorizeHttpRequests(
-                        authorizationRequests ->
-                                authorizationRequests.anyRequest().hasRole(ACTUATOR_ROLE))
-                .httpBasic(httpBasic -> httpBasic.realmName("actuator realm"))
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
-                .build();
+            .securityMatchers(securityMatcher -> securityMatcher.requestMatchers("/actuator/**"))
+            .authorizeHttpRequests(authorizationRequests -> authorizationRequests.anyRequest().hasRole(ACTUATOR_ROLE))
+            .httpBasic(httpBasic -> httpBasic.realmName("actuator realm"))
+            .csrf(AbstractHttpConfigurer::disable)
+            .cors(AbstractHttpConfigurer::disable)
+            .build();
     }
 
     // quick note on csrf
@@ -64,39 +61,37 @@ public class SecurityConfiguration {
     // https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
     @Bean
     @Order(1)
-    SecurityFilterChain appSecurityFilterChain(HttpSecurity http, AdminProperties adminProperties)
-            throws Exception {
-        return http.authorizeHttpRequests(
-                        authorizeRequests ->
-                                authorizeRequests
-                                        .requestMatchers("/admin/**")
-                                        .hasRole(ADMIN_ROLE)
-                                        // we can authorize everything else,
-                                        // as `/actuator/**` is handled first
-                                        .anyRequest()
-                                        .permitAll())
-                .formLogin(
-                        loginForm ->
-                                loginForm
-                                        .loginPage("/admin/login")
-                                        .defaultSuccessUrl("/admin/events")
-                                        .failureForwardUrl("/login-failed")
-                                        .permitAll())
-                .logout(
-                        logout ->
-                                logout.clearAuthentication(true)
-                                        .invalidateHttpSession(true)
-                                        .logoutUrl("/admin/logout")
-                                        .logoutSuccessUrl("/")
-                                        .deleteCookies(adminProperties.sessionCookieName()))
-                .sessionManagement(
-                        session ->
-                                session.sessionConcurrency(
-                                        concurrency -> concurrency.expiredUrl("/")))
-                .csrf(AbstractHttpConfigurer::disable)
-                // no need for CORS for our `app`, so let's be sure its forbidden
-                .cors(AbstractHttpConfigurer::disable)
-                .build();
+    SecurityFilterChain appSecurityFilterChain(HttpSecurity http, AdminProperties adminProperties) throws Exception {
+        return http
+            .authorizeHttpRequests(authorizeRequests ->
+                authorizeRequests
+                    .requestMatchers("/admin/**")
+                    .hasRole(ADMIN_ROLE)
+                    // we can authorize everything else,
+                    // as `/actuator/**` is handled first
+                    .anyRequest()
+                    .permitAll()
+            )
+            .formLogin(loginForm ->
+                loginForm
+                    .loginPage("/admin/login")
+                    .defaultSuccessUrl("/admin/events")
+                    .failureForwardUrl("/login-failed")
+                    .permitAll()
+            )
+            .logout(logout ->
+                logout
+                    .clearAuthentication(true)
+                    .invalidateHttpSession(true)
+                    .logoutUrl("/admin/logout")
+                    .logoutSuccessUrl("/")
+                    .deleteCookies(adminProperties.sessionCookieName())
+            )
+            .sessionManagement(session -> session.sessionConcurrency(concurrency -> concurrency.expiredUrl("/")))
+            .csrf(AbstractHttpConfigurer::disable)
+            // no need for CORS for our `app`, so let's be sure its forbidden
+            .cors(AbstractHttpConfigurer::disable)
+            .build();
     }
 
     @Bean
@@ -105,22 +100,21 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    UserDetailsService userDetailsService(
-            PasswordEncoder passwordEncoder, AdminProperties adminProperties) {
+    UserDetailsService userDetailsService(PasswordEncoder passwordEncoder, AdminProperties adminProperties) {
         var adminPassword = passwordEncoder.encode(adminProperties.adminPassword());
-        var adminUser =
-                User.builder()
-                        .username(adminProperties.adminUsername())
-                        .password(adminPassword)
-                        .roles(ADMIN_ROLE)
-                        .build();
+        var adminUser = User
+            .builder()
+            .username(adminProperties.adminUsername())
+            .password(adminPassword)
+            .roles(ADMIN_ROLE)
+            .build();
         var actuatorPassword = passwordEncoder.encode(adminProperties.actuatorPassword());
-        var actuatorUser =
-                User.builder()
-                        .username(adminProperties.actuatorUsername())
-                        .password(actuatorPassword)
-                        .roles(ACTUATOR_ROLE)
-                        .build();
+        var actuatorUser = User
+            .builder()
+            .username(adminProperties.actuatorUsername())
+            .password(actuatorPassword)
+            .roles(ACTUATOR_ROLE)
+            .build();
         return new InMemoryUserDetailsManager(adminUser, actuatorUser);
     }
 
@@ -146,11 +140,11 @@ public class SecurityConfiguration {
 
     @ConfigurationProperties(prefix = "app.admin")
     record AdminProperties(
-            String adminUsername,
-            String adminPassword,
-            String sessionCookieName,
-            String actuatorPassword) {
-
+        String adminUsername,
+        String adminPassword,
+        String sessionCookieName,
+        String actuatorPassword
+    ) {
         String actuatorUsername() {
             return "actuator";
         }

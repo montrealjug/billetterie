@@ -2,6 +2,7 @@
 package org.montrealjug.billetterie.exception;
 
 public class EntityNotFoundException extends RuntimeException {
+
     private String message;
     private String viewName;
 

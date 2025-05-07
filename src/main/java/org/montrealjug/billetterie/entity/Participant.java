@@ -7,6 +7,7 @@ import java.util.Objects;
 
 @Entity
 public class Participant {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

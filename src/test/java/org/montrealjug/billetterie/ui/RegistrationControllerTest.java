@@ -49,7 +49,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class RegistrationControllerTest {
 
-    @LocalServerPort private int port;
+    @LocalServerPort
+    private int port;
 
     @BeforeEach
     void setUp() {
@@ -72,15 +73,20 @@ class RegistrationControllerTest {
     static final Set<String> CREATED_BOOKER_IDS = new HashSet<>();
     static final Set<Long> CREATED_EVENT_IDS = new HashSet<>();
 
-    @Autowired BookerRepository bookerRepository;
+    @Autowired
+    BookerRepository bookerRepository;
 
-    @Autowired EventRepository eventRepository;
+    @Autowired
+    EventRepository eventRepository;
 
-    @MockitoBean SignatureService signatureService;
+    @MockitoBean
+    SignatureService signatureService;
 
-    @MockitoSpyBean EmailService emailService;
+    @MockitoSpyBean
+    EmailService emailService;
 
-    @Captor ArgumentCaptor<Email> emailCaptor;
+    @Captor
+    ArgumentCaptor<Email> emailCaptor;
 
     @Test
     void retrieveBaseUrlTest() {
@@ -116,33 +122,45 @@ class RegistrationControllerTest {
         participant.setYearOfBirth(1990);
 
         // Test with matching submission
-        ParticipantSubmission matchingSubmission =
-                new ParticipantSubmission("John", "Doe", 1990, 1L, "signature");
+        ParticipantSubmission matchingSubmission = new ParticipantSubmission("John", "Doe", 1990, 1L, "signature");
         boolean result = RegistrationController.isSameParticipant(participant, matchingSubmission);
         assertTrue(result, "Should return true for matching participant");
 
         // Test with different first name
-        ParticipantSubmission differentFirstNameSubmission =
-                new ParticipantSubmission("Jane", "Doe", 1990, 1L, "signature");
-        result =
-                RegistrationController.isSameParticipant(participant, differentFirstNameSubmission);
+        ParticipantSubmission differentFirstNameSubmission = new ParticipantSubmission(
+            "Jane",
+            "Doe",
+            1990,
+            1L,
+            "signature"
+        );
+        result = RegistrationController.isSameParticipant(participant, differentFirstNameSubmission);
         assertFalse(result, "Should return false for different first name");
 
         // Test with different last name
-        ParticipantSubmission differentLastNameSubmission =
-                new ParticipantSubmission("John", "Smith", 1990, 1L, "signature");
+        ParticipantSubmission differentLastNameSubmission = new ParticipantSubmission(
+            "John",
+            "Smith",
+            1990,
+            1L,
+            "signature"
+        );
         result = RegistrationController.isSameParticipant(participant, differentLastNameSubmission);
         assertFalse(result, "Should return false for different last name");
 
         // Test with different year of birth
-        ParticipantSubmission differentYearSubmission =
-                new ParticipantSubmission("John", "Doe", 1991, 1L, "signature");
+        ParticipantSubmission differentYearSubmission = new ParticipantSubmission("John", "Doe", 1991, 1L, "signature");
         result = RegistrationController.isSameParticipant(participant, differentYearSubmission);
         assertFalse(result, "Should return false for different year of birth");
 
         // Test case insensitivity
-        ParticipantSubmission caseInsensitiveSubmission =
-                new ParticipantSubmission("JOHN", "DOE", 1990, 1L, "signature");
+        ParticipantSubmission caseInsensitiveSubmission = new ParticipantSubmission(
+            "JOHN",
+            "DOE",
+            1990,
+            1L,
+            "signature"
+        );
         result = RegistrationController.isSameParticipant(participant, caseInsensitiveSubmission);
         assertTrue(result, "Should return true for case-insensitive match");
     }
@@ -152,78 +170,78 @@ class RegistrationControllerTest {
         var email = "not-known-email@test.org";
         var bookerCheck = new BookerCheck(email);
 
-        given().contentType(ContentType.JSON)
-                .body(bookerCheck)
-                .when()
-                .post("/check-returning-booker")
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value());
+        given()
+            .contentType(ContentType.JSON)
+            .body(bookerCheck)
+            .when()
+            .post("/check-returning-booker")
+            .then()
+            .statusCode(HttpStatus.NOT_FOUND.value());
 
         verifyNoInteractions(emailService);
     }
 
     @Test
-    void
-            checkReturningBooker_should_return_204_sending_RETURNING_BOOKER_email_if_booker_known_and_confirmed() {
+    void checkReturningBooker_should_return_204_sending_RETURNING_BOOKER_email_if_booker_known_and_confirmed() {
         var email = "returning-booker@test.org";
         createBooker(email, true);
         var bookerCheck = new BookerCheck(email);
 
-        given().contentType(ContentType.JSON)
-                .body(bookerCheck)
-                .when()
-                .post("/check-returning-booker")
-                .then()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+        given()
+            .contentType(ContentType.JSON)
+            .body(bookerCheck)
+            .when()
+            .post("/check-returning-booker")
+            .then()
+            .statusCode(HttpStatus.NO_CONTENT.value());
 
         verify(emailService).sendEmail(emailCaptor.capture());
         assertThat(emailCaptor.getValue().type()).isSameAs(EmailType.RETURNING_BOOKER);
     }
 
     @Test
-    void
-            checkReturningBooker_should_return_204_sending_AFTER_REGISTRATION_email_if_booker_known_and_not_confirmed() {
+    void checkReturningBooker_should_return_204_sending_AFTER_REGISTRATION_email_if_booker_known_and_not_confirmed() {
         var email = "not-verified-booker@test.org";
         createBooker(email, false);
         var bookerCheck = new BookerCheck(email);
 
-        given().contentType(ContentType.JSON)
-                .body(bookerCheck)
-                .when()
-                .post("/check-returning-booker")
-                .then()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+        given()
+            .contentType(ContentType.JSON)
+            .body(bookerCheck)
+            .when()
+            .post("/check-returning-booker")
+            .then()
+            .statusCode(HttpStatus.NO_CONTENT.value());
 
         verify(emailService).sendEmail(emailCaptor.capture());
         assertThat(emailCaptor.getValue().type()).isSameAs(EmailType.AFTER_REGISTRATION);
     }
 
     @Test
-    void
-            registerBooker_should_return_a_201_after_saving_booker_in_db_and_sending_AFTER_REGISTRATION_email()
-                    throws Exception {
+    void registerBooker_should_return_a_201_after_saving_booker_in_db_and_sending_AFTER_REGISTRATION_email()
+        throws Exception {
         var email = "registration-booker@test.org";
         when(signatureService.signAndTrim(email)).thenReturn(SIGNATURE);
         var booker = new PresentationBooker("New", "Booker", email);
         CREATED_BOOKER_IDS.add(email);
 
-        given().contentType(ContentType.JSON)
-                .body(booker)
-                .when()
-                .post("/register-booker")
-                .then()
-                .statusCode(HttpStatus.CREATED.value());
+        given()
+            .contentType(ContentType.JSON)
+            .body(booker)
+            .when()
+            .post("/register-booker")
+            .then()
+            .statusCode(HttpStatus.CREATED.value());
 
         var savedBooker = bookerRepository.findById(email);
         assertThat(savedBooker)
-                .hasValueSatisfying(
-                        b -> {
-                            assertThat(b.getFirstName()).isEqualTo(booker.firstName());
-                            assertThat(b.getLastName()).isEqualTo(booker.lastName());
-                            assertThat(b.getEmail()).isEqualTo(booker.email());
-                            assertThat(b.getEmailSignature()).isEqualTo(SIGNATURE);
-                            assertThat(b.getValidationTime()).isNull();
-                        });
+            .hasValueSatisfying(b -> {
+                assertThat(b.getFirstName()).isEqualTo(booker.firstName());
+                assertThat(b.getLastName()).isEqualTo(booker.lastName());
+                assertThat(b.getEmail()).isEqualTo(booker.email());
+                assertThat(b.getEmailSignature()).isEqualTo(SIGNATURE);
+                assertThat(b.getValidationTime()).isNull();
+            });
         verify(emailService).sendEmail(emailCaptor.capture());
         assertThat(emailCaptor.getValue().type()).isSameAs(EmailType.AFTER_REGISTRATION);
     }
@@ -234,12 +252,13 @@ class RegistrationControllerTest {
         createBooker(email, false);
         var booker = new PresentationBooker("Other First Name", "Other Last Name", email);
 
-        given().contentType(ContentType.JSON)
-                .body(booker)
-                .when()
-                .post("/register-booker")
-                .then()
-                .statusCode(HttpStatus.CONFLICT.value());
+        given()
+            .contentType(ContentType.JSON)
+            .body(booker)
+            .when()
+            .post("/register-booker")
+            .then()
+            .statusCode(HttpStatus.CONFLICT.value());
         verifyNoInteractions(emailService, signatureService);
     }
 
@@ -253,24 +272,23 @@ class RegistrationControllerTest {
         // keep track of time
         var beforeCall = Instant.now();
 
-        var htmlPath =
-                given().pathParam("signature", SIGNATURE)
-                        .when()
-                        .get("/bookings/{signature}")
-                        .then()
-                        .statusCode(HttpStatus.OK.value())
-                        .contentType(ContentType.HTML)
-                        .extract()
-                        .htmlPath();
+        var htmlPath = given()
+            .pathParam("signature", SIGNATURE)
+            .when()
+            .get("/bookings/{signature}")
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .contentType(ContentType.HTML)
+            .extract()
+            .htmlPath();
 
         // check the title to ensure we are in the html generated by the `booker-activities.jte`
         // template
         assertThat((String) htmlPath.get("html.head.title")).isEqualTo("Event Activities");
         // check that booker validationTime has been updated
-        var validatedBooker =
-                bookerRepository
-                        .findById(email)
-                        .orElseThrow(() -> new IllegalStateException("Booker not found"));
+        var validatedBooker = bookerRepository
+            .findById(email)
+            .orElseThrow(() -> new IllegalStateException("Booker not found"));
         assertThat(validatedBooker.getValidationTime()).isBetween(beforeCall, Instant.now());
     }
 
@@ -282,27 +300,26 @@ class RegistrationControllerTest {
         // get the active Event (creates it if needed)
         getOrCreateActiveEvent();
 
-        var htmlPath =
-                given().pathParam("signature", SIGNATURE)
-                        .when()
-                        .get("/bookings/{signature}")
-                        .then()
-                        .statusCode(HttpStatus.OK.value())
-                        .contentType(ContentType.HTML)
-                        .extract()
-                        .htmlPath();
+        var htmlPath = given()
+            .pathParam("signature", SIGNATURE)
+            .when()
+            .get("/bookings/{signature}")
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .contentType(ContentType.HTML)
+            .extract()
+            .htmlPath();
 
         // check the title to ensure we are in the html generated by the `booker-activities.jte`
         // template
         assertThat((String) htmlPath.get("html.head.title")).isEqualTo("Event Activities");
         // check that booker validationTime has been updated
-        var validatedBooker =
-                bookerRepository
-                        .findById(email)
-                        .orElseThrow(() -> new IllegalStateException("Booker not found"));
+        var validatedBooker = bookerRepository
+            .findById(email)
+            .orElseThrow(() -> new IllegalStateException("Booker not found"));
         // compare with millis, because we lose precision in the DB
         assertThat(validatedBooker.getValidationTime().truncatedTo(ChronoUnit.MILLIS))
-                .isEqualTo(booker.getValidationTime().truncatedTo(ChronoUnit.MILLIS));
+            .isEqualTo(booker.getValidationTime().truncatedTo(ChronoUnit.MILLIS));
     }
 
     @Test
@@ -313,15 +330,15 @@ class RegistrationControllerTest {
         // get the active Event (creates it if needed)
         getOrCreateActiveEvent();
 
-        var htmlPath =
-                given().pathParam("signature", "not-known-signature")
-                        .when()
-                        .get("/bookings/{signature}")
-                        .then()
-                        .statusCode(HttpStatus.OK.value())
-                        .contentType(ContentType.HTML)
-                        .extract()
-                        .htmlPath();
+        var htmlPath = given()
+            .pathParam("signature", "not-known-signature")
+            .when()
+            .get("/bookings/{signature}")
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .contentType(ContentType.HTML)
+            .extract()
+            .htmlPath();
 
         // check the title to ensure we are in the html generated by the `index.jte`
         // template
@@ -333,8 +350,7 @@ class RegistrationControllerTest {
     }
 
     @Test
-    void
-            startBooking_should_display_index_without_error_msg_if_Booker_found_but_no_Event_is_active() {
+    void startBooking_should_display_index_without_error_msg_if_Booker_found_but_no_Event_is_active() {
         // create an already validated Booker
         var email = "start-booking@test.org";
         createBooker(email, true);
@@ -344,15 +360,15 @@ class RegistrationControllerTest {
         try {
             event.setActive(false);
             eventRepository.save(event);
-            var htmlPath =
-                    given().pathParam("signature", SIGNATURE)
-                            .when()
-                            .get("/bookings/{signature}")
-                            .then()
-                            .statusCode(HttpStatus.OK.value())
-                            .contentType(ContentType.HTML)
-                            .extract()
-                            .htmlPath();
+            var htmlPath = given()
+                .pathParam("signature", SIGNATURE)
+                .when()
+                .get("/bookings/{signature}")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .contentType(ContentType.HTML)
+                .extract()
+                .htmlPath();
 
             // check the title to ensure we are in the html generated by the `index.jte`
             // template
@@ -369,20 +385,18 @@ class RegistrationControllerTest {
     }
 
     private Event getOrCreateActiveEvent() {
-        var activeEvent =
-                eventRepository
-                        .findByActiveIsTrue()
-                        .orElseGet(
-                                () -> {
-                                    var event = new Event();
-                                    event.setTitle("Test Event");
-                                    event.setDescription("Test Description");
-                                    event.setActive(true);
-                                    event.setDate(LocalDate.now());
-                                    event = eventRepository.save(event);
-                                    CREATED_EVENT_IDS.add(event.getId());
-                                    return event;
-                                });
+        var activeEvent = eventRepository
+            .findByActiveIsTrue()
+            .orElseGet(() -> {
+                var event = new Event();
+                event.setTitle("Test Event");
+                event.setDescription("Test Description");
+                event.setActive(true);
+                event.setDate(LocalDate.now());
+                event = eventRepository.save(event);
+                CREATED_EVENT_IDS.add(event.getId());
+                return event;
+            });
 
         if (activeEvent.getActivities().isEmpty()) {
             // add an Activity to the active Event

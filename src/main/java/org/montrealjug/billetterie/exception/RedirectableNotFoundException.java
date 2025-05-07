@@ -2,6 +2,7 @@
 package org.montrealjug.billetterie.exception;
 
 public class RedirectableNotFoundException extends RuntimeException {
+
     private final String redirectUrl;
     private final String flashMessage;
 

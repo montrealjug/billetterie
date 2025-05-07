@@ -32,8 +32,9 @@ class EmailConfiguration {
 
     @Bean
     EmailSender emailSender(
-            @Autowired(required = false) JavaMailSender javaMailSender, // useful for tests
-            EmailProperties emailProperties) {
+        @Autowired(required = false) JavaMailSender javaMailSender, // useful for tests
+        EmailProperties emailProperties
+    ) {
         final EmailSender emailSender;
         if (javaMailSender != null && emailProperties.mode != EmailMode.NO_OP) {
             emailSender = new SmtpEmailSender(javaMailSender, emailProperties);
@@ -46,9 +47,10 @@ class EmailConfiguration {
 
     @Bean
     EmailService emailService(
-            EmailSender emailSender,
-            TemplateEngine templateEngine,
-            ResourceBundleMessageSource messageSource) {
+        EmailSender emailSender,
+        TemplateEngine templateEngine,
+        ResourceBundleMessageSource messageSource
+    ) {
         var emailWriter = new EmailWriter(templateEngine, messageSource);
         return new EmailService(emailSender, emailWriter);
     }
@@ -56,13 +58,14 @@ class EmailConfiguration {
     @Validated
     @ConfigurationProperties(prefix = "app.mail")
     record EmailProperties(
-            @DefaultValue("SMTP") EmailMode mode,
-            @Valid @NotNull @NestedConfigurationProperty EmailAddress from,
-            @Valid @NotNull @NestedConfigurationProperty EmailAddress replyTo) {}
+        @DefaultValue("SMTP") EmailMode mode,
+        @Valid @NotNull @NestedConfigurationProperty EmailAddress from,
+        @Valid @NotNull @NestedConfigurationProperty EmailAddress replyTo
+    ) {}
 
     enum EmailMode {
         NO_OP,
-        SMTP
+        SMTP,
     }
 
     record EmailAddress(@Email @NotBlank String address, @NotBlank String name) {

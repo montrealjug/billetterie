@@ -27,8 +27,7 @@ public class EventsController {
     private final EventRepository eventRepository;
     private final ActivityRepository activityRepository;
 
-    public EventsController(
-            EventRepository eventRepository, ActivityRepository activityRepository) {
+    public EventsController(EventRepository eventRepository, ActivityRepository activityRepository) {
         this.eventRepository = eventRepository;
         this.activityRepository = activityRepository;
     }
@@ -38,19 +37,18 @@ public class EventsController {
         List<PresentationEvent> presentationEvents = new ArrayList<>();
         Iterable<Event> events = this.eventRepository.findAll();
 
-        events.forEach(
-                event -> {
-                    PresentationEvent presentationEvent =
-                            new PresentationEvent(
-                                    event.getId(),
-                                    event.getTitle(),
-                                    event.getDescription(),
-                                    event.getDate(),
-                                    toIndexActivities(event.getActivities()),
-                                    event.isActive(),
-                                    event.getImagePath());
-                    presentationEvents.add(presentationEvent);
-                });
+        events.forEach(event -> {
+            PresentationEvent presentationEvent = new PresentationEvent(
+                event.getId(),
+                event.getTitle(),
+                event.getDescription(),
+                event.getDate(),
+                toIndexActivities(event.getActivities()),
+                event.isActive(),
+                event.getImagePath()
+            );
+            presentationEvents.add(presentationEvent);
+        });
 
         model.addAttribute("events", presentationEvents);
         return "events-list";
@@ -64,9 +62,7 @@ public class EventsController {
         entity.setDate(event.date());
         eventRepository.save(entity);
 
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("/admin/events"))
-                .build();
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create("/admin/events")).build();
     }
 
     @GetMapping("{id}")
@@ -76,17 +72,17 @@ public class EventsController {
         if (optionalEvent.isPresent()) {
             Event event = optionalEvent.get();
             presentationEvent =
-                    new PresentationEvent(
-                            event.getId(),
-                            event.getTitle(),
-                            event.getDescription(),
-                            event.getDate(),
-                            Collections.emptyList(),
-                            event.isActive(),
-                            event.getImagePath());
+                new PresentationEvent(
+                    event.getId(),
+                    event.getTitle(),
+                    event.getDescription(),
+                    event.getDate(),
+                    Collections.emptyList(),
+                    event.isActive(),
+                    event.getImagePath()
+                );
         } else {
-            throw new EntityNotFoundException(
-                    "Event with id " + id + " not found", "events-create-update");
+            throw new EntityNotFoundException("Event with id " + id + " not found", "events-create-update");
         }
         model.addAttribute("event", presentationEvent);
         return "events-create-update";
@@ -94,7 +90,10 @@ public class EventsController {
 
     @PostMapping("{id}")
     public ResponseEntity<Void> updateEvent(
-            @Valid PresentationEvent presentationEvent, Model model, @PathVariable long id) {
+        @Valid PresentationEvent presentationEvent,
+        Model model,
+        @PathVariable long id
+    ) {
         Optional<Event> optionalEvent = this.eventRepository.findById(id);
 
         if (optionalEvent.isPresent()) {
@@ -102,17 +101,13 @@ public class EventsController {
             event.setTitle(presentationEvent.title());
             event.setDescription(presentationEvent.description());
             event.setDate(presentationEvent.date());
-            event.setActive(
-                    presentationEvent.active() != null ? presentationEvent.active() : false);
+            event.setActive(presentationEvent.active() != null ? presentationEvent.active() : false);
             eventRepository.save(event);
         } else {
-            throw new RedirectableNotFoundException(
-                    "Event with id " + id + " not found", "/admin/events/" + id);
+            throw new RedirectableNotFoundException("Event with id " + id + " not found", "/admin/events/" + id);
         }
 
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("/admin/events"))
-                .build();
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create("/admin/events")).build();
     }
 
     @DeleteMapping("{id}")
@@ -123,8 +118,7 @@ public class EventsController {
 
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } else {
-            throw new RedirectableNotFoundException(
-                    "Event with id " + id + " not found", "/admin/events/" + id);
+            throw new RedirectableNotFoundException("Event with id " + id + " not found", "/admin/events/" + id);
         }
     }
 
@@ -138,8 +132,7 @@ public class EventsController {
         Optional<Event> optionalEvent = this.eventRepository.findById(id);
 
         if (!optionalEvent.isPresent()) {
-            throw new EntityNotFoundException(
-                    "Event with id " + id + " not found", "activities-create-update");
+            throw new EntityNotFoundException("Event with id " + id + " not found", "activities-create-update");
         }
         model.addAttribute("eventId", id);
         return "activities-create-update";
@@ -153,19 +146,22 @@ public class EventsController {
             Activity activity = optionalActivity.get();
 
             presentationActivity =
-                    new PresentationActivity(
-                            activity.getId(),
-                            activity.getTitle(),
-                            activity.getDescription(),
-                            activity.getMaxParticipants(),
-                            activity.getMaxWaitingQueue(),
-                            activity.getWaitingParticipants(),
-                            activity.getNonWaitingParticipants(),
-                            activity.getRegistrationStatus(),
-                            activity.getStartTime().toLocalTime());
+                new PresentationActivity(
+                    activity.getId(),
+                    activity.getTitle(),
+                    activity.getDescription(),
+                    activity.getMaxParticipants(),
+                    activity.getMaxWaitingQueue(),
+                    activity.getWaitingParticipants(),
+                    activity.getNonWaitingParticipants(),
+                    activity.getRegistrationStatus(),
+                    activity.getStartTime().toLocalTime()
+                );
         } else {
             throw new EntityNotFoundException(
-                    "Activity with id " + activityId + " not found", "activities-create-update");
+                "Activity with id " + activityId + " not found",
+                "activities-create-update"
+            );
         }
         model.addAttribute("activity", presentationActivity);
         model.addAttribute("eventId", eventId);
@@ -174,26 +170,27 @@ public class EventsController {
 
     @PostMapping("{eventId}/activities/{activityId}")
     public ResponseEntity<Void> updateActivity(
-            @Valid PresentationActivity presentationActivity,
-            Model model,
-            @PathVariable long eventId,
-            @PathVariable long activityId) {
+        @Valid PresentationActivity presentationActivity,
+        Model model,
+        @PathVariable long eventId,
+        @PathVariable long activityId
+    ) {
         Optional<Activity> optionalActivity = activityRepository.findById(activityId);
 
         if (optionalActivity.isPresent()) {
             Activity activity = optionalActivity.get();
 
-            PresentationActivity fullActivity =
-                    new PresentationActivity(
-                            presentationActivity.id(),
-                            presentationActivity.title(),
-                            presentationActivity.description(),
-                            presentationActivity.maxParticipants(),
-                            presentationActivity.maxWaitingQueue(),
-                            activity.getWaitingParticipants(),
-                            activity.getNonWaitingParticipants(),
-                            activity.getRegistrationStatus(),
-                            presentationActivity.time());
+            PresentationActivity fullActivity = new PresentationActivity(
+                presentationActivity.id(),
+                presentationActivity.title(),
+                presentationActivity.description(),
+                presentationActivity.maxParticipants(),
+                presentationActivity.maxWaitingQueue(),
+                activity.getWaitingParticipants(),
+                activity.getNonWaitingParticipants(),
+                activity.getRegistrationStatus(),
+                presentationActivity.time()
+            );
 
             activity.setTitle(fullActivity.title());
             activity.setDescription(fullActivity.description());
@@ -201,87 +198,80 @@ public class EventsController {
             activity.setMaxWaitingQueue(fullActivity.maxWaitingQueue());
 
             eventRepository
-                    .findById(eventId)
-                    .ifPresent(
-                            event -> {
-                                LocalDate date = event.getDate();
-                                LocalDateTime localDateTime = date.atTime(fullActivity.time());
-                                activity.setStartTime(localDateTime);
-                            });
+                .findById(eventId)
+                .ifPresent(event -> {
+                    LocalDate date = event.getDate();
+                    LocalDateTime localDateTime = date.atTime(fullActivity.time());
+                    activity.setStartTime(localDateTime);
+                });
 
             activityRepository.save(activity);
         } else {
             throw new RedirectableNotFoundException(
-                    "Activity with id " + activityId + " not found",
-                    eventId + "/activities/" + activityId);
+                "Activity with id " + activityId + " not found",
+                eventId + "/activities/" + activityId
+            );
         }
 
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("/admin/events"))
-                .build();
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create("/admin/events")).build();
     }
 
     @PostMapping("{id}/activities")
     public ResponseEntity<Void> saveActivity(
-            @Valid PresentationActivity activity, Model model, @PathVariable final Long id) {
-
+        @Valid PresentationActivity activity,
+        Model model,
+        @PathVariable final Long id
+    ) {
         // For new activities, we need to create a PresentationActivity with the new fields
         // Since this is a new activity, currentParticipants and currentWaitingParticipants are 0
-        PresentationActivity fullActivity =
-                new PresentationActivity(
-                        activity.id(),
-                        activity.title(),
-                        activity.description(),
-                        activity.maxParticipants(),
-                        activity.maxWaitingQueue(),
-                        Collections.emptyList(),
-                        Collections.emptyList(),
-                        Activity.RegistrationStatus.OPEN,
-                        activity.time());
+        PresentationActivity fullActivity = new PresentationActivity(
+            activity.id(),
+            activity.title(),
+            activity.description(),
+            activity.maxParticipants(),
+            activity.maxWaitingQueue(),
+            Collections.emptyList(),
+            Collections.emptyList(),
+            Activity.RegistrationStatus.OPEN,
+            activity.time()
+        );
 
         Optional<Event> byId = eventRepository.findById(id);
 
         byId.ifPresentOrElse(
-                event -> {
-                    Activity entity = new Activity();
-                    entity.setDescription(fullActivity.description());
-                    entity.setTitle(fullActivity.title());
-                    entity.setMaxParticipants(fullActivity.maxParticipants());
-                    entity.setMaxWaitingQueue(fullActivity.maxWaitingQueue());
-                    entity.setEvent(event);
+            event -> {
+                Activity entity = new Activity();
+                entity.setDescription(fullActivity.description());
+                entity.setTitle(fullActivity.title());
+                entity.setMaxParticipants(fullActivity.maxParticipants());
+                entity.setMaxWaitingQueue(fullActivity.maxWaitingQueue());
+                entity.setEvent(event);
 
-                    LocalDate date = event.getDate();
-                    LocalDateTime localDateTime = date.atTime(fullActivity.time());
+                LocalDate date = event.getDate();
+                LocalDateTime localDateTime = date.atTime(fullActivity.time());
 
-                    entity.setStartTime(localDateTime);
-                    event.getActivities().add(entity);
-                    eventRepository.save(event);
-                },
-                () -> {
-                    throw new EntityNotFoundException(
-                            "Event with id " + id + " not found", "activities-create-update");
-                });
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("/admin/events"))
-                .build();
+                entity.setStartTime(localDateTime);
+                event.getActivities().add(entity);
+                eventRepository.save(event);
+            },
+            () -> {
+                throw new EntityNotFoundException("Event with id " + id + " not found", "activities-create-update");
+            }
+        );
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create("/admin/events")).build();
     }
 
     @DeleteMapping("{eventId}/activities/{activityId}")
-    public ResponseEntity<Void> deleteActivity(
-            Model model, @PathVariable long eventId, @PathVariable long activityId) {
-        this.eventRepository
-                .findById(eventId)
-                .ifPresent(
-                        event -> {
-                            Optional<Activity> optionalActivity =
-                                    activityRepository.findById(activityId);
-                            optionalActivity.ifPresent(
-                                    activity -> {
-                                        event.getActivities().remove(activity);
-                                        eventRepository.save(event);
-                                        activityRepository.delete(activity);
-                                    });
-                        });
+    public ResponseEntity<Void> deleteActivity(Model model, @PathVariable long eventId, @PathVariable long activityId) {
+        this.eventRepository.findById(eventId)
+            .ifPresent(event -> {
+                Optional<Activity> optionalActivity = activityRepository.findById(activityId);
+                optionalActivity.ifPresent(activity -> {
+                    event.getActivities().remove(activity);
+                    eventRepository.save(event);
+                    activityRepository.delete(activity);
+                });
+            });
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
