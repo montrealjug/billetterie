@@ -234,7 +234,7 @@
 					<nodeVersion>${node.version}</nodeVersion>
 					<workingDirectory>src/main/tailwind</workingDirectory>
 					<installDirectory>target</installDirectory>
-					<skip>true</skip>
+					<skip>false</skip>
 				</configuration>
 			</plugin>
 		</plugins>
