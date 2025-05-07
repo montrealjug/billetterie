@@ -31,11 +31,11 @@
         alt="Devoxx4Kids Québec logo"
         class="max-h-20 bg-white rounded-lg p-2 shadow-lg"
     />
-    <p class="grow-1 text-3xl font-bold pl-5 text-shadow-xs">Billetterie Devoxx4Kids Québec</p>
+    <p class="grow-1 text-3xl font-bold px-4 text-shadow-xs">Billetterie Devoxx4Kids Québec</p>
     <nav>
         <ul>
             <li>
-                <a class="shadow-2xs font-semibold p-3 rounded-md border-2 border-white hover:bg-white hover:text-d4k-orange"
+                <a class="inline-block shadow-2xs font-semibold p-3 rounded-md border-2 border-white hover:bg-white hover:text-d4k-orange"
                    href="/admin/events">Admin</a>
             </li>
         </ul>

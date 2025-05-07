@@ -31,23 +31,23 @@
         alt="Devoxx4Kids Québec logo"
         class="max-h-20 bg-white rounded-lg p-2 shadow-lg text-shadow-xs"
     />
-    <p class="grow-1 text-3xl font-bold pl-5">Billetterie Devoxx4Kids Québec (Admin)</p>
+    <p class="grow-1 text-3xl font-bold px-4">Billetterie Devoxx4Kids Québec (Admin)</p>
     <nav>
-        <ul class="flex justify-center space-x-10">
+        <ul class="flex flex-wrap justify-end gap-4">
             <li>
-                <a class="shadow-2xs font-semibold p-3 rounded-md border-2 border-white hover:bg-white hover:text-d4k-orange"
+                <a class="inline-block shadow-2xs font-semibold p-3 rounded-md border-2 border-white hover:bg-white hover:text-d4k-orange"
                    href="/admin/events">Manage Events</a>
             </li>
             <li>
-                <a class="shadow-2xs font-semibold p-3 rounded-md border-2 border-white hover:bg-white hover:text-d4k-orange"
+                <a class="inline-block shadow-2xs font-semibold p-3 rounded-md border-2 border-white hover:bg-white hover:text-d4k-orange"
                    href="/admin/bookers">Manage Bookers</a>
             </li>
             <li>
-                <a class="shadow-2xs font-semibold p-3 rounded-md border-2 border-white hover:bg-white hover:text-d4k-orange"
+                <a class="inline-block shadow-2xs font-semibold p-3 rounded-md border-2 border-white hover:bg-white hover:text-d4k-orange"
                     href="/">Main Site</a>
             </li>
             <li>
-                <a class="shadow-2xs font-semibold p-3 rounded-md border-2 border-white hover:bg-white hover:text-d4k-orange"
+                <a class="inline-block shadow-2xs font-semibold p-3 rounded-md border-2 border-white hover:bg-white hover:text-d4k-orange"
                    href="/admin/logout">Logout</a>
             </li>
         </ul>
