@@ -402,6 +402,7 @@ class RegistrationControllerTest {
             // add an Activity to the active Event
             var activity = new Activity();
             activity.setTitle("Test Activity");
+            activity.setDescription("Test Description");
             activity.setEvent(activeEvent);
             activity.setStartTime(LocalDateTime.now().plusMinutes(1L));
             activity.setMaxParticipants(12);

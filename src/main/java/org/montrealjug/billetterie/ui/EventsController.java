@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.ui;
 
-import static org.montrealjug.billetterie.ui.Utils.toPresentationActivities;
-import static org.montrealjug.billetterie.ui.Utils.toPresentationActivity;
+import static org.montrealjug.billetterie.ui.Utils.*;
 
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -42,11 +41,12 @@ public class EventsController {
             PresentationEvent presentationEvent = new PresentationEvent(
                 event.getId(),
                 event.getTitle(),
-                event.getDescription(),
+                markdownToHtml(event.getDescription()),
                 event.getDate(),
                 toPresentationActivities(event.getActivities()),
                 event.isActive(),
-                event.getImagePath()
+                event.getImagePath(),
+                event.getLocation()
             );
             presentationEvents.add(presentationEvent);
         });
@@ -61,6 +61,7 @@ public class EventsController {
         entity.setDescription(event.description());
         entity.setTitle(event.title());
         entity.setDate(event.date());
+        entity.setLocation(event.location());
         eventRepository.save(entity);
 
         return ResponseEntity.status(HttpStatus.FOUND).location(URI.create("/admin/events")).build();
@@ -80,7 +81,8 @@ public class EventsController {
                     event.getDate(),
                     Collections.emptyList(),
                     event.isActive(),
-                    event.getImagePath()
+                    event.getImagePath(),
+                    event.getLocation()
                 );
         } else {
             throw new EntityNotFoundException("Event with id " + id + " not found", "events-create-update");
@@ -102,6 +104,7 @@ public class EventsController {
             event.setTitle(presentationEvent.title());
             event.setDescription(presentationEvent.description());
             event.setDate(presentationEvent.date());
+            event.setLocation(presentationEvent.location());
             event.setActive(presentationEvent.active() != null ? presentationEvent.active() : false);
             eventRepository.save(event);
         } else {
@@ -145,8 +148,7 @@ public class EventsController {
         PresentationActivity presentationActivity;
         if (optionalActivity.isPresent()) {
             Activity activity = optionalActivity.get();
-
-            presentationActivity = toPresentationActivity(activity);
+            presentationActivity = toPresentationActivity(activity, false);
         } else {
             throw new EntityNotFoundException(
                 "Activity with id " + activityId + " not found",
@@ -161,7 +163,6 @@ public class EventsController {
     @PostMapping("{eventId}/activities/{activityId}")
     public ResponseEntity<Void> updateActivity(
         @Valid PresentationActivity presentationActivity,
-        Model model,
         @PathVariable long eventId,
         @PathVariable long activityId
     ) {
@@ -222,7 +223,7 @@ public class EventsController {
     }
 
     @DeleteMapping("{eventId}/activities/{activityId}")
-    public ResponseEntity<Void> deleteActivity(Model model, @PathVariable long eventId, @PathVariable long activityId) {
+    public ResponseEntity<Void> deleteActivity(@PathVariable long eventId, @PathVariable long activityId) {
         this.eventRepository.findById(eventId)
             .ifPresent(event -> {
                 Optional<Activity> optionalActivity = activityRepository.findById(activityId);

@@ -8,7 +8,7 @@
 title = "${event != null ? \"Create\" : \"Update\"} Event" ,
 content = @`
 <div class="flex flex-col items-center justify-center">
-    <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+    <div class="bg-white p-8 rounded shadow-md w-full max-w-xl">
 
         @if(errorMessage != null)
             <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -42,6 +42,12 @@ content = @`
                 <label for="description" class="block text-gray-700 font-medium mb-2">Description</label>
                 <textarea id="description" name="description" rows="4" required
                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none">${event != null ? event.description() : ""}</textarea>
+            </div>
+            <!-- Location Input -->
+            <div class="mb-4">
+                <label for="location" class="block text-gray-700 font-medium mb-2">Location</label>
+                <input type="text" id="location" name="location" value="${event!=null ? event.location() : ""}"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none">
             </div>
             <!-- Date Picker -->
             <div class="mb-4">

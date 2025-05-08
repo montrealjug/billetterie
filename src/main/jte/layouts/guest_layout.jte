@@ -16,6 +16,14 @@
         @theme {
             --color-d4k-orange: #f0690a;
         }
+        @layer base {
+            ol{
+                list-style-type: decimal;
+            }
+            h3{
+                @apply font-bold text-base mb-2;
+            }
+        }
     </style>
     <!-- favicons and co. -->
     <link rel="icon" type="image/png" href="/static/favicons/favicon-96x96.png" sizes="96x96" />
@@ -41,7 +49,7 @@
         </ul>
     </nav>
 </header>
-<main class="grow-1 justify-start overflow-y-auto p-4 flex flex-col">
+<main>
     ${content}
 </main>
 <footer class="bg-white p-4 flex justify-between text-gray-500 text-sm">

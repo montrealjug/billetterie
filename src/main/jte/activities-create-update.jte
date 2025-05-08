@@ -6,7 +6,7 @@
 title = "${activity != null ? \"Update\" : \"Create\"} Activity",
 content = @`
 <div class="flex flex-col items-center justify-center">
-    <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+    <div class="bg-white p-8 rounded shadow-md w-full max-w-xl">
         @if(errorMessage != null)
             <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
                 <p class="font-semibold">Error</p>

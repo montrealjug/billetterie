@@ -14,7 +14,10 @@ public class Activity {
 
     private LocalDateTime startTime;
     private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
+
     private int maxParticipants;
     private int maxWaitingQueue;
 

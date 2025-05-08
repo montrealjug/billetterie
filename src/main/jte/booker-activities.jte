@@ -26,7 +26,7 @@ content = @`
                     <div class="flex flex-col md:flex-row items-start md:items-center justify-between">
                         <div>
                             <h2 class="text-lg font-semibold text-gray-700">${event.title()}</h2>
-                            <p class="text-gray-600">${event.description()}</p>
+                            $unsafe{event.description()}
                             <p class="text-gray-500 text-sm mt-1">${event.date().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))}</p>
                         </div>
                     </div>
@@ -52,7 +52,7 @@ content = @`
 
                                 <tr>
                                     <td class="border border-gray-300 px-4 py-2">${activity.title()}</td>
-                                    <td class="border border-gray-300 px-4 py-2">${activity.description()}</td>
+                                    <td class="border border-gray-300 px-4 py-2">$unsafe{activity.description()}</td>
                                     <td class="border border-gray-300 px-4 py-2">
                                         ${regularParticipantsNumber}/${activity.maxParticipants()}
                                     </td>
