@@ -26,8 +26,10 @@ content = @`
                     <div class="flex flex-col md:flex-row items-start md:items-center justify-between">
                         <div>
                             <h2 class="text-lg font-semibold text-gray-700">${event.title()}</h2>
-                            <p class="text-gray-600">${event.description()}</p>
-                            <p class="text-gray-500 text-sm mt-1">${event.date().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))}</p>
+                            $unsafe{event.description()}
+                            <br />
+                            <h3 class="text-xl font-semibold text-gray-700">Lieu / Location</h3>
+                            <p class="text-black-500 text-sm mt-1">${event.location()}</p>
                         </div>
                         <div class="size-24">
                             @template.layouts.image_with_fallback(
@@ -64,7 +66,7 @@ content = @`
                                         </span>
                                         ${activity.title()}
                                     </td>
-                                    <td class="border border-gray-300 px-4 py-2">${activity.description()}</td>
+                                    <td class="border border-gray-300 px-4 py-2">$unsafe{activity.description()}</td>
                                     <td class="border border-gray-300 px-4 py-2">${activity.participants().size()}/${activity.maxParticipants()}</td>
                                     <td class="border border-gray-300 px-4 py-2">${activity.waitingParticipants().size()}/${activity.maxWaitingQueue()}</td>
 

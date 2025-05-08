@@ -16,6 +16,14 @@
         @theme {
             --color-d4k-orange: #f0690a;
         }
+        @layer base {
+            ol{
+                list-style-type: decimal;
+            }
+            h3{
+                @apply font-bold text-base mb-2;
+            }
+        }
     </style>
     <!-- favicons and co. -->
     <link rel="icon" type="image/png" href="/static/favicons/favicon-96x96.png" sizes="96x96" />

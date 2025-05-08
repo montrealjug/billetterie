@@ -12,5 +12,6 @@ public record PresentationEvent(
     LocalDate date,
     List<PresentationActivity> activities,
     Boolean active,
-    @Nullable String imagePath
+    @Nullable String imagePath,
+    String location
 ) {}

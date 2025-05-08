@@ -21,6 +21,8 @@ public class Event {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    private String location;
+
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private Set<Activity> activities = new HashSet<>();
 
@@ -70,6 +72,14 @@ public class Event {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     @Override

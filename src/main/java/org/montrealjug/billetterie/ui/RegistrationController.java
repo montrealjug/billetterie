@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.ui;
 
+import static org.montrealjug.billetterie.ui.Utils.markdownToHtml;
 import static org.montrealjug.billetterie.ui.Utils.toPresentationActivities;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -206,11 +207,12 @@ public class RegistrationController {
             PresentationEvent presentationEvent = new PresentationEvent(
                 event.getId(),
                 event.getTitle(),
-                event.getDescription(),
+                markdownToHtml(event.getDescription()),
                 event.getDate(),
                 toPresentationActivities(event.getActivities()),
                 event.isActive(),
-                event.getImagePath()
+                event.getImagePath(),
+                event.getLocation()
             );
 
             // Add attributes to model
@@ -230,7 +232,8 @@ public class RegistrationController {
                     event.getDate(),
                     toPresentationActivities(event.getActivities()),
                     event.isActive(),
-                    event.getImagePath()
+                    event.getImagePath(),
+                    event.getLocation()
                 );
                 model.addAttribute("event", presentationEvent);
             }

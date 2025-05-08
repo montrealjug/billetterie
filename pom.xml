@@ -67,6 +67,11 @@
 			<artifactId>jte-spring-boot-starter-3</artifactId>
 			<version>${jte.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.commonmark</groupId>
+			<artifactId>commonmark</artifactId>
+			<version>0.24.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

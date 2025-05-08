@@ -67,7 +67,7 @@ public class UtilsTest {
         var presentationActivity = result.getFirst();
         assertThat(presentationActivity.id()).isEqualTo(1L);
         assertThat(presentationActivity.title()).isEqualTo("Test Activity");
-        assertThat(presentationActivity.description()).isEqualTo("Test Description");
+        assertThat(presentationActivity.description()).isEqualTo("<p>Test Description</p>\n");
         assertThat(presentationActivity.maxParticipants()).isEqualTo(10);
         assertThat(presentationActivity.maxWaitingQueue()).isEqualTo(5);
         assertThat(presentationActivity.participants().size()).isEqualTo(10);
