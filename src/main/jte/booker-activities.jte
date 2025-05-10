@@ -2,6 +2,7 @@
 @import org.montrealjug.billetterie.entity.ActivityParticipant
 @import org.montrealjug.billetterie.ui.PresentationEvent
 @import org.montrealjug.billetterie.ui.PresentationActivity
+@import org.montrealjug.billetterie.ui.Utils
 @import org.montrealjug.billetterie.entity.Booker
 @import java.time.format.DateTimeFormatter
 
@@ -12,101 +13,126 @@
 @template.layouts.guest_layout(
 title = "Event Activities",
 content = @`
-<div class="flex flex-col items-center justify-center">
+<div class="flex flex-col items-center justify-center-safe h-full w-full bg-gray-100 py-2 md:p-2 lg:p-4">
     @if(error != null)
         <div class="bg-red-500 text-white p-4 mb-4 rounded-md w-full max-w-4xl">
             ${error}
         </div>
     @endif
 
-    <div class="flex flex-col items-center justify-center">
-        @if(event != null)
-            <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
-                <div class="bg-gray-100 p-4 rounded-md shadow">
-                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between">
-                        <div>
-                            <h2 class="text-lg font-semibold text-gray-700">${event.title()}</h2>
-                            $unsafe{event.description()}
-                            <p class="text-gray-500 text-sm mt-1">${event.date().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))}</p>
-                        </div>
+    @if(event != null)
+        <div class="w-full max-w-full h-full md:rounded md:h-auto md:max-h-full md:p-4 lg:p-8 lg:max-w-6xl flex flex-col justify-end-safe md:bg-white md:shadow-md">
+            <div class="bg-gray-100 p-2 grow-1 w-full max-w-full md:rounded-md md:shadow md:p-4 overflow-y-auto flex flex-col">
+                <div class="flex flex-col md:flex-row-reverse items-start justify-between w-full">
+                    <div class="w-full h-24 md:w-1/2">
+                        @template.layouts.image_with_fallback(
+                        entityType = "event",
+                        cssClass = "object-contain size-full rounded-lg",
+                        id = event.id()
+                        )
                     </div>
-                    <!-- Activities Table -->
+                    <div class="md:w-1/2">
+                        <h2 class="text-lg font-semibold text-gray-700">${event.title()}</h2>
+                        <p class="mt-1">${Utils.DATE_FORMAT.format(event.date())}</p>
+                        <p class="mt-1 text-sm md:text-base">
+                            <span class="font-semibold text-gray-700">Lieu / Location:&nbsp;</span>
+                            <span>${event.location()}</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="my-2">$unsafe{event.description()}</div>
+                <!-- Activities Section -->
                     <div class="mt-4">
                         <h3 class="text-md font-semibold text-gray-700 mb-2">Activities</h3>
-                        <table class="w-full table-auto border-collapse border border-gray-300">
-                            <thead>
-                            <tr class="bg-gray-200">
-                                <th class="border border-gray-300 px-4 py-2 text-left">Title</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Description</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Attendance</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Waiting line</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Start Time</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Actions</th>
-                            </tr>
-                            </thead>
-                            <tbody id="activity-list-1">
-                            <!-- Activities Rows -->
+                        <div class="bg-white rounded md:rounded-md md:shadow">
                             @for(PresentationActivity activity: event.activities())
                                 !{var regularParticipantsNumber = activity.participants().size(); }
                                 !{var waitingParticipantsNumber = activity.waitingParticipants().size(); }
 
-                                <tr>
-                                    <td class="border border-gray-300 px-4 py-2">${activity.title()}</td>
-                                    <td class="border border-gray-300 px-4 py-2">$unsafe{activity.description()}</td>
-                                    <td class="border border-gray-300 px-4 py-2">
-                                        ${regularParticipantsNumber}/${activity.maxParticipants()}
-                                    </td>
-                                    <td class="border border-gray-300 px-4 py-2">
-                                        ${waitingParticipantsNumber}/${activity.maxWaitingQueue()}
-                                    </td>
-                                    <td class="border border-gray-300 px-4 py-2">${activity.time().format(DateTimeFormatter.ofPattern("H:mm a"))}</td>
-                                    <td class="border border-gray-300 px-4 py-2">
-                                        @if(activity.registrationStatus().equals(Activity.RegistrationStatus.CLOSED))
-                                            <button disabled
-                                                    class="bg-gray-400 text-white px-3 py-1 rounded cursor-not-allowed">
-                                                Activity Full
-                                            </button>
-                                        @else
-                                            <button onclick="displayParticipantModal(${activity.id()})" 
-                                                    class="bg-d4k-orange text-white px-3 py-1 rounded hover:opacity-80 focus:outline-none focus:ring focus:ring-orange-300">
-                                                Add participant
-                                            </button>
+                                <article class="my-4 flex flex-col md:flex-row items-start justify-between md:my-8 p-4 border-b border-gray-200">
+                                    <div class="size-12 shrink-0 mr-2 md:size-16 md:mr-4">
+                                        @template.layouts.image_with_fallback(
+                                            entityType = "activity",
+                                            cssClass = "object-cover object-center size-full rounded-lg",
+                                            id = activity.id()
+                                        )
+                                    </div>
+                                    <div class="grow-1 flex flex-col justify-between mt-2 md:mt-0">
+                                        <h4 class="font-semibold">${activity.title()}</h4>
+                                        <details name="activity" class="mt-2">
+                                            <summary class="italic text-gray-700 list-none cursor-pointer">details</summary>
+                                            <div class="mt-2">$unsafe{activity.description()}</div>
+                                        </details>
+                                    </div>
+                                    <div class="flex flex-col justify-between items-end mx-2 self-stretch md:mx-4 mt-2 md:mt-0">
+                                        <time>${activity.time().format(DateTimeFormatter.ofPattern("H:mm a"))}</time>
+                                        <div class="flex flex-row items-center mt-2">
+                                            <span class="text-left text-sm text-gray-700">seats:</span>
+                                            <span class="ml-2 w-12 text-right">${regularParticipantsNumber}/${activity.maxParticipants()}</span>
+                                        </div>
+                                        <div class="flex flex-row items-center mt-1">
+                                            <span class="text-left text-sm text-gray-700">waiting:</span>
+                                            <span class="ml-2 w-12 text-right">${waitingParticipantsNumber}/${activity.maxWaitingQueue()}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            @if(activity.registrationStatus().equals(Activity.RegistrationStatus.CLOSED))
+                                                <button disabled
+                                                        class="bg-gray-400 text-white px-3 py-1 rounded cursor-not-allowed">
+                                                    Activity Full
+                                                </button>
+                                            @else
+                                                <button onclick="displayParticipantModal(${activity.id()})" 
+                                                        class="bg-d4k-orange text-white px-3 py-1 rounded hover:opacity-80 focus:outline-none focus:ring focus:ring-orange-300">
+                                                    Add participant
+                                                </button>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </article>
+
+                                <div id="participants-container-${activity.id()}" class="${activity.participants().isEmpty() ? "hidden" : ""} px-4 py-2 bg-gray-50 mb-4 ml-4 mr-4 rounded">
+                                    <div class="text-sm font-semibold mb-2">Participants:</div>
+                                    <ul id="participants-list-${activity.id()}" class="list-disc pl-5">
+                                        <!-- Display existing regular participants -->
+                                        @if(regularParticipantsNumber != 0)
+                                            <div class="mb-2">
+                                                <span class="font-medium">Regular participants:</span>
+                                                @for(ActivityParticipant activityParticipant : activity.participants())
+                                                    !{var participant = activityParticipant.getParticipant(); }
+                                                    <li>${participant.getFirstName()} ${participant.getLastName()}, born in ${participant.getYearOfBirth()}</li>
+                                                @endfor
+                                            </div>
                                         @endif
-                                    </td>
-                                </tr>
-                                <tr id="participants-container-${activity.id()}" class="${activity.participants().isEmpty() ? "hidden" : ""}">
-                                    <td colspan="6" class="border border-gray-300 px-4 py-2 bg-gray-50">
-                                        <div class="text-sm font-semibold mb-2">Participants:</div>
-                                        <ul id="participants-list-${activity.id()}" class="list-disc pl-5">
-                                            <!-- Display existing regular participants -->
-                                            @if(regularParticipantsNumber != 0)
-                                                <div class="mb-2">
-                                                    <span class="font-medium">Regular participants:</span>
-                                                    @for(ActivityParticipant activityParticipant : activity.participants())
-                                                        !{var participant = activityParticipant.getParticipant(); }
-                                                        <li>${participant.getFirstName()} ${participant.getLastName()}, born in ${participant.getYearOfBirth()}</li>
-                                                    @endfor
-                                                </div>
-                                            @endif
 
-                                            <!-- Display waiting participants -->
-                                            @if(waitingParticipantsNumber != 0)
-                                                <div>
-                                                    <span class="font-medium text-orange-600">Waiting list:</span>
-                                                    @for(ActivityParticipant activityParticipant : activity.waitingParticipants())
-                                                        !{var participant = activityParticipant.getParticipant(); }
-                                                        <li class="text-orange-600">${participant.getFirstName()} ${participant.getLastName()}, born in ${participant.getYearOfBirth()} (waiting)</li>
-                                                    @endfor
-                                                </div>
-                                            @endif
+                                        <!-- Display waiting participants -->
+                                        @if(waitingParticipantsNumber != 0)
+                                            <div>
+                                                <span class="font-medium text-orange-600">Waiting list:</span>
+                                                @for(ActivityParticipant activityParticipant : activity.waitingParticipants())
+                                                    !{var participant = activityParticipant.getParticipant(); }
+                                                    <li class="text-orange-600">${participant.getFirstName()} ${participant.getLastName()}, born in ${participant.getYearOfBirth()} (waiting)</li>
+                                                @endfor
+                                            </div>
+                                        @endif
 
-                                            <!-- New participants will be added here dynamically -->
-                                        </ul>
-                                    </td>
-                                </tr>
+                                        <!-- New participants will be added here dynamically -->
+                                    </ul>
+                                </div>
                             @endfor
-                            </tbody>
-                        </table>
+                        </div>
+
+                        <!-- Submit changes button container - fixed at the bottom of the viewport -->
+                        <div id="submit-changes-container" class="fixed bottom-0 left-0 right-0 w-full bg-white p-4 border-t border-gray-200 flex justify-center shadow-md z-50">
+                            <button id="submit-changes-button" 
+                                    onclick="submitAllParticipants()" 
+                                    class="bg-gray-400 text-white px-4 py-2 rounded cursor-not-allowed" 
+                                    disabled>
+                                Submit changes
+                            </button>
+                        </div>
+
+                        <!-- Add padding at the bottom to prevent content from being hidden behind the fixed button -->
+                        <div class="h-16"></div>
                     </div>
                 </div>
             </div>
@@ -117,12 +143,15 @@ content = @`
         @endif
     </div>
 
-</div>
     <script>
         // Store booker email signature in a JavaScript variable
         const bookerEmailSignature = "${booker.getEmailSignature()}";
         // Store event ID in a JavaScript variable
         const eventId = "${event.id()}";
+        // Store added participants that haven't been submitted yet
+        const pendingParticipants = [];
+        // Track if there are any pending changes
+        let hasPendingChanges = false;
 
         function displayParticipantModal(activityId) {
             // Create the modal elements
@@ -162,14 +191,14 @@ content = @`
             const form = document.getElementById("participant-form");
             const errorMessage = document.getElementById("error-message");
 
-            form.addEventListener("submit", async (e) => {
+            form.addEventListener("submit", (e) => {
                 e.preventDefault();
 
                 // Gather form data
-                const activityId = form.activityId.value;
+                const activityId = parseInt(form.activityId.value);
                 const firstName = form.firstName.value.trim();
                 const lastName = form.lastName.value.trim();
-                const yearOfBirth = form.yearOfBirth.value;
+                const yearOfBirth = parseInt(form.yearOfBirth.value);
 
                 // Validate inputs
                 if (!firstName || !lastName || !yearOfBirth) {
@@ -180,41 +209,29 @@ content = @`
 
                 errorMessage.classList.add("hidden");
 
-                // Send HTTP POST request
-                try {
-                    const url = "/events/" + eventId + "/registerParticipant";
-                    const response = await fetch(url, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            activityId: parseInt(activityId),
-                            firstName: firstName,
-                            lastName: lastName,
-                            yearOfBirth: parseInt(yearOfBirth),
-                            bookerEmailSignature: bookerEmailSignature
-                        }),
-                    });
+                // Create participant data object
+                const participantData = {
+                    activityId: activityId,
+                    firstName: firstName,
+                    lastName: lastName,
+                    yearOfBirth: yearOfBirth,
+                    bookerEmailSignature: bookerEmailSignature
+                };
 
-                    if (response.ok) {
-                        // Get the participant data from the response
-                        const participantData = await response.json();
+                // Add to pending participants array
+                pendingParticipants.push(participantData);
 
-                        // Add participant to the list
-                        addParticipantToList(activityId, participantData);
+                // Update UI with the new participant
+                addParticipantToList(activityId, participantData);
 
-                        closeModal();
-                    } else {
-                        const errorData = await response.json();
-                        errorMessage.textContent = errorData.message || "Registration failed.";
-                        errorMessage.classList.remove("hidden");
-                    }
-                } catch (error) {
-                    console.error("Error during registration:", error);
-                    errorMessage.textContent = "An error occurred. Please try again.";
-                    errorMessage.classList.remove("hidden");
-                }
+                // Set flag for pending changes
+                hasPendingChanges = true;
+
+                // Update submit changes button state
+                updateSubmitChangesButton();
+
+                // Close the modal
+                closeModal();
             });
         }
 
@@ -223,12 +240,27 @@ content = @`
             const container = document.getElementById("participants-container-" + activityId);
             const list = document.getElementById("participants-list-" + activityId);
 
-            // Check if we need to create the regular or waiting participants section
-            // Get max participants from the attendance cell (format: "X/Y")
-            const activityRow = document.querySelector("tr:has(button[onclick*='" + activityId + "'])");
-            const attendanceCell = activityRow.querySelector("td:nth-child(3)");
-            const attendanceText = attendanceCell.textContent.trim();
-            const maxParticipants = parseInt(attendanceText.split('/')[1]);
+            // Find the article element for this activity
+            const articles = document.querySelectorAll("article");
+            let activityArticle = null;
+            for (const article of articles) {
+                const button = article.querySelector("button[onclick*='" + activityId + "']");
+                if (button) {
+                    activityArticle = article;
+                    break;
+                }
+            }
+
+            // Get max participants from the seats display (format: "X/Y")
+            const seatsElements = activityArticle.querySelectorAll(".flex-row");
+            let seatsText = "";
+            for (const element of seatsElements) {
+                if (element.textContent.includes("seats:")) {
+                    seatsText = element.querySelector(".text-right").textContent.trim();
+                    break;
+                }
+            }
+            const maxParticipants = parseInt(seatsText.split('/')[1]);
 
             const currentRegularCount = document.querySelectorAll("#participants-list-" + activityId + " > div:first-child li").length;
             const isWaiting = currentRegularCount >= maxParticipants;
@@ -284,21 +316,42 @@ content = @`
         function updateCounts(activityId, isWaiting) {
             // This is a simplified update - in a real app, you'd want to refresh from the server
             // or maintain more accurate client-side state
-            const activityRow = document.querySelector("tr:has(button[onclick*='" + activityId + "'])");
-            if (activityRow) {
-                const attendanceCell = activityRow.querySelector("td:nth-child(3)");
-                const waitingCell = activityRow.querySelector("td:nth-child(4)");
+
+            // Find the article element for this activity
+            const articles = document.querySelectorAll("article");
+            let activityArticle = null;
+            for (const article of articles) {
+                const button = article.querySelector("button[onclick*='" + activityId + "']");
+                if (button) {
+                    activityArticle = article;
+                    break;
+                }
+            }
+
+            if (activityArticle) {
+                // Find the seats and waiting elements
+                const flexRows = activityArticle.querySelectorAll(".flex-row");
+                let seatsElement = null;
+                let waitingElement = null;
+
+                for (const row of flexRows) {
+                    if (row.textContent.includes("seats:")) {
+                        seatsElement = row.querySelector(".text-right");
+                    } else if (row.textContent.includes("waiting:")) {
+                        waitingElement = row.querySelector(".text-right");
+                    }
+                }
 
                 if (isWaiting) {
                     // Update waiting count
-                    const waitingText = waitingCell.textContent;
+                    const waitingText = waitingElement.textContent;
                     const [current, max] = waitingText.split('/');
                     const newCount = parseInt(current) + 1;
-                    waitingCell.textContent = newCount + '/' + max;
+                    waitingElement.textContent = newCount + '/' + max;
 
                     // If waiting queue is now full, disable the add button
                     if (newCount >= parseInt(max)) {
-                        const addButton = activityRow.querySelector("button[onclick*='displayParticipantModal']");
+                        const addButton = activityArticle.querySelector("button[onclick*='displayParticipantModal']");
                         if (addButton) {
                             const disabledButton = document.createElement("button");
                             disabledButton.disabled = true;
@@ -309,10 +362,10 @@ content = @`
                     }
                 } else {
                     // Update attendance count
-                    const attendanceText = attendanceCell.textContent;
-                    const [current, max] = attendanceText.split('/');
+                    const seatsText = seatsElement.textContent;
+                    const [current, max] = seatsText.split('/');
                     const newCount = parseInt(current) + 1;
-                    attendanceCell.textContent = newCount + '/' + max;
+                    seatsElement.textContent = newCount + '/' + max;
                 }
             }
         }
@@ -321,6 +374,54 @@ content = @`
             const modal = document.getElementById("participant-modal");
             if (modal) {
                 modal.remove();
+            }
+        }
+
+        function updateSubmitChangesButton() {
+            const submitButton = document.getElementById("submit-changes-button");
+            if (hasPendingChanges && pendingParticipants.length > 0) {
+                submitButton.disabled = false;
+                submitButton.classList.remove("bg-gray-400", "cursor-not-allowed");
+                submitButton.classList.add("bg-d4k-orange", "hover:opacity-80");
+            } else {
+                submitButton.disabled = true;
+                submitButton.classList.remove("bg-d4k-orange", "hover:opacity-80");
+                submitButton.classList.add("bg-gray-400", "cursor-not-allowed");
+            }
+        }
+
+        async function submitAllParticipants() {
+            if (!hasPendingChanges || pendingParticipants.length === 0) {
+                return;
+            }
+
+            try {
+                const url = "/events/" + eventId + "/registerParticipants";
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(pendingParticipants),
+                });
+
+                if (response.ok) {
+                    // Clear pending participants after successful submission
+                    pendingParticipants.length = 0;
+                    hasPendingChanges = false;
+
+                    // Update button state
+                    updateSubmitChangesButton();
+
+                    // Show success message
+                    alert("All participants have been successfully registered!");
+                } else {
+                    const errorData = await response.json();
+                    alert(errorData.message || "Failed to register participants.");
+                }
+            } catch (error) {
+                console.error("Error during registration:", error);
+                alert("An error occurred while registering participants. Please try again.");
             }
         }
     </script>

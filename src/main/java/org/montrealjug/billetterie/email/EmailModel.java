@@ -7,13 +7,11 @@ import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.Temporal;
-import java.util.Locale;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 import org.montrealjug.billetterie.entity.ActivityParticipant;
 import org.montrealjug.billetterie.entity.Booker;
 import org.montrealjug.billetterie.entity.Event;
+import org.montrealjug.billetterie.ui.PresentationActivityParticipant;
 
 public class EmailModel {
 
@@ -41,6 +39,7 @@ public class EmailModel {
     public enum EmailType {
         AFTER_BOOKING,
         AFTER_REGISTRATION,
+        AFTER_PARTICIPANTS_CHANGES,
         RETURNING_BOOKER;
 
         public String subjectKey() {
@@ -91,6 +90,15 @@ public class EmailModel {
             return new AfterRegistrationEmail(booker, baseUrl);
         }
 
+        static Email afterParticipantsChanges(
+            Booker booker,
+            List<PresentationActivityParticipant> participants,
+            Event event,
+            String baseUrl
+        ) {
+            return new AfterParticipantsChangesEmail(booker, participants, event, baseUrl);
+        }
+
         static Email returningBooker(Booker booker, String baseUrl) {
             return new ReturningBookingEmail(booker, baseUrl);
         }
@@ -136,6 +144,28 @@ public class EmailModel {
         @Override
         public EmailType type() {
             return EmailType.AFTER_REGISTRATION;
+        }
+
+        @Override
+        public InternetAddress to() {
+            return Email.fromBooker(booker);
+        }
+
+        public String registrationLink() {
+            return baseUrl + "/bookings/" + booker.getEmailSignature();
+        }
+    }
+
+    public record AfterParticipantsChangesEmail(
+        Booker booker,
+        List<PresentationActivityParticipant> participants,
+        Event event,
+        String baseUrl
+    )
+        implements Email {
+        @Override
+        public EmailType type() {
+            return EmailType.AFTER_PARTICIPANTS_CHANGES;
         }
 
         @Override

@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.ui;
 
-import static org.montrealjug.billetterie.ui.Utils.markdownToHtml;
-import static org.montrealjug.billetterie.ui.Utils.toPresentationActivities;
+import static org.montrealjug.billetterie.ui.Utils.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -10,19 +9,18 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
-import java.util.logging.Logger;
+import java.util.List;
 import org.montrealjug.billetterie.email.EmailModel.Email;
 import org.montrealjug.billetterie.email.EmailService;
-import org.montrealjug.billetterie.entity.Activity;
-import org.montrealjug.billetterie.entity.ActivityParticipant;
-import org.montrealjug.billetterie.entity.Booker;
-import org.montrealjug.billetterie.entity.Participant;
+import org.montrealjug.billetterie.entity.*;
 import org.montrealjug.billetterie.exception.EntityNotFoundException;
 import org.montrealjug.billetterie.repository.ActivityRepository;
 import org.montrealjug.billetterie.repository.BookerRepository;
 import org.montrealjug.billetterie.repository.EventRepository;
 import org.montrealjug.billetterie.repository.ParticipantRepository;
 import org.montrealjug.billetterie.service.SignatureService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +31,7 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 public class RegistrationController {
 
-    private static final Logger LOGGER = Logger.getLogger(RegistrationController.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationController.class.getName());
 
     private final BookerRepository bookerRepository;
     private final SignatureService signatureService;
@@ -58,7 +56,7 @@ public class RegistrationController {
         this.participantRepository = participantRepository;
     }
 
-    record BookerCheck(@NotBlank String email) {}
+    public record BookerCheck(@NotBlank String email) {}
 
     @PostMapping("/check-returning-booker")
     public ResponseEntity<?> checkReturningBooker(
@@ -112,7 +110,7 @@ public class RegistrationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(signature);
     }
 
-    record ParticipantSubmission(
+    public record ParticipantSubmission(
         @NotBlank String firstName,
         @NotBlank String lastName,
         @Min(2005) int yearOfBirth,
@@ -175,15 +173,114 @@ public class RegistrationController {
             // Return a success response with the participant data for display
             return ResponseEntity.ok().body(participantSub);
         } catch (DataIntegrityViolationException e) {
-            LOGGER.warning("Data integrity violation: " + e.getMessage());
+            LOGGER.warn("Data integrity violation: {}", e.getMessage());
             return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body("{\"message\":\"Failed to register participant due to data integrity" + " violation\"}");
         } catch (Exception e) {
-            LOGGER.severe("Error registering participant: " + e.getMessage());
+            LOGGER.error("Error registering participant: {}", e.getMessage());
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("{\"message\":\"An error occurred while registering the participant\"}");
+        }
+    }
+
+    @PostMapping("/events/{eventId}/registerParticipants")
+    public ResponseEntity<?> registerParticipants(
+        @PathVariable Long eventId,
+        @RequestBody @Valid List<ParticipantSubmission> participantSubs,
+        HttpServletRequest request
+    ) {
+        // Log the batch registration request
+        LOGGER.info(
+            "Received batch participant registration for event {}: {} participants",
+            eventId,
+            participantSubs.size()
+        );
+
+        if (participantSubs.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\":\"No participants provided\"}");
+        }
+
+        Booker booker = bookerRepository
+            .findByEmailSignature(participantSubs.getFirst().bookerEmailSignature())
+            .orElseThrow(() -> new EntityNotFoundException("Booker not found"));
+
+        Event event = eventRepository
+            .findById(eventId)
+            .orElseThrow(() -> new EntityNotFoundException("Event not found"));
+        try {
+            // Process each participant
+            for (ParticipantSubmission participantSub : participantSubs) {
+                // Check if the activityId matches an existing activity
+                Activity activity = activityRepository
+                    .findById(participantSub.activityId())
+                    .orElseThrow(() -> new EntityNotFoundException("Activity not found: " + participantSub.activityId())
+                    );
+
+                // Check if both regular spots and waiting queue are full
+                if (activity.getRegistrationStatus().equals(Activity.RegistrationStatus.CLOSED)) {
+                    // Skip this participant if the activity is full
+                    LOGGER.warn(
+                        "Activity {} is full, skipping participant: {} {}",
+                        activity.getId(),
+                        participantSub.firstName(),
+                        participantSub.lastName()
+                    );
+                    continue;
+                }
+
+                Participant participant = booker
+                    .getParticipants()
+                    .stream()
+                    .filter(p -> isSameParticipant(p, participantSub))
+                    .findFirst()
+                    .orElseGet(() -> {
+                        // Create and save the participant entity
+                        Participant participantToCreate = new Participant();
+                        participantToCreate.setFirstName(participantSub.firstName());
+                        participantToCreate.setLastName(participantSub.lastName());
+                        participantToCreate.setYearOfBirth(participantSub.yearOfBirth());
+                        participantToCreate.setBooker(booker);
+                        return participantRepository.save(participantToCreate);
+                    });
+
+                // Create and save the ActivityParticipant entity
+                ActivityParticipant activityParticipant = new ActivityParticipant();
+                activityParticipant.setActivity(activity);
+                activityParticipant.setParticipant(participant);
+                activityParticipant.getActivityParticipantKey().setActivityId(activity.getId());
+                activityParticipant.getActivityParticipantKey().setParticipantId(participant.getId());
+
+                activity.getParticipants().add(activityParticipant);
+                activityRepository.save(activity);
+            }
+
+            var participantsForEventAndBooker = activityRepository.findAllActivityParticipantByEventIdAndBookerEmail(
+                eventId,
+                booker.getEmail()
+            );
+            emailService.sendEmail(
+                Email.afterParticipantsChanges(
+                    booker,
+                    toPresentationActivityParticipants(participantsForEventAndBooker),
+                    event,
+                    retrieveBaseUrl(request)
+                )
+            );
+
+            // Return a success response
+            return ResponseEntity.ok().body("{\"message\":\"All participants registered successfully\"}");
+        } catch (DataIntegrityViolationException e) {
+            LOGGER.warn("Data integrity violation: {}", e.getMessage());
+            return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("{\"message\":\"Failed to register participants due to data integrity violation\"}");
+        } catch (Exception e) {
+            LOGGER.error("Error registering participants: {}", e.getMessage());
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("{\"message\":\"An error occurred while registering the participants\"}");
         }
     }
 
@@ -277,7 +374,7 @@ public class RegistrationController {
             // Return success response
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            LOGGER.severe("Error deleting participant from activity: " + e.getMessage());
+            LOGGER.error("Error deleting participant from activity: {}", e.getMessage());
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("{\"message\":\"An error occurred while deleting the participant from" + " the activity\"}");
