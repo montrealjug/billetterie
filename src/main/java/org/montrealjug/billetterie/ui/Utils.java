@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.ui;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
 import org.commonmark.node.Node;
@@ -29,10 +30,14 @@ public class Utils {
         );
     }
 
+    private static final Parser MD_PARSER = Parser.builder().build();
+    private static final HtmlRenderer HTML_RENDERER = HtmlRenderer.builder().softbreak("<br />").build();
+
     static String markdownToHtml(String markdown) {
-        Parser parser = Parser.builder().build();
-        Node document = parser.parse(markdown);
-        HtmlRenderer renderer = HtmlRenderer.builder().softbreak("<br />").build();
-        return renderer.render(document);
+        Node document = MD_PARSER.parse(markdown);
+        return HTML_RENDERER.render(document);
     }
+
+    public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+    public static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm");
 }
