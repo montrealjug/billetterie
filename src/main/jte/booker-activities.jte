@@ -112,7 +112,7 @@ content = @`
                                                             <span>${participant.getFirstName()} ${participant.getLastName()}, born in ${participant.getYearOfBirth()} (waiting)</span>
                                                             @if (booker.getParticipants().contains(participant))
                                                                 <div class="flex space-x-2">
-                                                                    <button onclick="displayRemovalModal(${participant.getId()}, ${participant.getFirstName()}, ${participant.getLastName()}, ${participant.getYearOfBirth()})"
+                                                                    <button onclick='displayRemovalModal(${activity.id()}, "${participant.getFirstName()}", "${participant.getLastName()}", ${participant.getYearOfBirth()})'
                                                                             data-activity-id="${activity.id()}"
                                                                             class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
                                                                         Remove
