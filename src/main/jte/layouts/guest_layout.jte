@@ -32,29 +32,24 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/static/favicons/apple-touch-icon.png" />
     <link rel="manifest" href="/static/favicons/site.webmanifest" />
 </head>
-<body class="bg-gray-100 flex flex-col h-screen justify-between">
-<header class="shadow-md p-4 bg-d4k-orange w-full flex justify-between items-center text-white">
+<body class="bg-gray-100 flex flex-col h-screen max-h-screen justify-end-safe">
+<header class="shadow-md p-2 pb-0 md:p-4 bg-d4k-orange w-full flex flex-col md:flex-row justify-between items-start text-white md:items-center gap-2">
     <img
         src="https://www.devoxx4kids.org/quebec/wp-content/uploads/sites/12/2014/06/D4K_QUEBEC_1000px.png"
         alt="Devoxx4Kids Québec logo"
-        class="max-h-20 bg-white rounded-lg p-2 shadow-lg"
+        class="max-h-20 bg-white rounded-lg p-1 shadow-lg object-scale-down w-full md:w-auto md:p-2"
     />
-    <p class="grow-1 text-3xl font-bold px-4 text-shadow-xs">Billetterie Devoxx4Kids Québec</p>
-    <nav>
-        <ul>
-            <li>
-                <a class="inline-block shadow-2xs font-semibold p-3 rounded-md border-2 border-white hover:bg-white hover:text-d4k-orange"
-                   href="/admin/events">Admin</a>
-            </li>
-        </ul>
-    </nav>
+    <p class="font-bold py-2 md:p-4 text-sm text-shadow-xs md:grow-1 md:text-2xl lg:text-3xl">Billetterie Devoxx4Kids Québec</p>
+    <!-- TODO: remove admin link -->
+    <a class="inline-block absolute top-24 right-2 md:top-8 md:p-2 text-xs shadow-2xs font-semibold p-1 rounded-md border-2 border-white hover:bg-white hover:text-d4k-orange md:text-xl"
+       href="/admin/events">Admin</a>
 </header>
-<main>
+<main class="grow-1 flex flex-col justify-start md:p-2 lg:p-4 overflow-hidden">
     ${content}
 </main>
-<footer class="bg-white p-4 flex justify-between text-gray-500 text-sm">
+<footer class="bg-white p-2 flex justify-between items-center text-gray-500 text-xs md:p-4 md:text-sm">
     <span>&copy;&nbsp;${java.time.LocalDate.now().getYear()}&nbsp;Devoxx4Kids Québec</span>
-    <ul class="flex space-x-10 justify-center">
+    <ul class="flex flex-col text-right">
         <li><a href="#">Privacy Policy</a></li>
         <li><a href="#">Terms and Conditions</a></li>
     </ul>
