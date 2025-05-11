@@ -8,11 +8,23 @@ import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 import org.montrealjug.billetterie.entity.Activity;
+import org.montrealjug.billetterie.entity.ActivityParticipant;
 
 public class Utils {
 
     static List<PresentationActivity> toPresentationActivities(Set<Activity> activities) {
         return activities.stream().map((Activity activity) -> toPresentationActivity(activity, true)).toList();
+    }
+
+    static List<PresentationActivityParticipant> toPresentationActivityParticipants(List<ActivityParticipant> aps) {
+        return aps.stream().map(Utils::toPresentationParticipantActivity).toList();
+    }
+
+    private static PresentationActivityParticipant toPresentationParticipantActivity(ActivityParticipant ap) {
+        return new PresentationActivityParticipant(
+            toPresentationActivity(ap.getActivity(), false),
+            ap.getParticipant()
+        );
     }
 
     static PresentationActivity toPresentationActivity(Activity activity, boolean html) {

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.montrealjug.billetterie.entity.Activity;
 import org.montrealjug.billetterie.entity.ActivityParticipant;
@@ -125,5 +126,106 @@ public class ActivityRepositoryTest {
             .toList();
 
         assertThat(participantIdList).containsExactly(thirdPart.getId(), firstPart.getId(), secondPart.getId());
+    }
+
+    @Test
+    void should_find_all_activity_participants_by_event_id_and_booker_email() {
+        // create first booker with 2 participants
+        var firstBooker = new Booker();
+        firstBooker.setFirstName("First");
+        firstBooker.setLastName("Booker");
+        firstBooker.setEmail("firstBooker@test.org");
+        firstBooker.setEmailSignature("pof");
+        var firstPart = new Participant();
+        firstPart.setFirstName("First");
+        firstPart.setLastName("Participant");
+        firstPart.setBooker(firstBooker);
+        firstBooker.getParticipants().add(firstPart);
+        firstBooker = bookerRepository.save(firstBooker);
+        firstBooker.getParticipants().stream().findFirst().map(Participant::getId).ifPresent(firstPart::setId);
+
+        var secondPart = new Participant();
+        secondPart.setFirstName("Second");
+        secondPart.setLastName("Participant");
+        secondPart.setBooker(firstBooker);
+        firstBooker.getParticipants().add(secondPart);
+        firstBooker = bookerRepository.save(firstBooker);
+        firstBooker
+            .getParticipants()
+            .stream()
+            .filter(p -> p.getId() != firstPart.getId())
+            .findFirst()
+            .map(Participant::getId)
+            .ifPresent(secondPart::setId);
+
+        // create second Booker with 1 Participant
+        var secondBooker = new Booker();
+        secondBooker.setFirstName("Second");
+        secondBooker.setLastName("Booker");
+        secondBooker.setEmail("secondBooker@test.org");
+        secondBooker.setEmailSignature("pif");
+        var thirdPart = new Participant();
+        thirdPart.setFirstName("Third");
+        thirdPart.setLastName("Participant");
+        thirdPart.setBooker(secondBooker);
+        secondBooker.getParticipants().add(thirdPart);
+        secondBooker = bookerRepository.save(secondBooker);
+        secondBooker.getParticipants().stream().findFirst().map(Participant::getId).ifPresent(thirdPart::setId);
+
+        // create the Event
+        var event = new Event();
+        event.setDate(LocalDate.now().plusDays(2L));
+        event.setActive(true);
+        event.setDescription("Description");
+        event.setTitle("Title");
+        event = eventRepository.save(event);
+
+        // create the Activity in the Event
+        var activity = new Activity();
+        activity.setTitle("Title");
+        activity.setDescription("Description");
+        activity.setMaxParticipants(12);
+        activity.setMaxWaitingQueue(120);
+        activity.setStartTime(LocalDateTime.now().plusDays(2L));
+        activity.setEvent(event);
+        activity = activityRepository.save(activity);
+
+        // create `registrations`
+        var firstRegistration = new ActivityParticipant();
+        firstRegistration.setActivity(activity);
+        firstRegistration.setParticipant(firstPart);
+        activity.getParticipants().add(firstRegistration);
+        activity = activityRepository.save(activity);
+
+        var secondRegistration = new ActivityParticipant();
+        secondRegistration.setActivity(activity);
+        secondRegistration.setParticipant(secondPart);
+        activity.getParticipants().add(secondRegistration);
+        activity = activityRepository.save(activity);
+
+        var thirdRegistration = new ActivityParticipant();
+        thirdRegistration.setActivity(activity);
+        thirdRegistration.setParticipant(thirdPart);
+        activity.getParticipants().add(thirdRegistration);
+        activityRepository.save(activity);
+
+        // Test the finder method for first booker
+        List<ActivityParticipant> firstBookerParticipants =
+            activityRepository.findAllActivityParticipantByEventIdAndBookerEmail(event.getId(), firstBooker.getEmail());
+
+        assertThat(firstBookerParticipants).hasSize(2);
+        assertThat(firstBookerParticipants.stream().map(ap -> ap.getParticipant().getId()).toList())
+            .containsExactlyInAnyOrder(firstPart.getId(), secondPart.getId());
+
+        // Test the finder method for second booker
+        List<ActivityParticipant> secondBookerParticipants =
+            activityRepository.findAllActivityParticipantByEventIdAndBookerEmail(
+                event.getId(),
+                secondBooker.getEmail()
+            );
+
+        assertThat(secondBookerParticipants).hasSize(1);
+        assertThat(secondBookerParticipants.stream().map(ap -> ap.getParticipant().getId()).toList())
+            .containsExactly(thirdPart.getId());
     }
 }
