@@ -284,6 +284,65 @@ public class RegistrationController {
         }
     }
 
+    @DeleteMapping("/events/{eventId}/removeParticipant")
+    public ResponseEntity<?> removeParticipant(
+        @PathVariable Long eventId,
+        @RequestBody @Valid ParticipantSubmission participantSub
+    ) {
+        // Log the participant information
+        LOGGER.info("Received participant removal request " + eventId + ": " + participantSub);
+
+        //Remove participant from an activity but not from the booker entity
+
+        try {
+            // Check if the activityId matches an existing activity
+            Activity activity = activityRepository
+                .findById(participantSub.activityId())
+                .orElseThrow(() -> new EntityNotFoundException("Activity not found"));
+
+            // Check if the emailSignature matches an existing booker
+            Booker booker = bookerRepository
+                .findByEmailSignature(participantSub.bookerEmailSignature())
+                .orElseThrow(() -> new EntityNotFoundException("Booker not found"));
+
+            Participant participant = booker
+                .getParticipants()
+                .stream()
+                .filter(p -> isSameParticipant(p, participantSub))
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("Participant not exists"));
+
+            //            Set<ActivityParticipant> activityParticipantSet = activity.getParticipants().stream().filter(activityParticipant ->
+            //                    !(activityParticipant.getParticipant().getId() == participant.getId())
+            //            ).collect(Collectors.toSet());
+
+            ActivityParticipant activityParticipantToRemove = activity
+                .getParticipants()
+                .stream()
+                .filter(activityParticipant -> activityParticipant.getParticipant().getId() == participant.getId())
+                .findFirst()
+                .orElseThrow();
+
+            activity.getParticipants().remove(activityParticipantToRemove);
+            //            activity.setParticipants(activityParticipantSet);
+            activityRepository.save(activity);
+
+            // Return a success response with the participant data for display
+            // Not really necessary as the UI gets updated by reloading the page, but leaving here just in case
+            return ResponseEntity.ok().body(participantSub);
+        } catch (DataIntegrityViolationException e) {
+            LOGGER.warn("Data integrity violation: " + e.getMessage());
+            return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("{\"message\":\"Failed to remove participant due to data integrity" + " violation\"}");
+        } catch (Exception e) {
+            LOGGER.error("Error removing participant: " + e.getMessage());
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("{\"message\":\"An error occurred while removing the participant\"}");
+        }
+    }
+
     @GetMapping("/bookings/{signature}")
     public String startBooking(@PathVariable String signature, Model model) {
         // Find booker by email signature

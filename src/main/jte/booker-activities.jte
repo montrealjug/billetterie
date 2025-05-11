@@ -81,7 +81,7 @@ content = @`
                                                     Activity Full
                                                 </button>
                                             @else
-                                                <button onclick="displayParticipantModal(${activity.id()})" 
+                                                <button onclick="displayParticipantModal(${activity.id()})"
                                                         class="bg-d4k-orange text-white px-3 py-1 rounded hover:opacity-80 focus:outline-none focus:ring focus:ring-orange-300">
                                                     Add participant
                                                 </button>
@@ -99,21 +99,43 @@ content = @`
                                                 <span class="font-medium">Regular participants:</span>
                                                 @for(ActivityParticipant activityParticipant : activity.participants())
                                                     !{var participant = activityParticipant.getParticipant(); }
-                                                    <li>${participant.getFirstName()} ${participant.getLastName()}, born in ${participant.getYearOfBirth()}</li>
+                                                    <li class="flex justify-between items-center mb-1">
+                                                        <span>${participant.getFirstName()} ${participant.getLastName()}, born in ${participant.getYearOfBirth()}</span>
+                                                        @if (booker.getParticipants().contains(participant))
+                                                            <div class="flex space-x-2">
+                                                                <button onclick='displayRemovalModal(${activity.id()}, "${participant.getFirstName()}", "${participant.getLastName()}", ${participant.getYearOfBirth()})'
+                                                                        data-activity-id="${activity.id()}"
+                                                                        class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
+                                                                    Remove
+                                                                </button>
+                                                            </div>
+                                                        @endif
+                                                    </li>
                                                 @endfor
                                             </div>
                                         @endif
 
-                                        <!-- Display waiting participants -->
-                                        @if(waitingParticipantsNumber != 0)
-                                            <div>
-                                                <span class="font-medium text-orange-600">Waiting list:</span>
-                                                @for(ActivityParticipant activityParticipant : activity.waitingParticipants())
-                                                    !{var participant = activityParticipant.getParticipant(); }
-                                                    <li class="text-orange-600">${participant.getFirstName()} ${participant.getLastName()}, born in ${participant.getYearOfBirth()} (waiting)</li>
-                                                @endfor
-                                            </div>
-                                        @endif
+                                            <!-- Display waiting participants -->
+                                            @if(waitingParticipantsNumber != 0)
+                                                <div>
+                                                    <span class="font-medium text-orange-600">Waiting list:</span>
+                                                    @for(ActivityParticipant activityParticipant : activity.waitingParticipants())
+                                                        !{var participant = activityParticipant.getParticipant(); }
+                                                        <li class="text-orange-600">
+                                                            <span>${participant.getFirstName()} ${participant.getLastName()}, born in ${participant.getYearOfBirth()} (waiting)</span>
+                                                            @if (booker.getParticipants().contains(participant))
+                                                                <div class="flex space-x-2">
+                                                                    <button onclick='displayRemovalModal(${activity.id()}, "${participant.getFirstName()}", "${participant.getLastName()}", ${participant.getYearOfBirth()})'
+                                                                            data-activity-id="${activity.id()}"
+                                                                            class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
+                                                                        Remove
+                                                                    </button>
+                                                                </div>
+                                                            @endif
+                                                        </li>
+                                                    @endfor
+                                                </div>
+                                            @endif
 
                                         <!-- New participants will be added here dynamically -->
                                     </ul>
@@ -123,9 +145,9 @@ content = @`
 
                         <!-- Submit changes button container - fixed at the bottom of the viewport -->
                         <div id="submit-changes-container" class="fixed bottom-0 left-0 right-0 w-full bg-white p-4 border-t border-gray-200 flex justify-center shadow-md z-50">
-                            <button id="submit-changes-button" 
-                                    onclick="submitAllParticipants()" 
-                                    class="bg-gray-400 text-white px-4 py-2 rounded cursor-not-allowed" 
+                            <button id="submit-changes-button"
+                                    onclick="submitAllParticipants()"
+                                    class="bg-gray-400 text-white px-4 py-2 rounded cursor-not-allowed"
                                     disabled>
                                 Submit changes
                             </button>
@@ -178,7 +200,7 @@ content = @`
                 </div>
                 <div id="error-message" class="text-red-500 text-sm hidden"></div>
                 <div class="flex justify-end gap-2">
-                    <button type="button" onclick="closeModal()" class="bg-gray-300 text-gray-700 px-3 py-1 rounded hover:bg-gray-400 focus:outline-none focus:ring">Cancel</button>
+                    <button type="button" onclick="closeSubmitModal()" class="bg-gray-300 text-gray-700 px-3 py-1 rounded hover:bg-gray-400 focus:outline-none focus:ring">Cancel</button>
                     <button type="submit" class="bg-d4k-orange text-white px-3 py-1 rounded hover:opacity-80 focus:outline-none focus:ring focus:ring-blue-300">Submit</button>
                 </div>
             </form>
@@ -232,6 +254,87 @@ content = @`
 
                 // Close the modal
                 closeModal();
+            });
+        }
+
+        function displayRemovalModal(activityId, firstName, lastName, yearOfBirth) {
+            console.log("Display Removal")
+            const modal = document.createElement('div');
+            modal.id = "removal-modal";
+            modal.className = "fixed inset-0 flex items-center justify-center bg-black/50 z-50";
+            @raw
+            modal.innerHTML = `
+        <div class="bg-white rounded-lg shadow-md p-6 w-96">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Remove Participant</h2>
+            <form id="removal-form" class="space-y-4">
+                <input type="hidden" id="activity-id" name="activityId" value="` + activityId + `">
+                <input type="hidden" id="first-name" name="firstName" value="` + firstName + `">
+                <input type="hidden" id="last-name" name="lastName" value="` + lastName + `">
+                <input type="hidden" id="yearOfBirth" name="yearOfBirth" min="1900" max="2023" value="`+ yearOfBirth + `">
+                <span>Are you sure you want to remove participant: ` + firstName + " " + lastName +`?</span>
+                <div id="error-message" class="text-red-500 text-sm hidden"></div>
+                <div>
+                    <button type="button" onclick="closeRemovalModal()" class="bg-gray-300 text-gray-700 px-3 py-1 rounded hover:bg-gray-400 focus:outline-none focus:ring">Cancel</button>
+                    <button type="submit" class="bg-d4k-orange text-white px-3 py-1 rounded hover:opacity-80 focus:outline-none focus:ring focus:ring-blue-300">Confirm</button>
+                </div>
+            </form>
+        </div>
+    `;
+            @endraw
+
+            document.body.appendChild(modal);
+
+            const form = document.getElementById("removal-form");
+            const errorMessage = document.getElementById("error-message");
+
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                // Gather form data
+                const activityId = form.activityId.value;
+                const firstName = form.firstName.value;
+                const lastName = form.lastName.value;
+                const yearOfBirth = form.yearOfBirth.value;
+
+                // Should not ever happen but just in case
+                if (!firstName || !lastName || !yearOfBirth) {
+                    errorMessage.textContent = "Something went wrong";
+                    errorMessage.classList.remove("hidden");
+                    return;
+                }
+
+                errorMessage.classList.add("hidden");
+
+                // Send HTTP POST request
+                try {
+                    const url = "/events/" + eventId + "/removeParticipant";
+                    const response = await fetch(url, {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            activityId: parseInt(activityId),
+                            firstName: firstName,
+                            lastName: lastName,
+                            yearOfBirth: parseInt(yearOfBirth),
+                            bookerEmailSignature: bookerEmailSignature
+                        }),
+                    });
+
+                    if (response.ok) {
+                        window.location.reload();
+                        closeRemovalModal();
+                    } else {
+                        const errorData = await response.json();
+                        errorMessage.textContent = errorData.message || "Participant removal failed.";
+                        errorMessage.classList.remove("hidden");
+                    }
+                } catch (error) {
+                    console.error("Error during removal:", error);
+                    errorMessage.textContent = "An error occurred. Please try again.";
+                    errorMessage.classList.remove("hidden");
+                }
             });
         }
 
@@ -370,7 +473,7 @@ content = @`
             }
         }
 
-        function closeModal() {
+        function closeSubmitModal() {
             const modal = document.getElementById("participant-modal");
             if (modal) {
                 modal.remove();
@@ -422,6 +525,13 @@ content = @`
             } catch (error) {
                 console.error("Error during registration:", error);
                 alert("An error occurred while registering participants. Please try again.");
+            }
+        }
+
+        function closeRemovalModal() {
+            const modal = document.getElementById("removal-modal");
+            if(modal) {
+                modal.remove();
             }
         }
     </script>
