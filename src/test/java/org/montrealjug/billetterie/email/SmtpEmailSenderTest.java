@@ -20,6 +20,7 @@ import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -171,7 +172,7 @@ class SmtpEmailSenderTest {
             var subject = "subject";
             var plainText = "plain_text";
             var htmlText = "html_text";
-            return new EmailToSend(from, subject, plainText, htmlText);
+            return new EmailToSend(from, subject, plainText, htmlText, Optional.empty());
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
