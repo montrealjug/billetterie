@@ -95,7 +95,7 @@ content = @`
                                     <ul id="participants-list-${activity.id()}" class="list-disc pl-5">
                                         <!-- Display existing regular participants -->
                                         @if(regularParticipantsNumber != 0)
-                                            <div class="mb-2">
+                                            <div class="mb-2" id="regular-participants-container">
                                                 <span class="font-medium">Regular participants:</span>
                                                 @for(ActivityParticipant activityParticipant : activity.participants())
                                                     !{var participant = activityParticipant.getParticipant(); }
@@ -117,11 +117,11 @@ content = @`
 
                                             <!-- Display waiting participants -->
                                             @if(waitingParticipantsNumber != 0)
-                                                <div>
+                                                <div id="waiting-participants-container">
                                                     <span class="font-medium text-orange-600">Waiting list:</span>
                                                     @for(ActivityParticipant activityParticipant : activity.waitingParticipants())
                                                         !{var participant = activityParticipant.getParticipant(); }
-                                                        <li class="text-orange-600">
+                                                        <li class="text-orange-600 flex justify-between items-center mb-1">
                                                             <span>${participant.getFirstName()} ${participant.getLastName()}, born in ${participant.getYearOfBirth()} (waiting)</span>
                                                             @if (booker.getParticipants().contains(participant))
                                                                 <div class="flex space-x-2">
@@ -253,7 +253,7 @@ content = @`
                 updateSubmitChangesButton();
 
                 // Close the modal
-                closeModal();
+                closeSubmitModal();
             });
         }
 
@@ -372,23 +372,25 @@ content = @`
             let section;
             if (isWaiting) {
                 // Look for waiting list section
-                section = list.querySelector("div:nth-child(2)");
+                section = list.children.namedItem("waiting-participants-container");
                 if (!section) {
                     // Create waiting list section if it doesn't exist
                     section = document.createElement("div");
                     const heading = document.createElement("span");
                     heading.className = "font-medium text-orange-600";
+                    heading.id = "waiting-participants-container"
                     heading.textContent = "Waiting list:";
                     section.appendChild(heading);
                     list.appendChild(section);
                 }
             } else {
                 // Look for regular participants section
-                section = list.querySelector("div:first-child");
+                section = list.children.namedItem("regular-participants-container");
                 if (!section) {
                     // Create regular participants section if it doesn't exist
                     section = document.createElement("div");
                     section.className = "mb-2";
+                    section.id = "regular-participants-container"
                     const heading = document.createElement("span");
                     heading.className = "font-medium";
                     heading.textContent = "Regular participants:";
@@ -400,10 +402,36 @@ content = @`
             // Create a new list item for the participant
             const listItem = document.createElement("li");
             if (isWaiting) {
-                listItem.className = "text-orange-600";
-                listItem.textContent = participant.firstName + " " + participant.lastName + ", born in " + participant.yearOfBirth + " (waiting)";
+                listItem.className = "text-orange-600 flex justify-between items-center mb-1";
+                // listItem.textContent = participant.firstName + " " + participant.lastName + ", born in " + participant.yearOfBirth + " (waiting)";
+                @raw
+                listItem.innerHTML = `
+                    <span>${participant.firstName} ${participant.lastName}, born in ${participant.yearOfBirth} (waiting)</span>
+                    <div class="flex space-x-2">
+                        <button onclick='displayRemovalModal(${activityId}, "${participant.firstName}", "${participant.lastName}", ${participant.yearOfBirth})'
+                                data-activity-id="${activityId}"
+                                class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
+                            Remove
+                        </button>
+                    </div>
+                `
+                @endraw
+
             } else {
-                listItem.textContent = participant.firstName + " " + participant.lastName + ", born in " + participant.yearOfBirth;
+                // listItem.textContent = participant.firstName + " " + participant.lastName + ", born in " + participant.yearOfBirth;
+                listItem.className = "flex justify-between items-center mb-1";
+                @raw
+                listItem.innerHTML = `
+                    <span>${participant.firstName} ${participant.lastName}, born in ${participant.yearOfBirth}</span>
+                    <div class="flex space-x-2">
+                        <button onclick='displayRemovalModal(${activityId}, "${participant.firstName}", "${participant.lastName}", ${participant.yearOfBirth})'
+                                data-activity-id="${activityId}"
+                                class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
+                            Remove
+                        </button>
+                    </div>
+                `
+                @endraw
             }
 
             // Add the list item to the appropriate section
