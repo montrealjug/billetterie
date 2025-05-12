@@ -5,6 +5,7 @@ import static org.montrealjug.billetterie.ui.Utils.*;
 
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.Optional;
 import org.montrealjug.billetterie.entity.*;
 import org.montrealjug.billetterie.exception.EntityNotFoundException;
 import org.montrealjug.billetterie.repository.ActivityRepository;
@@ -41,14 +42,13 @@ public class CheckInController {
 
     @GetMapping("/admin/bookings/{signature}")
     public String startCheckIn(@PathVariable String signature, Model model) {
-        // Find booker by email signature
-        var booker = bookerRepository.findByEmailSignature(signature).orElse(null);
-
-        // Get active event
-        var event = eventRepository.findByActiveIsTrue().orElse(null);
+        Optional<Booker> optionalBooker = bookerRepository.findByEmailSignature(signature);
+        Optional<Event> optionalEvent = eventRepository.findByActiveIsTrue();
 
         // we found the Booker, and there is an active Event, so admin can check in participants
-        if (booker != null && event != null) {
+        if (optionalBooker.isPresent() && optionalEvent.isPresent()) {
+            var booker = optionalBooker.get();
+            var event = optionalEvent.get();
             // Create presentation event
             PresentationEvent presentationEvent = new PresentationEvent(
                 event.getId(),
@@ -68,26 +68,7 @@ public class CheckInController {
             // Return checkin template
             return "checkin";
         } else {
-            // or the Booker is missing, or there is no active Event, so we go to `index`
-            if (event != null) {
-                // add the Event for index, if any
-                PresentationEvent presentationEvent = new PresentationEvent(
-                    event.getId(),
-                    event.getTitle(),
-                    event.getDescription(),
-                    event.getDate(),
-                    toPresentationActivities(event.getActivities()),
-                    event.isActive(),
-                    event.getImagePath(),
-                    event.getLocation()
-                );
-                model.addAttribute("event", presentationEvent);
-            }
-            if (booker == null) {
-                // set the error msg if no Booker found
-                model.addAttribute("error", "The booker could not be retrieved from the DB");
-            }
-            return "index";
+            throw new org.montrealjug.billetterie.exception.EntityNotFoundException("Booker or Event not found");
         }
     }
 
@@ -124,7 +105,11 @@ public class CheckInController {
             activityRepository.save(activity);
 
             // Return success response
-            return ResponseEntity.ok().body("{\"message\":\"Participant successfully checked in\"}");
+            if (checkInRequest.checked()) {
+                return ResponseEntity.ok().body("{\"message\":\"Participant successfully checked in\"}");
+            } else {
+                return ResponseEntity.ok().body("{\"message\":\"Participant successfully UNchecked\"}");
+            }
         } catch (Exception e) {
             LOGGER.error("Error checking in participant: {}", e.getMessage());
             return ResponseEntity
