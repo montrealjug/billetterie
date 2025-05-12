@@ -36,7 +36,9 @@
 		<!-- tailwind processor stack -->
 		<node.version>v22.15.0</node.version>
 		<frontend-maven-plugin.version>1.15.1</frontend-maven-plugin.version>
-    </properties>
+		<commonmark.version>0.24.0</commonmark.version>
+		<okapibarcode.version>0.5.0</okapibarcode.version>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -70,7 +72,12 @@
 		<dependency>
 			<groupId>org.commonmark</groupId>
 			<artifactId>commonmark</artifactId>
-			<version>0.24.0</version>
+			<version>${commonmark.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>uk.org.okapibarcode</groupId>
+			<artifactId>okapibarcode</artifactId>
+			<version>${okapibarcode.version}</version>
 		</dependency>
 
 		<dependency>

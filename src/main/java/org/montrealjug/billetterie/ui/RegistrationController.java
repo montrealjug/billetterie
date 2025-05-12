@@ -18,6 +18,7 @@ import org.montrealjug.billetterie.repository.ActivityRepository;
 import org.montrealjug.billetterie.repository.BookerRepository;
 import org.montrealjug.billetterie.repository.EventRepository;
 import org.montrealjug.billetterie.repository.ParticipantRepository;
+import org.montrealjug.billetterie.service.QrCodeService;
 import org.montrealjug.billetterie.service.SignatureService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,7 @@ public class RegistrationController {
 
     private final BookerRepository bookerRepository;
     private final SignatureService signatureService;
+    private final QrCodeService qrCodeService;
     private final EmailService emailService;
     private final EventRepository eventRepository;
     private final ActivityRepository activityRepository;
@@ -43,6 +45,7 @@ public class RegistrationController {
     public RegistrationController(
         BookerRepository bookerRepository,
         SignatureService signatureService,
+        QrCodeService qrCodeService,
         EmailService emailService,
         EventRepository eventRepository,
         ActivityRepository activityRepository,
@@ -50,6 +53,7 @@ public class RegistrationController {
     ) {
         this.bookerRepository = bookerRepository;
         this.signatureService = signatureService;
+        this.qrCodeService = qrCodeService;
         this.emailService = emailService;
         this.eventRepository = eventRepository;
         this.activityRepository = activityRepository;
@@ -265,7 +269,10 @@ public class RegistrationController {
                     booker,
                     toPresentationActivityParticipants(participantsForEventAndBooker),
                     event,
-                    retrieveBaseUrl(request)
+                    retrieveBaseUrl(request),
+                    qrCodeService.generateQrCode(
+                        retrieveBaseUrl(request) + "/admin/bookings/" + booker.getEmailSignature()
+                    )
                 )
             );
 
