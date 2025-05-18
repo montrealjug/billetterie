@@ -294,10 +294,11 @@ public class RegistrationController {
     @DeleteMapping("/events/{eventId}/removeParticipant")
     public ResponseEntity<?> removeParticipant(
         @PathVariable Long eventId,
-        @RequestBody @Valid ParticipantSubmission participantSub
+        @RequestBody @Valid ParticipantSubmission participantSub,
+        HttpServletRequest request
     ) {
         // Log the participant information
-        LOGGER.info("Received participant removal request " + eventId + ": " + participantSub);
+        LOGGER.info("Received participant removal request {}: {}", eventId, participantSub);
 
         //Remove participant from an activity but not from the booker entity
 
@@ -307,10 +308,21 @@ public class RegistrationController {
                 .findById(participantSub.activityId())
                 .orElseThrow(() -> new EntityNotFoundException("Activity not found"));
 
+            var lastParticipantBeforeRemoval = activity
+                .getNonWaitingParticipants()
+                .stream()
+                .toList()
+                .getLast()
+                .getParticipant();
+
             // Check if the emailSignature matches an existing booker
             Booker booker = bookerRepository
                 .findByEmailSignature(participantSub.bookerEmailSignature())
                 .orElseThrow(() -> new EntityNotFoundException("Booker not found"));
+
+            Event event = eventRepository
+                .findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found"));
 
             Participant participant = booker
                 .getParticipants()
@@ -334,16 +346,62 @@ public class RegistrationController {
             //            activity.setParticipants(activityParticipantSet);
             activityRepository.save(activity);
 
+            List<ActivityParticipant> allActivityParticipantByEventIdAndBookerEmail =
+                activityRepository.findAllActivityParticipantByEventIdAndBookerEmail(eventId, booker.getEmail());
+
+            emailService.sendEmail(
+                Email.afterParticipantsChanges(
+                    booker,
+                    toPresentationActivityParticipants(allActivityParticipantByEventIdAndBookerEmail),
+                    event,
+                    retrieveBaseUrl(request),
+                    qrCodeService.generateQrCode(
+                        retrieveBaseUrl(request) + "/admin/bookings/" + booker.getEmailSignature()
+                    )
+                )
+            );
+
+            activity =
+                activityRepository
+                    .findById(participantSub.activityId())
+                    .orElseThrow(() -> new EntityNotFoundException("Activity not found"));
+
+            var lastParticipantAfterRemoval = activity
+                .getNonWaitingParticipants()
+                .stream()
+                .toList()
+                .getLast()
+                .getParticipant();
+
+            if (!lastParticipantBeforeRemoval.equals(lastParticipantAfterRemoval)) {
+                // this participant just got upgraded from waiting to non-waiting
+                ActivityParticipant upgradedActivityParticipant = activity.getNonWaitingParticipants().getLast();
+                Booker upgradedParticipantBooker = lastParticipantAfterRemoval.getBooker();
+                emailService.sendEmail(
+                    Email.participantUpgraded(
+                        upgradedParticipantBooker,
+                        toPresentationParticipantActivity(upgradedActivityParticipant),
+                        event,
+                        retrieveBaseUrl(request),
+                        qrCodeService.generateQrCode(
+                            retrieveBaseUrl(request) +
+                            "/admin/bookings/" +
+                            upgradedParticipantBooker.getEmailSignature()
+                        )
+                    )
+                );
+            }
+
             // Return a success response with the participant data for display
             // Not really necessary as the UI gets updated by reloading the page, but leaving here just in case
             return ResponseEntity.ok().body(participantSub);
         } catch (DataIntegrityViolationException e) {
-            LOGGER.warn("Data integrity violation: " + e.getMessage());
+            LOGGER.warn("Data integrity violation: {}", e.getMessage());
             return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body("{\"message\":\"Failed to remove participant due to data integrity" + " violation\"}");
         } catch (Exception e) {
-            LOGGER.error("Error removing participant: " + e.getMessage());
+            LOGGER.error("Error removing participant: {}", e.getMessage());
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("{\"message\":\"An error occurred while removing the participant\"}");
@@ -366,13 +424,15 @@ public class RegistrationController {
                 bookerRepository.save(booker);
             }
 
+            var bookerParticipants = booker.getParticipants();
+
             // Create presentation event
             PresentationEvent presentationEvent = new PresentationEvent(
                 event.getId(),
                 event.getTitle(),
                 markdownToHtml(event.getDescription()),
                 event.getDate(),
-                toPresentationActivities(event.getActivities()),
+                toPresentationActivitiesLimitedToBooker(event.getActivities(), bookerParticipants),
                 event.isActive(),
                 event.getImagePath(),
                 event.getLocation()
@@ -424,7 +484,11 @@ public class RegistrationController {
     }
 
     @DeleteMapping("/admin/activities/{activityId}/participants/{participantId}")
-    public ResponseEntity<?> deleteParticipant(@PathVariable Long activityId, @PathVariable Long participantId) {
+    public ResponseEntity<?> deleteParticipant(
+        @PathVariable Long activityId,
+        @PathVariable Long participantId,
+        HttpServletRequest request
+    ) {
         try {
             Activity activity = activityRepository
                 .findById(activityId)
@@ -436,6 +500,27 @@ public class RegistrationController {
 
             // Save the updated activity with merge to ensure the removal is persisted
             activityRepository.save(activity);
+
+            activity =
+                activityRepository
+                    .findById(activityId)
+                    .orElseThrow(() -> new EntityNotFoundException("Activity not found"));
+            // this participant just got upgraded from waiting to non-waiting
+            ActivityParticipant upgradedActivityParticipant = activity.getNonWaitingParticipants().getLast();
+            Participant upgradedParticipant = upgradedActivityParticipant.getParticipant();
+            Booker upgradedParticipantBooker = upgradedParticipant.getBooker();
+            var event = activity.getEvent();
+            emailService.sendEmail(
+                Email.participantUpgraded(
+                    upgradedParticipantBooker,
+                    toPresentationParticipantActivity(upgradedActivityParticipant),
+                    event,
+                    retrieveBaseUrl(request),
+                    qrCodeService.generateQrCode(
+                        retrieveBaseUrl(request) + "/admin/bookings/" + upgradedParticipantBooker.getEmailSignature()
+                    )
+                )
+            );
 
             // Return success response
             return ResponseEntity.noContent().build();

@@ -41,6 +41,7 @@ public class EmailModel {
         AFTER_BOOKING,
         AFTER_REGISTRATION,
         AFTER_PARTICIPANTS_CHANGES,
+        PARTICIPANT_UPGRADED,
         RETURNING_BOOKER;
 
         public String subjectKey() {
@@ -99,6 +100,16 @@ public class EmailModel {
             InputStream qrCodeInputStream
         ) {
             return new AfterParticipantsChangesEmail(booker, participants, event, baseUrl, qrCodeInputStream);
+        }
+
+        static Email participantUpgraded(
+            Booker booker,
+            PresentationActivityParticipant participantActivity,
+            Event event,
+            String baseUrl,
+            InputStream qrCodeInputStream
+        ) {
+            return new ParticipantUpgraded(booker, participantActivity, event, baseUrl, qrCodeInputStream);
         }
 
         static Email returningBooker(Booker booker, String baseUrl) {
@@ -179,6 +190,34 @@ public class EmailModel {
         @Override
         public EmailType type() {
             return EmailType.AFTER_PARTICIPANTS_CHANGES;
+        }
+
+        @Override
+        public InternetAddress to() {
+            return Email.fromBooker(booker);
+        }
+
+        @Override
+        public Optional<InputStream> attachmentInputStream() {
+            return Optional.of(qrCodeInputStream);
+        }
+
+        public String registrationLink() {
+            return baseUrl + "/bookings/" + booker.getEmailSignature();
+        }
+    }
+
+    public record ParticipantUpgraded(
+        Booker booker,
+        PresentationActivityParticipant participant,
+        Event event,
+        String baseUrl,
+        InputStream qrCodeInputStream
+    )
+        implements Email {
+        @Override
+        public EmailType type() {
+            return EmailType.PARTICIPANT_UPGRADED;
         }
 
         @Override

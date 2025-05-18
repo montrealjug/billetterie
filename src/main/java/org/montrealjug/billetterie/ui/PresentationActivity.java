@@ -13,6 +13,8 @@ public record PresentationActivity(
     @NotBlank String description,
     int maxParticipants,
     int maxWaitingQueue,
+    int totalParticipants,
+    int totalWaitingQueue,
     List<ActivityParticipant> waitingParticipants,
     List<ActivityParticipant> participants,
     Activity.RegistrationStatus registrationStatus,

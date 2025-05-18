@@ -19,6 +19,7 @@ content = @`
             ${error}
         </div>
     @endif
+        <div>Ticket for ${booker.getFirstName()} ${booker.getLastName()} (${booker.getEmail()})</div>
 
     @if(event != null)
         <div class="w-full max-w-full h-full md:rounded md:h-auto md:max-h-full md:p-4 lg:p-8 lg:max-w-6xl flex flex-col justify-end-safe md:bg-white md:shadow-md">
@@ -46,8 +47,8 @@ content = @`
                         <h3 class="text-md font-semibold text-gray-700 mb-2">Activities</h3>
                         <div class="bg-white rounded md:rounded-md md:shadow">
                             @for(PresentationActivity activity: event.activities())
-                                !{var regularParticipantsNumber = activity.participants().size(); }
-                                !{var waitingParticipantsNumber = activity.waitingParticipants().size(); }
+                                !{var waitingParticipantsNumber = activity.totalWaitingQueue(); }
+                                !{var regularParticipantsNumber = activity.totalParticipants() - waitingParticipantsNumber; }
 
                                 <article class="my-4 flex flex-col md:flex-row items-start justify-between md:my-8 p-4 border-b border-gray-200">
                                     <div class="size-12 shrink-0 mr-2 md:size-16 md:mr-4">
@@ -90,7 +91,7 @@ content = @`
                                     </div>
                                 </article>
 
-                                <div id="participants-container-${activity.id()}" class="${activity.participants().isEmpty() ? "hidden" : ""} px-4 py-2 bg-gray-50 mb-4 ml-4 mr-4 rounded">
+                                <div id="participants-container-${activity.id()}" class="${activity.participants().isEmpty() && activity.waitingParticipants().isEmpty() ? "hidden" : ""} px-4 py-2 bg-gray-50 mb-4 ml-4 mr-4 rounded">
                                     <div class="text-sm font-semibold mb-2">Participants:</div>
                                     <ul id="participants-list-${activity.id()}" class="list-disc pl-5">
                                         <!-- Display existing regular participants -->
@@ -121,18 +122,18 @@ content = @`
                                                     <span class="font-medium text-orange-600">Waiting list:</span>
                                                     @for(ActivityParticipant activityParticipant : activity.waitingParticipants())
                                                         !{var participant = activityParticipant.getParticipant(); }
-                                                        <li class="text-orange-600 flex justify-between items-center mb-1">
-                                                            <span>${participant.getFirstName()} ${participant.getLastName()}, born in ${participant.getYearOfBirth()} (waiting)</span>
                                                             @if (booker.getParticipants().contains(participant))
-                                                                <div class="flex space-x-2">
-                                                                    <button onclick='displayRemovalModal(${activity.id()}, "${participant.getFirstName()}", "${participant.getLastName()}", ${participant.getYearOfBirth()})'
-                                                                            data-activity-id="${activity.id()}"
-                                                                            class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
-                                                                        Remove
-                                                                    </button>
-                                                                </div>
+                                                                <li class="text-orange-600 flex justify-between items-center mb-1">
+                                                                        <span>${participant.getFirstName()} ${participant.getLastName()}, born in ${participant.getYearOfBirth()} (waiting)</span>
+                                                                        <div class="flex space-x-2">
+                                                                            <button onclick='displayRemovalModal(${activity.id()}, "${participant.getFirstName()}", "${participant.getLastName()}", ${participant.getYearOfBirth()})'
+                                                                                    data-activity-id="${activity.id()}"
+                                                                                    class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
+                                                                                Remove
+                                                                            </button>
+                                                                        </div>
+                                                                </li>
                                                             @endif
-                                                        </li>
                                                     @endfor
                                                 </div>
                                             @endif

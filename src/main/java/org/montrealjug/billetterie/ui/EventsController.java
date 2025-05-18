@@ -115,7 +115,7 @@ public class EventsController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> delete(Model model, @PathVariable long id) {
+    public ResponseEntity<Void> delete(@PathVariable long id) {
         Optional<Event> optionalEvent = this.eventRepository.findById(id);
         if (optionalEvent.isPresent()) {
             this.eventRepository.deleteById(id);

@@ -9,6 +9,7 @@ import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 import org.montrealjug.billetterie.entity.Activity;
 import org.montrealjug.billetterie.entity.ActivityParticipant;
+import org.montrealjug.billetterie.entity.Participant;
 
 public class Utils {
 
@@ -16,11 +17,21 @@ public class Utils {
         return activities.stream().map((Activity activity) -> toPresentationActivity(activity, true)).toList();
     }
 
+    static List<PresentationActivity> toPresentationActivitiesLimitedToBooker(
+        Set<Activity> activities,
+        Set<Participant> bookerParticipants
+    ) {
+        return activities
+            .stream()
+            .map((Activity activity) -> toPresentationActivity(activity, bookerParticipants, true))
+            .toList();
+    }
+
     static List<PresentationActivityParticipant> toPresentationActivityParticipants(List<ActivityParticipant> aps) {
         return aps.stream().map(Utils::toPresentationParticipantActivity).toList();
     }
 
-    private static PresentationActivityParticipant toPresentationParticipantActivity(ActivityParticipant ap) {
+    static PresentationActivityParticipant toPresentationParticipantActivity(ActivityParticipant ap) {
         return new PresentationActivityParticipant(
             toPresentationActivity(ap.getActivity(), false),
             ap.getParticipant()
@@ -34,8 +45,39 @@ public class Utils {
             html ? markdownToHtml(activity.getDescription()) : activity.getDescription(),
             activity.getMaxParticipants(),
             activity.getMaxWaitingQueue(),
+            activity.getParticipants().size(),
+            activity.getWaitingParticipants().size(),
             activity.getWaitingParticipants(),
             activity.getNonWaitingParticipants(),
+            activity.getRegistrationStatus(),
+            activity.getStartTime().toLocalTime(),
+            activity.getImagePath()
+        );
+    }
+
+    static PresentationActivity toPresentationActivity(
+        Activity activity,
+        Set<Participant> bookerParticipants,
+        boolean html
+    ) {
+        return new PresentationActivity(
+            activity.getId(),
+            activity.getTitle(),
+            html ? markdownToHtml(activity.getDescription()) : activity.getDescription(),
+            activity.getMaxParticipants(),
+            activity.getMaxWaitingQueue(),
+            activity.getParticipants().size(),
+            activity.getWaitingParticipants().size(),
+            activity
+                .getWaitingParticipants()
+                .stream()
+                .filter(ap -> bookerParticipants.contains(ap.getParticipant()))
+                .toList(),
+            activity
+                .getNonWaitingParticipants()
+                .stream()
+                .filter(ap -> bookerParticipants.contains(ap.getParticipant()))
+                .toList(),
             activity.getRegistrationStatus(),
             activity.getStartTime().toLocalTime(),
             activity.getImagePath()
