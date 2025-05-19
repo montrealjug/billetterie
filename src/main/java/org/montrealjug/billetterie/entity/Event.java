@@ -3,9 +3,7 @@ package org.montrealjug.billetterie.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 public class Event {
@@ -24,7 +22,7 @@ public class Event {
     private String location;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
-    private Set<Activity> activities = new HashSet<>();
+    private SortedSet<Activity> activities = new TreeSet<>();
 
     public long getId() {
         return id;
@@ -58,11 +56,11 @@ public class Event {
         this.description = description;
     }
 
-    public Set<Activity> getActivities() {
+    public SortedSet<Activity> getActivities() {
         return activities;
     }
 
-    public void setActivities(Set<Activity> activities) {
+    public void setActivities(SortedSet<Activity> activities) {
         this.activities = activities;
     }
 

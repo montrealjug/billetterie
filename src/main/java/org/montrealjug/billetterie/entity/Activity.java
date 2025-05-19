@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
-public class Activity {
+public class Activity implements Comparable<Activity> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -147,5 +147,10 @@ public class Activity {
         } else {
             return "";
         }
+    }
+
+    @Override
+    public int compareTo(Activity o) {
+        return Long.compare(id, o.id);
     }
 }
