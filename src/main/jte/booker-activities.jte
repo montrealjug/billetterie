@@ -19,7 +19,7 @@ content = @`
             ${error}
         </div>
     @endif
-        <div>Ticket for ${booker.getFirstName()} ${booker.getLastName()} (${booker.getEmail()})</div>
+    <div><b>DON'T FORGET TO SUBMIT CHANGES</b> - Ticket for ${booker.getFirstName()} ${booker.getLastName()} (${booker.getEmail()}) - <b>OUBLIE PAS DE CLIQUER SUR SUBMIT CHANGES</b></div>
 
     @if(event != null)
         <div class="w-full max-w-full h-full md:rounded md:h-auto md:max-h-full md:p-4 lg:p-8 lg:max-w-6xl flex flex-col justify-end-safe md:bg-white md:shadow-md">
@@ -50,7 +50,7 @@ content = @`
                                 !{var waitingParticipantsNumber = activity.totalWaitingQueue(); }
                                 !{var regularParticipantsNumber = activity.totalParticipants() - waitingParticipantsNumber; }
 
-                                <article class="my-4 flex flex-col md:flex-row items-start justify-between md:my-8 p-4 border-b border-gray-200">
+                                <article class="my-4 flex flex-col md:flex-row md:my-8 p-4">
                                     <div class="size-12 shrink-0 mr-2 md:size-16 md:mr-4">
                                         @template.layouts.image_with_fallback(
                                             entityType = "activity",
@@ -122,18 +122,18 @@ content = @`
                                                     <span class="font-medium text-orange-600">Waiting list:</span>
                                                     @for(ActivityParticipant activityParticipant : activity.waitingParticipants())
                                                         !{var participant = activityParticipant.getParticipant(); }
-                                                            @if (booker.getParticipants().contains(participant))
-                                                                <li class="text-orange-600 flex justify-between items-center mb-1">
-                                                                        <span>${participant.getFirstName()} ${participant.getLastName()}, born in ${participant.getYearOfBirth()} (waiting)</span>
-                                                                        <div class="flex space-x-2">
-                                                                            <button onclick='displayRemovalModal(${activity.id()}, "${participant.getFirstName()}", "${participant.getLastName()}", ${participant.getYearOfBirth()})'
-                                                                                    data-activity-id="${activity.id()}"
-                                                                                    class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
-                                                                                Remove
-                                                                            </button>
-                                                                        </div>
-                                                                </li>
-                                                            @endif
+                                                        <li class="text-orange-600 flex justify-between items-center mb-1">
+                                                                <span>${participant.getFirstName()} ${participant.getLastName()}, born in ${participant.getYearOfBirth()} (waiting)</span>
+                                                                 @if (booker.getParticipants().contains(participant))
+                                                                    <div class="flex space-x-2">
+                                                                        <button onclick='displayRemovalModal(${activity.id()}, "${participant.getFirstName()}", "${participant.getLastName()}", ${participant.getYearOfBirth()})'
+                                                                                data-activity-id="${activity.id()}"
+                                                                                class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
+                                                                            Remove
+                                                                        </button>
+                                                                    </div>
+                                                                @endif
+                                                        </li>
                                                     @endfor
                                                 </div>
                                             @endif

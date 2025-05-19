@@ -21,7 +21,7 @@ public class Event {
 
     private String location;
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private SortedSet<Activity> activities = new TreeSet<>();
 
     public long getId() {
@@ -60,8 +60,12 @@ public class Event {
         return activities;
     }
 
-    public void setActivities(SortedSet<Activity> activities) {
-        this.activities = activities;
+    public void setActivities(Set<Activity> activities) {
+        if (activities instanceof SortedSet<Activity> sortedActivities) {
+            this.activities = sortedActivities;
+        } else {
+            this.activities = new TreeSet<>(activities);
+        }
     }
 
     public boolean isActive() {
