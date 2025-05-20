@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
 import org.montrealjug.billetterie.email.EmailModel.Email;
 import org.montrealjug.billetterie.email.EmailService;
 import org.montrealjug.billetterie.entity.*;
@@ -300,8 +301,6 @@ public class RegistrationController {
         // Log the participant information
         LOGGER.info("Received participant removal request {}: {}", eventId, participantSub);
 
-        //Remove participant from an activity but not from the booker entity
-
         try {
             // Check if the activityId matches an existing activity
             Activity activity = activityRepository
@@ -329,7 +328,7 @@ public class RegistrationController {
                 .stream()
                 .filter(p -> isSameParticipant(p, participantSub))
                 .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException("Participant not exists"));
+                .orElseThrow(() -> new EntityNotFoundException("Participant does not exist"));
 
             //            Set<ActivityParticipant> activityParticipantSet = activity.getParticipants().stream().filter(activityParticipant ->
             //                    !(activityParticipant.getParticipant().getId() == participant.getId())
@@ -400,6 +399,9 @@ public class RegistrationController {
             return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body("{\"message\":\"Failed to remove participant due to data integrity" + " violation\"}");
+        } catch (NoSuchElementException e) {
+            LOGGER.info("UI tried to remove non existant participant");
+            return ResponseEntity.ok().body(participantSub);
         } catch (Exception e) {
             LOGGER.error("Error removing participant: {}", e.getMessage());
             return ResponseEntity
