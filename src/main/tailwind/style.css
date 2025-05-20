@@ -3,3 +3,14 @@
 @theme {
   --color-d4k-orange: #f0690a;
 }
+@layer base {
+  ol{
+    @apply list-decimal mt-2;
+  }
+  li {
+    @apply ml-6;
+  }
+  h3{
+    @apply font-bold text-base mb-2;
+  }
+}
