@@ -34,7 +34,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/static/favicons/apple-touch-icon.png" />
     <link rel="manifest" href="/static/favicons/site.webmanifest" />
 </head>
-<body class="bg-gray-100 flex flex-col h-screen max-h-screen justify-end-safe">
+<body class="bg-gray-100 flex flex-col h-svh max-h-svh justify-end-safe">
 <header class="shadow-md p-2 pb-0 md:p-4 bg-d4k-orange w-full flex flex-col md:flex-row justify-between items-start text-white md:items-center gap-2">
     <img
         src="https://www.devoxx4kids.org/quebec/wp-content/uploads/sites/12/2014/06/D4K_QUEBEC_1000px.png"
