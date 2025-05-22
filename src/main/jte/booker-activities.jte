@@ -197,7 +197,7 @@ content = @`
                 </div>
                 <div>
                     <label for="yearOfBirth" class="block text-gray-700">Year of Birth</label>
-                    <input type="number" id="yearOfBirth" name="yearOfBirth" min="1900" max="2023" class="border border-gray-300 rounded px-3 py-2 w-full" required>
+                    <input type="number" id="yearOfBirth" name="yearOfBirth" min="${new Date().getFullYear() - 19}" max="${new Date().getFullYear() - 2}" class="border border-gray-300 rounded px-3 py-2 w-full" required>
                 </div>
                 <div id="error-message" class="text-red-500 text-sm hidden"></div>
                 <div class="flex justify-end gap-2">
@@ -271,7 +271,7 @@ content = @`
                 <input type="hidden" id="activity-id" name="activityId" value="` + activityId + `">
                 <input type="hidden" id="first-name" name="firstName" value="` + firstName + `">
                 <input type="hidden" id="last-name" name="lastName" value="` + lastName + `">
-                <input type="hidden" id="yearOfBirth" name="yearOfBirth" min="1900" max="2023" value="`+ yearOfBirth + `">
+                <input type="hidden" id="yearOfBirth" name="yearOfBirth" min="${new Date().getFullYear() - 19}" max="${new Date().getFullYear() - 2}" value="`+ yearOfBirth + `">
                 <span>Are you sure you want to remove participant: ` + firstName + " " + lastName +`?</span>
                 <div id="error-message" class="text-red-500 text-sm hidden"></div>
                 <div>
