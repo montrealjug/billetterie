@@ -1,6 +1,6 @@
 # Billetterie
 
-A webapp to manage the ticketing for a Devoxx4Kids event
+A webapp to manage the ticketing for a non-profit [Devoxx4KidsQC](https://www.devoxx4kids.org/quebec/) event
 
 ## See it in action
 
