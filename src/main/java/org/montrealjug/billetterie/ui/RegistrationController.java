@@ -15,6 +15,7 @@ import org.montrealjug.billetterie.email.EmailModel.Email;
 import org.montrealjug.billetterie.email.EmailService;
 import org.montrealjug.billetterie.entity.*;
 import org.montrealjug.billetterie.exception.EntityNotFoundException;
+import org.montrealjug.billetterie.repository.ActivityParticipantRepository;
 import org.montrealjug.billetterie.repository.ActivityRepository;
 import org.montrealjug.billetterie.repository.BookerRepository;
 import org.montrealjug.billetterie.repository.EventRepository;
@@ -41,6 +42,7 @@ public class RegistrationController {
     private final EmailService emailService;
     private final EventRepository eventRepository;
     private final ActivityRepository activityRepository;
+    private final ActivityParticipantRepository activityParticipantRepository;
     private final ParticipantRepository participantRepository;
 
     public RegistrationController(
@@ -50,6 +52,7 @@ public class RegistrationController {
         EmailService emailService,
         EventRepository eventRepository,
         ActivityRepository activityRepository,
+        ActivityParticipantRepository activityParticipantRepository,
         ParticipantRepository participantRepository
     ) {
         this.bookerRepository = bookerRepository;
@@ -58,6 +61,7 @@ public class RegistrationController {
         this.emailService = emailService;
         this.eventRepository = eventRepository;
         this.activityRepository = activityRepository;
+        this.activityParticipantRepository = activityParticipantRepository;
         this.participantRepository = participantRepository;
     }
 
@@ -261,10 +265,11 @@ public class RegistrationController {
                 activityRepository.save(activity);
             }
 
-            var participantsForEventAndBooker = activityRepository.findAllActivityParticipantByEventIdAndBookerEmail(
-                eventId,
-                booker.getEmail()
-            );
+            var participantsForEventAndBooker =
+                activityParticipantRepository.findAllActivityParticipantByEventIdAndBookerEmail(
+                    eventId,
+                    booker.getEmail()
+                );
             emailService.sendEmail(
                 Email.afterParticipantsChanges(
                     booker,
@@ -346,7 +351,10 @@ public class RegistrationController {
             activityRepository.save(activity);
 
             List<ActivityParticipant> allActivityParticipantByEventIdAndBookerEmail =
-                activityRepository.findAllActivityParticipantByEventIdAndBookerEmail(eventId, booker.getEmail());
+                activityParticipantRepository.findAllActivityParticipantByEventIdAndBookerEmail(
+                    eventId,
+                    booker.getEmail()
+                );
 
             emailService.sendEmail(
                 Email.afterParticipantsChanges(

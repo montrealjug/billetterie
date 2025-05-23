@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.nio.charset.StandardCharsets;
@@ -12,10 +13,12 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.montrealjug.billetterie.config.BilletterieProperties;
 
+@ExtendWith(MockitoExtension.class)
 class SignatureServiceTest {
 
     @Mock
@@ -70,7 +73,6 @@ class SignatureServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         when(properties.rsaKey()).thenReturn(TEST_PRIVATE_KEY);
         signatureService = new SignatureService(properties);
     }
