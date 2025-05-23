@@ -295,7 +295,7 @@ class RegistrationControllerTest {
     @Test
     void startBooking_should_not_update_validationTime_if_already_set() {
         // create an already validated Booker
-        var email = "start-bookingr@test.org";
+        var email = "start-booking@test.org";
         var booker = createBooker(email, true);
         // get the active Event (creates it if needed)
         getOrCreateActiveEvent();
