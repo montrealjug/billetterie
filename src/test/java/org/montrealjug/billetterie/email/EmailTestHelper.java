@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.email;
 
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.montrealjug.billetterie.email.EmailConfiguration.EmailAddress;
@@ -16,14 +17,26 @@ class EmailTestHelper {
     }
 
     static String loadResourceContent(String resourceName) {
+        try {
+            return Files.readString(loadResourcePath(resourceName));
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    static byte[] loadResourceBinaryContent(String resourceName) {
+        try {
+            return Files.readAllBytes(loadResourcePath(resourceName));
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    static Path loadResourcePath(String resourceName) throws URISyntaxException {
         var resource = EmailTestHelper.class.getClassLoader().getResource(resourceName);
         if (resource == null) {
             throw new IllegalArgumentException(resourceName + " not found");
         }
-        try {
-            return Files.readString(Path.of(resource.toURI()));
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
-        }
+        return Path.of(resource.toURI());
     }
 }

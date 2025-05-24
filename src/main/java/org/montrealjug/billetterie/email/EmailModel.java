@@ -2,7 +2,6 @@
 package org.montrealjug.billetterie.email;
 
 import jakarta.mail.internet.InternetAddress;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
@@ -60,7 +59,10 @@ public class EmailModel {
     public interface Email {
         EmailType type();
         InternetAddress to();
-        Optional<InputStream> attachmentInputStream();
+
+        default Optional<byte[]> qrCode() {
+            return Optional.empty();
+        }
 
         default String formatDateFr(Temporal temporal) {
             return FR_DATE_FORMAT.format(temporal);
@@ -97,9 +99,9 @@ public class EmailModel {
             List<PresentationActivityParticipant> participants,
             Event event,
             String baseUrl,
-            InputStream qrCodeInputStream
+            byte[] qrCode
         ) {
-            return new AfterParticipantsChangesEmail(booker, participants, event, baseUrl, qrCodeInputStream);
+            return new AfterParticipantsChangesEmail(booker, participants, event, baseUrl, Optional.of(qrCode));
         }
 
         static Email participantUpgraded(
@@ -107,9 +109,9 @@ public class EmailModel {
             PresentationActivityParticipant participantActivity,
             Event event,
             String baseUrl,
-            InputStream qrCodeInputStream
+            byte[] qrCode
         ) {
-            return new ParticipantUpgraded(booker, participantActivity, event, baseUrl, qrCodeInputStream);
+            return new ParticipantUpgraded(booker, participantActivity, event, baseUrl, Optional.of(qrCode));
         }
 
         static Email returningBooker(Booker booker, String baseUrl) {
@@ -148,11 +150,6 @@ public class EmailModel {
             return Email.fromBooker(booker);
         }
 
-        @Override
-        public Optional<InputStream> attachmentInputStream() {
-            return Optional.empty();
-        }
-
         public String registrationLink() {
             return "https://placeholder_for_registration_link.test";
         }
@@ -169,11 +166,6 @@ public class EmailModel {
             return Email.fromBooker(booker);
         }
 
-        @Override
-        public Optional<InputStream> attachmentInputStream() {
-            return Optional.empty();
-        }
-
         public String registrationLink() {
             return baseUrl + "/bookings/" + booker.getEmailSignature();
         }
@@ -184,7 +176,7 @@ public class EmailModel {
         List<PresentationActivityParticipant> participants,
         Event event,
         String baseUrl,
-        InputStream qrCodeInputStream
+        Optional<byte[]> qrCode
     )
         implements Email {
         @Override
@@ -197,11 +189,6 @@ public class EmailModel {
             return Email.fromBooker(booker);
         }
 
-        @Override
-        public Optional<InputStream> attachmentInputStream() {
-            return Optional.of(qrCodeInputStream);
-        }
-
         public String registrationLink() {
             return baseUrl + "/bookings/" + booker.getEmailSignature();
         }
@@ -212,7 +199,7 @@ public class EmailModel {
         PresentationActivityParticipant participant,
         Event event,
         String baseUrl,
-        InputStream qrCodeInputStream
+        Optional<byte[]> qrCode
     )
         implements Email {
         @Override
@@ -223,11 +210,6 @@ public class EmailModel {
         @Override
         public InternetAddress to() {
             return Email.fromBooker(booker);
-        }
-
-        @Override
-        public Optional<InputStream> attachmentInputStream() {
-            return Optional.of(qrCodeInputStream);
         }
 
         public String registrationLink() {
@@ -246,11 +228,6 @@ public class EmailModel {
             return Email.fromBooker(booker);
         }
 
-        @Override
-        public Optional<InputStream> attachmentInputStream() {
-            return Optional.empty();
-        }
-
         public String registrationLink() {
             return baseUrl + "/bookings/" + booker.getEmailSignature();
         }
@@ -261,6 +238,6 @@ public class EmailModel {
         String subject,
         String plainText,
         String html,
-        Optional<InputStream> attachmentInputStream
+        Optional<byte[]> attachment
     ) {}
 }
