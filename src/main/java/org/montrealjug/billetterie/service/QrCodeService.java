@@ -3,10 +3,8 @@ package org.montrealjug.billetterie.service;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import javax.imageio.ImageIO;
 import org.springframework.stereotype.Service;
 import uk.org.okapibarcode.backend.QrCode;
@@ -19,7 +17,7 @@ import uk.org.okapibarcode.output.Java2DRenderer;
 @Service
 public class QrCodeService {
 
-    public InputStream generateQrCode(String text) throws IOException {
+    public byte[] generateQrCode(String text) throws IOException {
         QrCode qrCode = new QrCode();
         qrCode.setContent(text);
 
@@ -35,7 +33,7 @@ public class QrCodeService {
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         ImageIO.write(resizedImage, "jpeg", os);
-        return new ByteArrayInputStream(os.toByteArray());
+        return os.toByteArray();
     }
 
     // from https://www.baeldung.com/java-resize-image

@@ -14,11 +14,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import jakarta.mail.Address;
+import jakarta.mail.MessagingException;
 import jakarta.mail.Multipart;
+import jakarta.mail.Part;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -166,6 +170,33 @@ class SmtpEmailSenderTest {
         assertThat(htmlPart.getContent()).isEqualTo(TEST_DATA.html());
     }
 
+    @Test
+    void send_should_add_expected_body_parts_with_attachment() throws MessagingException, IOException {
+        emailSender.send(testDataWithAttachment());
+
+        var captor = ArgumentCaptor.forClass(Multipart.class);
+        verify(mimeMessage).setContent(captor.capture());
+
+        var rootPart = captor.getValue();
+        // `rootPart` should have a contentType starting by `multipart/mixed;` to be valid
+        assertThat(rootPart.getContentType()).startsWith("multipart/mixed;");
+        // our `rootPart` should have a contentType containing `boundary="..."` to be valid
+        assertThat(rootPart.getContentType()).containsPattern("boundary=\".*\"");
+        // our `rootPart` should contain two parts, our `bodyPart` and our `attachment` that should both be an instance of
+        // MimeBodyPart, the second one being our `attachmentPart`
+        assertThat(rootPart.getCount()).isEqualTo(2);
+        assertThat(rootPart.getBodyPart(0)).isInstanceOf(MimeBodyPart.class);
+        assertThat(rootPart.getBodyPart(1)).isInstanceOf(MimeBodyPart.class);
+        var attachmentPart = (MimeBodyPart) rootPart.getBodyPart(1);
+        assertThat(attachmentPart.getDisposition()).isEqualTo(Part.ATTACHMENT);
+        // our `attachmentPart` should have the content of our qrCode
+        var attachmentContent = attachmentPart.getContent();
+        assertThat(attachmentContent).isInstanceOf(ByteArrayInputStream.class);
+        var attachmentBytes = ((ByteArrayInputStream) attachmentContent).readAllBytes();
+        var expectedBytes = EmailTestHelper.loadResourceBinaryContent("email/qr_code.jpg");
+        assertThat(attachmentBytes).isEqualTo(expectedBytes);
+    }
+
     private static EmailToSend testData() {
         try {
             var from = new InternetAddress("from@test.org");
@@ -176,5 +207,17 @@ class SmtpEmailSenderTest {
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    private static EmailToSend testDataWithAttachment() {
+        var withoutAttachment = testData();
+        var attachment = EmailTestHelper.loadResourceBinaryContent("email/qr_code.jpg");
+        return new EmailToSend(
+            withoutAttachment.to(),
+            withoutAttachment.subject(),
+            withoutAttachment.plainText(),
+            withoutAttachment.html(),
+            Optional.of(attachment)
+        );
     }
 }
