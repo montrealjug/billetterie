@@ -4,13 +4,17 @@ package org.montrealjug.billetterie.ui;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 import org.montrealjug.billetterie.entity.Booker;
+import org.montrealjug.billetterie.entity.Event;
 import org.montrealjug.billetterie.exception.EntityNotFoundException;
 import org.montrealjug.billetterie.exception.RedirectableNotFoundException;
+import org.montrealjug.billetterie.repository.ActivityParticipantRepository;
 import org.montrealjug.billetterie.repository.BookerRepository;
+import org.montrealjug.billetterie.repository.EventRepository;
 import org.montrealjug.billetterie.service.SignatureService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,22 +31,49 @@ public class BookersController {
 
     private final BookerRepository bookerRepository;
     private final SignatureService signatureService;
+    private final EventRepository eventRepository;
+    private final ActivityParticipantRepository activityParticipantRepository;
 
-    public BookersController(BookerRepository bookerRepository, SignatureService signatureService) {
+    public BookersController(
+        BookerRepository bookerRepository,
+        SignatureService signatureService,
+        EventRepository eventRepository,
+        ActivityParticipantRepository activityParticipantRepository
+    ) {
         this.bookerRepository = bookerRepository;
         this.signatureService = signatureService;
+        this.eventRepository = eventRepository;
+        this.activityParticipantRepository = activityParticipantRepository;
     }
 
     @GetMapping("")
     public String bookers(Model model) {
         Iterable<Booker> bookers = bookerRepository.findAll();
-
-        List<PresentationBooker> presentationBookers = StreamSupport
-            .stream(bookers.spliterator(), false)
-            .map(booker -> new PresentationBooker(booker.getFirstName(), booker.getLastName(), booker.getEmail()))
-            .toList();
+        Optional<Event> activeEventOptional = eventRepository.findByActiveIsTrue();
+        List<PresentationBookerWithParticipants> presentationBookers;
+        presentationBookers =
+            StreamSupport
+                .stream(bookers.spliterator(), false)
+                .map(booker ->
+                    new PresentationBookerWithParticipants(
+                        booker.getFirstName(),
+                        booker.getLastName(),
+                        booker.getEmail(),
+                        booker.getEmailSignature(),
+                        activeEventOptional
+                            .map(event ->
+                                activityParticipantRepository.findAllActivityParticipantByEventIdAndBookerEmail(
+                                    event.getId(),
+                                    booker.getEmail()
+                                )
+                            )
+                            .orElse(new ArrayList<>())
+                    )
+                )
+                .toList();
 
         model.addAttribute("bookerList", presentationBookers);
+        activeEventOptional.ifPresent(event -> model.addAttribute("activeEvent", event));
 
         return "bookers-list";
     }
@@ -93,11 +124,7 @@ public class BookersController {
     }
 
     @PostMapping("{email}")
-    public ResponseEntity<Void> updateBooker(
-        Model model,
-        @PathVariable String email,
-        @Valid PresentationBooker presentationBooker
-    ) {
+    public ResponseEntity<Void> updateBooker(@PathVariable String email, @Valid PresentationBooker presentationBooker) {
         Optional<Booker> optionalBooker = bookerRepository.findById(email);
 
         if (optionalBooker.isEmpty()) {

@@ -1,7 +1,10 @@
 @import java.util.List
-@import org.montrealjug.billetterie.ui.PresentationBooker
+@import org.montrealjug.billetterie.ui.PresentationBookerWithParticipants
+@import org.montrealjug.billetterie.entity.Event
+@import org.montrealjug.billetterie.entity.ActivityParticipant
 
-@param List<PresentationBooker> bookerList
+@param List<PresentationBookerWithParticipants> bookerList
+@param Event activeEvent
 
 @template.layouts.admin_layout(title = "Booker List",content = @`
 
@@ -17,13 +20,34 @@
             </a>
         </div>
 
-        @for(PresentationBooker booker: bookerList)
-            <div class="bg-gray-150 p-4 rounded-md shadow my-1 flex justify-between">
-                <p class="mx-10">${booker.firstName() + " " + booker.lastName()}</p>
-                <a href="/admin/bookers/${booker.email()}"
-                   class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
-                    Edit
-                </a>
+        @for(PresentationBookerWithParticipants booker: bookerList)
+            <div class="bg-gray-150 p-4 rounded-md shadow my-1">
+                <div class="flex justify-between">
+                    <p class="mx-10">${booker.firstName() + " " + booker.lastName()} (${booker.email()})</p>
+                    <div>
+                        <a href="/admin/bookers/${booker.email()}"
+                           class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
+                            Edit
+                        </a>
+                            <a href="/admin/bookings/${booker.emailSignature()}"
+                               class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
+                                Checkin
+                            </a>
+                    </div>
+                </div>
+
+                @if(activeEvent != null && !booker.participants().isEmpty())
+                    <div class="mt-2 ml-12 text-sm">
+                        <p class="font-semibold">Participants for ${activeEvent.getTitle()}:</p>
+                        <ul class="list-disc ml-6">
+                            @for(ActivityParticipant participant : booker.participants())
+                                <li class="flex justify-between items-center">
+                                    <span>${participant.getParticipant().getFirstName()} ${participant.getParticipant().getLastName()} - ${participant.getActivity().getTitle()}</span>
+                                </li>
+                            @endfor
+                        </ul>
+                    </div>
+                @endif
             </div>
         @endfor
     </div>

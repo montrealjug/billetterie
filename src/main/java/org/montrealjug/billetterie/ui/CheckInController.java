@@ -48,6 +48,7 @@ public class CheckInController {
         // we found the Booker, and there is an active Event, so admin can check in participants
         if (optionalBooker.isPresent() && optionalEvent.isPresent()) {
             var booker = optionalBooker.get();
+            var bookerParticipants = booker.getParticipants();
             var event = optionalEvent.get();
             // Create presentation event
             PresentationEvent presentationEvent = new PresentationEvent(
@@ -55,7 +56,7 @@ public class CheckInController {
                 event.getTitle(),
                 markdownToHtml(event.getDescription()),
                 event.getDate(),
-                toPresentationActivities(event.getActivities()),
+                toPresentationActivitiesLimitedToBooker(event.getActivities(), bookerParticipants),
                 event.isActive(),
                 event.getImagePath(),
                 event.getLocation()
