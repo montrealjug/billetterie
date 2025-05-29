@@ -41,7 +41,8 @@ public class EmailModel {
         AFTER_REGISTRATION,
         AFTER_PARTICIPANTS_CHANGES,
         PARTICIPANT_UPGRADED,
-        RETURNING_BOOKER;
+        RETURNING_BOOKER,
+        LAST_REMINDER;
 
         public String subjectKey() {
             return this.name().toLowerCase();
@@ -116,6 +117,16 @@ public class EmailModel {
 
         static Email returningBooker(Booker booker, String baseUrl) {
             return new ReturningBookingEmail(booker, baseUrl);
+        }
+
+        static Email lastReminder(
+            Booker booker,
+            List<PresentationActivityParticipant> participants,
+            Event event,
+            String baseUrl,
+            byte[] qrCode
+        ) {
+            return new LastReminderEmail(booker, participants, event, baseUrl, Optional.of(qrCode));
         }
 
         private static InternetAddress fromBooker(Booker booker) {
@@ -221,6 +232,29 @@ public class EmailModel {
         @Override
         public EmailType type() {
             return EmailType.RETURNING_BOOKER;
+        }
+
+        @Override
+        public InternetAddress to() {
+            return Email.fromBooker(booker);
+        }
+
+        public String registrationLink() {
+            return baseUrl + "/bookings/" + booker.getEmailSignature();
+        }
+    }
+
+    public record LastReminderEmail(
+        Booker booker,
+        List<PresentationActivityParticipant> participants,
+        Event event,
+        String baseUrl,
+        Optional<byte[]> qrCode
+    )
+        implements Email {
+        @Override
+        public EmailType type() {
+            return EmailType.LAST_REMINDER;
         }
 
         @Override

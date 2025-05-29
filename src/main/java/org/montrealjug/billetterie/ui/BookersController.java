@@ -1,13 +1,21 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.montrealjug.billetterie.ui;
 
+import static org.montrealjug.billetterie.ui.RegistrationController.retrieveBaseUrl;
+import static org.montrealjug.billetterie.ui.Utils.toPresentationActivityParticipants;
+
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
+import org.montrealjug.billetterie.email.EmailModel;
+import org.montrealjug.billetterie.email.EmailService;
+import org.montrealjug.billetterie.entity.ActivityParticipant;
 import org.montrealjug.billetterie.entity.Booker;
 import org.montrealjug.billetterie.entity.Event;
 import org.montrealjug.billetterie.exception.EntityNotFoundException;
@@ -15,6 +23,7 @@ import org.montrealjug.billetterie.exception.RedirectableNotFoundException;
 import org.montrealjug.billetterie.repository.ActivityParticipantRepository;
 import org.montrealjug.billetterie.repository.BookerRepository;
 import org.montrealjug.billetterie.repository.EventRepository;
+import org.montrealjug.billetterie.service.QrCodeService;
 import org.montrealjug.billetterie.service.SignatureService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,14 +42,20 @@ public class BookersController {
     private final SignatureService signatureService;
     private final EventRepository eventRepository;
     private final ActivityParticipantRepository activityParticipantRepository;
+    private final QrCodeService qrCodeService;
+    private final EmailService emailService;
 
     public BookersController(
         BookerRepository bookerRepository,
         SignatureService signatureService,
         EventRepository eventRepository,
-        ActivityParticipantRepository activityParticipantRepository
+        ActivityParticipantRepository activityParticipantRepository,
+        EmailService emailService,
+        QrCodeService qrCodeService
     ) {
         this.bookerRepository = bookerRepository;
+        this.qrCodeService = qrCodeService;
+        this.emailService = emailService;
         this.signatureService = signatureService;
         this.eventRepository = eventRepository;
         this.activityParticipantRepository = activityParticipantRepository;
@@ -121,6 +136,42 @@ public class BookersController {
         model.addAttribute("booker", presentationBooker);
 
         return "bookers-create-update";
+    }
+
+    @PostMapping("/sendReminderEmail")
+    public ResponseEntity<Void> sendReminderEmail(HttpServletRequest request) {
+        eventRepository
+            .findByActiveIsTrue()
+            .ifPresent(event ->
+                bookerRepository
+                    .findAll()
+                    .forEach(booker -> {
+                        List<ActivityParticipant> bookings =
+                            activityParticipantRepository.findAllActivityParticipantByEventIdAndBookerEmail(
+                                event.getId(),
+                                booker.getEmail()
+                            );
+                        if (!bookings.isEmpty()) {
+                            try {
+                                emailService.sendEmail(
+                                    EmailModel.Email.lastReminder(
+                                        booker,
+                                        toPresentationActivityParticipants(bookings),
+                                        event,
+                                        retrieveBaseUrl(request),
+                                        qrCodeService.generateQrCode(
+                                            retrieveBaseUrl(request) + "/admin/bookings/" + booker.getEmailSignature()
+                                        )
+                                    )
+                                );
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    })
+            );
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("{email}")
