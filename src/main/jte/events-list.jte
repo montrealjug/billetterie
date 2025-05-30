@@ -30,6 +30,10 @@
                         <p class="text-gray-500 text-sm mt-1">${event.imagePath()}</p>
                     </div>
                     <div class="flex space-x-2 mt-4 md:mt-0">
+                        <a href="/admin/events/${event.id()}/status"
+                           class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
+                            Status
+                        </a>
                         <a href="/admin/events/${event.id()}"
                            class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
                             Edit

@@ -56,7 +56,7 @@ public class EventsController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createEvents(@Valid PresentationEvent event, Model model) {
+    public ResponseEntity<Void> createEvents(@Valid PresentationEvent event) {
         Event entity = new Event();
         entity.setDescription(event.description());
         entity.setTitle(event.title());
@@ -92,11 +92,7 @@ public class EventsController {
     }
 
     @PostMapping("{id}")
-    public ResponseEntity<Void> updateEvent(
-        @Valid PresentationEvent presentationEvent,
-        Model model,
-        @PathVariable long id
-    ) {
+    public ResponseEntity<Void> updateEvent(@Valid PresentationEvent presentationEvent, @PathVariable long id) {
         Optional<Event> optionalEvent = this.eventRepository.findById(id);
 
         if (optionalEvent.isPresent()) {
@@ -127,7 +123,7 @@ public class EventsController {
     }
 
     @GetMapping("createEvent")
-    public String createEvent(Model model) {
+    public String createEvent() {
         return "events-create-update";
     }
 
@@ -135,7 +131,7 @@ public class EventsController {
     public String createActivity(Model model, @PathVariable final Long id) {
         Optional<Event> optionalEvent = this.eventRepository.findById(id);
 
-        if (!optionalEvent.isPresent()) {
+        if (optionalEvent.isEmpty()) {
             throw new EntityNotFoundException("Event with id " + id + " not found", "activities-create-update");
         }
         model.addAttribute("eventId", id);
@@ -234,5 +230,29 @@ public class EventsController {
                 });
             });
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("{eventId}/status")
+    public String eventStatus(Model model, @PathVariable long eventId) {
+        Optional<Event> optionalEvent = this.eventRepository.findById(eventId);
+
+        if (optionalEvent.isEmpty()) {
+            throw new RedirectableNotFoundException("Event with id " + eventId + " not found", "/admin/events");
+        }
+
+        Event event = optionalEvent.get();
+        PresentationEvent presentationEvent = new PresentationEvent(
+            event.getId(),
+            event.getTitle(),
+            markdownToHtml(event.getDescription()),
+            event.getDate(),
+            toPresentationActivities(event.getActivities()),
+            event.isActive(),
+            event.getImagePath(),
+            event.getLocation()
+        );
+
+        model.addAttribute("event", presentationEvent);
+        return "event-status";
     }
 }
