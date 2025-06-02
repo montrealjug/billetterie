@@ -32,7 +32,7 @@
 		<!-- third-party dependencies (outside of springboot BOM) -->
 		<jsoup.version>1.20.1</jsoup.version>
 		<jte.version>3.2.1</jte.version>
-		<spotless.version>2.44.4</spotless.version>
+		<spotless.version>2.44.5</spotless.version>
 		<!-- tailwind processor stack -->
 		<node.version>v22.15.0</node.version>
 		<frontend-maven-plugin.version>1.15.1</frontend-maven-plugin.version>
