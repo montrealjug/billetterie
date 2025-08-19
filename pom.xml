@@ -32,12 +32,12 @@
 		<!-- third-party dependencies (outside of springboot BOM) -->
 		<jsoup.version>1.21.1</jsoup.version>
 		<jte.version>3.2.1</jte.version>
-		<spotless.version>2.44.5</spotless.version>
+		<spotless.version>2.46.1</spotless.version>
 		<!-- tailwind processor stack -->
 		<node.version>v22.15.0</node.version>
 		<frontend-maven-plugin.version>1.15.1</frontend-maven-plugin.version>
-		<commonmark.version>0.25.0</commonmark.version>
-		<okapibarcode.version>0.5.1</okapibarcode.version>
+		<commonmark.version>0.25.1</commonmark.version>
+		<okapibarcode.version>0.5.2</okapibarcode.version>
 	</properties>
 	<dependencies>
 		<dependency>
