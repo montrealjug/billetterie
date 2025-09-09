@@ -34,11 +34,13 @@
 </head>
 <body class="bg-gray-100 flex flex-col h-screen justify-between">
 <header class="shadow-md p-4 bg-d4k-orange w-full flex justify-between items-center text-white">
-    <img
-        src="https://www.devoxx4kids.org/quebec/wp-content/uploads/sites/12/2014/06/D4K_QUEBEC_1000px.png"
-        alt="Devoxx4Kids Québec logo"
-        class="max-h-20 bg-white rounded-lg p-2 shadow-lg text-shadow-xs"
-    />
+    <a href="https://www.devoxx4kids.org/quebec/" target="_blank" rel="noopener noreferrer">
+        <img
+            src="https://www.devoxx4kids.org/quebec/wp-content/uploads/sites/12/2014/06/D4K_QUEBEC_1000px.png"
+            alt="Devoxx4Kids Québec logo"
+            class="max-h-20 bg-white rounded-lg p-2 shadow-lg text-shadow-xs"
+        />
+    </a>
     <p class="grow-1 text-3xl font-bold px-4">Billetterie Devoxx4Kids Québec (Admin)</p>
     <nav>
         <ul class="flex flex-wrap justify-end gap-4">
