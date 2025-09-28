@@ -38,9 +38,16 @@ public class QrCodeService {
 
     // from https://www.baeldung.com/java-resize-image
     BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
-        Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
-        BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-        outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
+        Image resultingImage = originalImage.getScaledInstance(
+            targetWidth - 20,
+            targetHeight - 20,
+            Image.SCALE_DEFAULT
+        );
+        BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, originalImage.getType());
+        var g2d = outputImage.getGraphics();
+        g2d.setColor(java.awt.Color.WHITE);
+        g2d.fillRect(0, 0, targetWidth, targetHeight);
+        g2d.drawImage(resultingImage, 10, 10, null);
         return outputImage;
     }
 }
