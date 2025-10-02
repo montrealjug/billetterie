@@ -4,7 +4,7 @@
 @import org.montrealjug.billetterie.entity.ActivityParticipant
 
 @param List<PresentationBookerWithParticipants> bookerList
-@param Event activeEvent
+@param List<Event> allEvents
 
 @template.layouts.admin_layout(title = "Booker List",content = @`
 
@@ -42,17 +42,21 @@
                     </div>
                 </div>
 
-                @if(activeEvent != null && !booker.participants().isEmpty())
-                    <div class="mt-2 ml-12 text-sm">
-                        <p class="font-semibold">Participants for ${activeEvent.getTitle()}:</p>
-                        <ul class="list-disc ml-6">
-                            @for(ActivityParticipant participant : booker.participants())
-                                <li class="flex justify-between items-center">
-                                    <span>${participant.getParticipant().getFirstName()} ${participant.getParticipant().getLastName()} - ${participant.getActivity().getTitle()}</span>
-                                </li>
-                            @endfor
-                        </ul>
-                    </div>
+                @if(!booker.participants().isEmpty())
+                    @for(Event event: allEvents)
+                        @if(booker.participants().get(event) != null && !booker.participants().get(event).isEmpty())
+                            <div class="mt-2 ml-12 text-sm">
+                                    <p class="font-semibold">Participants for ${event.getTitle()}:</p>
+                                    <ul class="list-disc ml-6">
+                                        @for(ActivityParticipant participant : booker.participants().get(event))
+                                            <li class="flex justify-between items-center">
+                                                <span>${participant.getParticipant().getFirstName()} ${participant.getParticipant().getLastName()} - ${participant.getActivity().getTitle()}</span>
+                                            </li>
+                                        @endfor
+                                    </ul>
+                            </div>
+                        @endif
+                    @endfor
                 @endif
             </div>
         @endfor
