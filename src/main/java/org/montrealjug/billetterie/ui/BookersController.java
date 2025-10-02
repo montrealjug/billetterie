@@ -9,9 +9,9 @@ import jakarta.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.montrealjug.billetterie.email.EmailModel;
 import org.montrealjug.billetterie.email.EmailService;
@@ -64,7 +64,7 @@ public class BookersController {
     @GetMapping("")
     public String bookers(Model model) {
         Iterable<Booker> bookers = bookerRepository.findAll();
-        Optional<Event> activeEventOptional = eventRepository.findByActiveIsTrue();
+        Iterable<Event> allEvents = eventRepository.findAll();
         List<PresentationBookerWithParticipants> presentationBookers;
         presentationBookers =
             StreamSupport
@@ -75,20 +75,24 @@ public class BookersController {
                         booker.getLastName(),
                         booker.getEmail(),
                         booker.getEmailSignature(),
-                        activeEventOptional
-                            .map(event ->
-                                activityParticipantRepository.findAllActivityParticipantByEventIdAndBookerEmail(
-                                    event.getId(),
-                                    booker.getEmail()
+                        StreamSupport
+                            .stream(allEvents.spliterator(), false)
+                            .collect(
+                                Collectors.toMap(
+                                    event -> event,
+                                    event ->
+                                        activityParticipantRepository.findAllActivityParticipantByEventIdAndBookerEmail(
+                                            event.getId(),
+                                            booker.getEmail()
+                                        )
                                 )
                             )
-                            .orElse(new ArrayList<>())
                     )
                 )
                 .toList();
 
         model.addAttribute("bookerList", presentationBookers);
-        activeEventOptional.ifPresent(event -> model.addAttribute("activeEvent", event));
+        model.addAttribute("allEvents", StreamSupport.stream(allEvents.spliterator(), false).toList());
 
         return "bookers-list";
     }
