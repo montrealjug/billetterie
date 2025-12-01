@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.6</version>
+		<version>3.5.8</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>org.montrealjug</groupId>
@@ -32,11 +32,11 @@
 		<!-- third-party dependencies (outside of springboot BOM) -->
 		<jsoup.version>1.21.2</jsoup.version>
 		<jte.version>3.2.1</jte.version>
-		<spotless.version>2.46.1</spotless.version>
+		<spotless.version>3.1.0</spotless.version>
 		<!-- tailwind processor stack -->
 		<node.version>v22.15.0</node.version>
-		<frontend-maven-plugin.version>1.15.1</frontend-maven-plugin.version>
-		<commonmark.version>0.25.1</commonmark.version>
+		<frontend-maven-plugin.version>1.15.4</frontend-maven-plugin.version>
+		<commonmark.version>0.27.0</commonmark.version>
 		<okapibarcode.version>0.5.2</okapibarcode.version>
 	</properties>
 	<dependencies>
