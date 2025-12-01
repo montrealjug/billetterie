@@ -42,13 +42,14 @@
                     </div>
                 </div>
 
-                @if(!booker.participants().isEmpty())
+                !{var participants = booker.participants(); }
+                @if(!participants.isEmpty())
                     @for(Event event: allEvents)
-                        @if(booker.participants().get(event) != null && !booker.participants().get(event).isEmpty())
+                        @if(participants.get(event) != null && !participants.get(event).isEmpty())
                             <div class="mt-2 ml-12 text-sm">
                                     <p class="font-semibold">Participants for ${event.getTitle()}:</p>
                                     <ul class="list-disc ml-6">
-                                        @for(ActivityParticipant participant : booker.participants().get(event))
+                                        @for(ActivityParticipant participant : participants.get(event))
                                             <li class="flex justify-between items-center">
                                                 <span>${participant.getParticipant().getFirstName()} ${participant.getParticipant().getLastName()} - ${participant.getActivity().getTitle()}</span>
                                             </li>

@@ -3,7 +3,7 @@
 How to use AI/code agents effectively and safely in this project.
 
 ## Project context
-- Java 25 / Spring Boot 3.5 webapp for Devoxx4KidsQC quarterly workshop ticketing.
+- Java 21 / Spring Boot 3.5 webapp for Devoxx4KidsQC quarterly workshop ticketing.
 - Authentication: no passwords; users receive personal links by email and use them for re-auth.
 - Tech: JTE templating, QR code generation, Tailwind build (currently disabled for dev speed), Postgres via Docker/Testcontainers in tests, MailHog for dev email capture.
 - Formatting: Spotless (`./mvnw spotless:apply`) is required; builds will fail on style drift.
