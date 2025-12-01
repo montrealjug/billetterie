@@ -2,6 +2,7 @@
 @import org.montrealjug.billetterie.ui.PresentationEvent
 @import org.montrealjug.billetterie.ui.PresentationActivity
 @import java.time.format.DateTimeFormatter
+@import java.time.LocalDate
 @import java.util.List
 
 @param List<PresentationEvent> events
@@ -19,142 +20,157 @@
                 </a>
             </div>
             @for(PresentationEvent event: events)
-
-            <div class="bg-gray-100 p-4 rounded-md shadow">
-                <div class="flex flex-col md:flex-row items-start md:items-center justify-between">
+            !{var isPast = event.date().isBefore(LocalDate.now()); }
+            <details class="bg-gray-100 p-4 rounded-md shadow mb-4" open?="${!isPast}">
+                <summary class="flex flex-col md:flex-row items-start md:items-center justify-between cursor-pointer select-none">
                     <div>
                         <h2 class="text-lg font-semibold text-gray-700">${event.title()} - ${event.active() ? "Active" : "Not Active"}</h2>
-                        $unsafe{event.description()}
                         <p class="text-gray-500 text-sm mt-1">${event.date().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))}</p>
                         <p class="text-gray-500 text-sm mt-1">${event.location() != null ? event.location() : ""}</p>
-                        <p class="text-gray-500 text-sm mt-1">${event.imagePath()}</p>
                     </div>
-                    <div class="flex space-x-2 mt-4 md:mt-0">
-                        <a href="/admin/events/${event.id()}/status"
-                           class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
-                            Status
-                        </a>
-                        <a href="/admin/events/${event.id()}"
-                           class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
-                            Edit
-                        </a>
-                        <button onclick="deleteEvent(${event.id()})"
-                                class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
-                            Delete
-                        </button>
+                    <div class="flex items-center space-x-2 mt-2 md:mt-0 text-sm">
+                        @if(isPast)
+                            <span class="text-orange-600 font-semibold">Past event</span>
+                        @else
+                            <span class="text-green-700 font-semibold">Upcoming</span>
+                        @endif
+                        <span class="text-gray-500 text-base">&gt;</span>
                     </div>
-                </div>
-                <!-- Activities Table -->
+                </summary>
+
                 <div class="mt-4">
-                    <h3 class="text-md font-semibold text-gray-700 mb-2">Activities</h3>
-                    <table class="w-full table-auto border-collapse border border-gray-300">
-                        <thead>
-                        <tr class="bg-gray-200">
-                            <th class="border border-gray-300 px-4 py-2 text-left">Title</th>
-                            <th class="border border-gray-300 px-4 py-2 text-left">Description</th>
-                            <th class="border border-gray-300 px-4 py-2 text-left">Attendance</th>
-                            <th class="border border-gray-300 px-4 py-2 text-left">Waiting line</th>
-                            <th class="border border-gray-300 px-4 py-2 text-left">Start Time</th>
-                            <th class="border border-gray-300 px-4 py-2 text-center">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody id="activity-list-1">
-                        <!-- Example Activity Row -->
-                        @for(PresentationActivity activity: event.activities())
-                            !{var regularParticipantsNumber = activity.participants().size(); }
-                            !{var waitingParticipantsNumber = activity.waitingParticipants().size(); }
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between">
+                        <div>
+                            $unsafe{event.description()}
+                            <p class="text-gray-500 text-sm mt-1">${event.imagePath()}</p>
+                        </div>
+                        <div class="flex space-x-2 mt-4 md:mt-0">
+                            <a href="/admin/events/${event.id()}/status"
+                               class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
+                                Status
+                            </a>
+                            <a href="/admin/events/${event.id()}"
+                               class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
+                                Edit
+                            </a>
+                            <button onclick="deleteEvent(${event.id()})"
+                                    class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Activities Table -->
+                    <div class="mt-4">
+                        <h3 class="text-md font-semibold text-gray-700 mb-2">Activities</h3>
+                        <table class="w-full table-auto border-collapse border border-gray-300">
+                            <thead>
+                            <tr class="bg-gray-200">
+                                <th class="border border-gray-300 px-4 py-2 text-left">Title</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Description</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Attendance</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Waiting line</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Start Time</th>
+                                <th class="border border-gray-300 px-4 py-2 text-center">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="activity-list-1">
+                            <!-- Example Activity Row -->
+                            @for(PresentationActivity activity: event.activities())
+                                !{var regularParticipantsNumber = activity.participants().size(); }
+                                !{var waitingParticipantsNumber = activity.waitingParticipants().size(); }
 
-                            <tr>
-                            <td class="border border-gray-300 px-4 py-2">
-                                ${activity.title()}
-                                <span class="block mt-1 text-sm text-gray-500 text-no-wrap whitespace-nowrap">${activity.imagePath()}</span>
-                            </td>
-                            <td class="border border-gray-300 px-4 py-2">$unsafe{activity.description()}</td>
-                            <td class="border border-gray-300 px-4 py-2">
-                                ${regularParticipantsNumber}/${activity.maxParticipants()}
-                            </td>
-                            <td class="border border-gray-300 px-4 py-2">
-                                ${waitingParticipantsNumber}/${activity.maxWaitingQueue()}
-                            </td>
+                                <tr>
+                                    <td class="border border-gray-300 px-4 py-2">
+                                        ${activity.title()}
+                                        <span class="block mt-1 text-sm text-gray-500 text-no-wrap whitespace-nowrap">${activity.imagePath()}</span>
+                                    </td>
+                                    <td class="border border-gray-300 px-4 py-2">$unsafe{activity.description()}</td>
+                                    <td class="border border-gray-300 px-4 py-2">
+                                        ${regularParticipantsNumber}/${activity.maxParticipants()}
+                                    </td>
+                                    <td class="border border-gray-300 px-4 py-2">
+                                        ${waitingParticipantsNumber}/${activity.maxWaitingQueue()}
+                                    </td>
 
-                            <td class="border border-gray-300 px-4 py-2">${activity.time().format(DateTimeFormatter.ofPattern("H:mm a"))}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
-                                <a href="/admin/events/${event.id()}/activities/${activity.id()}"
-                                   class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
-                                    Edit
-                                </a>
-                                <button onclick="deleteActivity('${event.id()}', ${activity.id()})"
-                                        class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
-                                    Delete
-                                </button>
-                            </td>
-                        </tr>
-                        <!-- Participants Row -->
-                        <tr>
-                            <td colspan="6" class="border border-gray-300 px-4 py-2 bg-gray-50">
-                                <div class="text-sm font-semibold mb-2">Participants:</div>
-                                <ul class="list-disc pl-5" id="participants-list-${activity.id()}">
-                                    <!-- Regular participants -->
-                                    @if(regularParticipantsNumber > 0)
-                                        <div class="mb-2">
-                                            <span class="font-medium">Regular participants:</span>
-                                            @for(ActivityParticipant activityParticipant : activity.participants())
-                                                !{var participant = activityParticipant.getParticipant(); }
-                                                <li class="flex justify-between items-center mb-1">
-                                                    <span>${participant.getFirstName()} ${participant.getLastName()}, aged ${participant.getAge()} - Booker: <a href="http://localhost:8080/admin/bookers/${participant.getBooker().getEmail()}">${participant.getBooker().getFirstName()} ${participant.getBooker().getLastName()} (${participant.getBooker().getEmail()})</a></span>
-                                                    <div class="flex space-x-2">
-                                                        <button onclick="deleteParticipant(${participant.getId()})"
-                                                                data-activity-id="${activity.id()}"
-                                                                class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
-                                                            Delete
-                                                        </button>
-                                                    </div>
-                                                </li>
-                                            @endfor
-                                        </div>
-                                    @endif
+                                    <td class="border border-gray-300 px-4 py-2">${activity.time().format(DateTimeFormatter.ofPattern("H:mm a"))}</td>
+                                    <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
+                                        <a href="/admin/events/${event.id()}/activities/${activity.id()}"
+                                           class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
+                                            Edit
+                                        </a>
+                                        <button onclick="deleteActivity('${event.id()}', ${activity.id()})"
+                                                class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                                <!-- Participants Row -->
+                                <tr>
+                                    <td colspan="6" class="border border-gray-300 px-4 py-2 bg-gray-50">
+                                        <div class="text-sm font-semibold mb-2">Participants:</div>
+                                        <ul class="list-disc pl-5" id="participants-list-${activity.id()}">
+                                            <!-- Regular participants -->
+                                            @if(regularParticipantsNumber > 0)
+                                                <div class="mb-2">
+                                                    <span class="font-medium">Regular participants:</span>
+                                                    @for(ActivityParticipant activityParticipant : activity.participants())
+                                                        !{var participant = activityParticipant.getParticipant(); }
+                                                        <li class="flex justify-between items-center mb-1">
+                                                            <span>${participant.getFirstName()} ${participant.getLastName()}, aged ${participant.getAge()} - Booker: <a href="http://localhost:8080/admin/bookers/${participant.getBooker().getEmail()}">${participant.getBooker().getFirstName()} ${participant.getBooker().getLastName()} (${participant.getBooker().getEmail()})</a></span>
+                                                            <div class="flex space-x-2">
+                                                                <button onclick="deleteParticipant(${participant.getId()})"
+                                                                        data-activity-id="${activity.id()}"
+                                                                        class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
+                                                                    Delete
+                                                                </button>
+                                                            </div>
+                                                        </li>
+                                                    @endfor
+                                                </div>
+                                            @endif
 
-                                    <!-- Waiting participants -->
-                                    @if(waitingParticipantsNumber > 0)
-                                        <div>
-                                            <span class="font-medium text-orange-600">Waiting list:</span>
-                                            @for(ActivityParticipant activityParticipant : activity.waitingParticipants())
-                                                !{var participant = activityParticipant.getParticipant(); }
-                                                <li class="flex justify-between items-center mb-1 text-orange-600">
-                                                    <span>${participant.getFirstName()} ${participant.getLastName()}, aged ${participant.getAge()} - Booker: <a href="http://localhost:8080/admin/bookers/${participant.getBooker().getEmail()}" class="text-orange-800">${participant.getBooker().getFirstName()} ${participant.getBooker().getLastName()} (${participant.getBooker().getEmail()})</a> (waiting)</span>
-                                                    <div class="flex space-x-2">
-                                                        <button onclick="deleteParticipant(${participant.getId()})"
-                                                                data-activity-id="${activity.id()}"
-                                                                class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
-                                                            Delete
-                                                        </button>
-                                                    </div>
-                                                </li>
-                                            @endfor
-                                        </div>
-                                    @endif
+                                            <!-- Waiting participants -->
+                                            @if(waitingParticipantsNumber > 0)
+                                                <div>
+                                                    <span class="font-medium text-orange-600">Waiting list:</span>
+                                                    @for(ActivityParticipant activityParticipant : activity.waitingParticipants())
+                                                        !{var participant = activityParticipant.getParticipant(); }
+                                                        <li class="flex justify-between items-center mb-1 text-orange-600">
+                                                            <span>${participant.getFirstName()} ${participant.getLastName()}, aged ${participant.getAge()} - Booker: <a href="http://localhost:8080/admin/bookers/${participant.getBooker().getEmail()}" class="text-orange-800">${participant.getBooker().getFirstName()} ${participant.getBooker().getLastName()} (${participant.getBooker().getEmail()})</a> (waiting)</span>
+                                                            <div class="flex space-x-2">
+                                                                <button onclick="deleteParticipant(${participant.getId()})"
+                                                                        data-activity-id="${activity.id()}"
+                                                                        class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
+                                                                    Delete
+                                                                </button>
+                                                            </div>
+                                                        </li>
+                                                    @endfor
+                                                </div>
+                                            @endif
 
-                                    <!-- No participants message -->
-                                    @if(regularParticipantsNumber == 0 )
-                                        <li>No participants yet</li>
-                                    @endif
-                                </ul>
-                            </td>
-                        </tr>
-                        @endfor
+                                            <!-- No participants message -->
+                                            @if(regularParticipantsNumber == 0 )
+                                                <li>No participants yet</li>
+                                            @endif
+                                        </ul>
+                                    </td>
+                                </tr>
+                            @endfor
 
-                        <!-- More rows will be dynamically added -->
-                        </tbody>
-                    </table>
-                    <!-- Create Activity Button -->
-                    <div class="text-right mt-2">
-                        <button onclick="window.location.href = '/admin/events/${event.id()}/createActivity'"
-                                class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
-                            Add Activity
-                        </button>
+                            <!-- More rows will be dynamically added -->
+                            </tbody>
+                        </table>
+                        <!-- Create Activity Button -->
+                        <div class="text-right mt-2">
+                            <button onclick="window.location.href = '/admin/events/${event.id()}/createActivity'"
+                                    class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
+                                Add Activity
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </details>
             @endfor
         </div>
     </div>
