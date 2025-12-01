@@ -4,7 +4,7 @@
 #
 
 app = 'billetterie'
-primary_region = 'yul'
+primary_region = 'yyz'
 
 [http_service]
   internal_port = 8080
