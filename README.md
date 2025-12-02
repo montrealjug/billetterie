@@ -2,6 +2,10 @@
 
 A webapp to manage the ticketing for a non-profit [Devoxx4KidsQC](https://www.devoxx4kids.org/quebec/) event
 
+## AI/code agents
+
+See `AGENTS.md` for guidelines on using AI/code assistants with this project.
+
 ## See it in action
 
 https://billetterie.devoxx4kids.montreal-jug.org
@@ -70,6 +74,10 @@ If you have a failure during compilation, make sure to run:
 
 to make sure your files are formatted according to our convention.
 
+#### Java version
+
+Builds are pinned to Java 21. Using Java 25 currently breaks Hibernate enhancement because Byte Buddy does not yet support classfile version 69; upgrade tooling first if you need Java 25.
+
 #### Database schema changes
 
 If the database schema changed, because of JPA entities, the safest way to rebuild everything is... to delete your DB!
@@ -82,6 +90,16 @@ docker-compose down
 ```
 
 ## Run the app in production (fly.io)
+
+### Dumping the database and injecting it in docker backed local postgresql
+
+```shell
+fly proxy 5432 -a billetterie-db
+pg_dump postgres://username:password@localhost:5432/billetterie  > ./billetterie.sql
+dropdb -U myuser  -h localhost -p 25432 mydatabase
+createdb -U myuser  -h localhost -p 25432 mydatabase
+psql -U myuser -d mydatabase -h localhost -p 25432  -f billetterie.sql
+```
 
 ### Database schema changes
 
