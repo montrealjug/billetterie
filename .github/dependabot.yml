@@ -22,7 +22,7 @@ updates:
         exclude-patterns:
           - "org.springframework.boot*"
   - package-ecosystem: "npm"
-    directory: "/src/main/node"
+    directory: "/src/main/tailwind"
     schedule:
       interval: "weekly"
     groups:

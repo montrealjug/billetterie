@@ -194,6 +194,7 @@
 								<prettier-plugin-java>2.1.0</prettier-plugin-java>
 							</devDependencies>
 							<configFile>prettier.config.js</configFile>
+							<nodeExecutable>target/node/node</nodeExecutable>
 						</prettier>
 						<importOrder/>
 						<removeUnusedImports/>
