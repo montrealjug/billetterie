@@ -38,6 +38,6 @@ jobs:
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - name: Deploy image
         if: github.ref == 'refs/heads/main'
-        run:  flyctl deploy --verbose --remote-only
+        run:  flyctl deploy --verbose --local-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
