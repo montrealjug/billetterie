@@ -9,7 +9,7 @@
   "author": "montrealjug",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@tailwindcss/cli": "4.1.5",
-    "tailwindcss": "4.1.5"
+    "@tailwindcss/cli": "4.2.1",
+    "tailwindcss": "4.2.1"
   }
 }
