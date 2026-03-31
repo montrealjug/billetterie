@@ -119,7 +119,7 @@ public class SecurityTest {
             .then()
             .statusCode(302)
             .header("Location", "http://localhost:" + port + "/")
-            .cookie(adminProperties.sessionCookieName(), detailedCookie().path("/").maxAge(0).value(""));
+            .cookie(adminProperties.sessionCookieName(), detailedCookie().path("/").value(""));
         // `/admin/events` -> `/admin/login`
         given()
             .redirects()
