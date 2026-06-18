@@ -162,7 +162,7 @@ public class SecurityTest {
             .get("http://localhost:" + port + "/actuator")
             .then()
             .statusCode(401)
-            .header("WWW-Authenticate", "Basic realm=\"actuator realm\"");
+            .header("WWW-Authenticate", "Basic realm=\"actuator realm\", charset=\"UTF-8\"");
         // 200 with basic auth
         given()
             .auth()
