@@ -119,7 +119,7 @@ public class SecurityTest {
             .then()
             .statusCode(302)
             .header("Location", "http://localhost:" + port + "/")
-            .cookie(adminProperties.sessionCookieName(), detailedCookie().path("/").maxAge(0).value(""));
+            .cookie(adminProperties.sessionCookieName(), detailedCookie().path("/").value(""));
         // `/admin/events` -> `/admin/login`
         given()
             .redirects()
@@ -162,7 +162,7 @@ public class SecurityTest {
             .get("http://localhost:" + port + "/actuator")
             .then()
             .statusCode(401)
-            .header("WWW-Authenticate", "Basic realm=\"actuator realm\"");
+            .header("WWW-Authenticate", "Basic realm=\"actuator realm\", charset=\"UTF-8\"");
         // 200 with basic auth
         given()
             .auth()

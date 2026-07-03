@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.8</version>
+		<version>4.1.0</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>org.montrealjug</groupId>
@@ -30,15 +30,29 @@
 		<!-- general properties -->
 		<java.version>21</java.version>
 		<!-- third-party dependencies (outside of springboot BOM) -->
-		<jsoup.version>1.22.1</jsoup.version>
-		<jte.version>3.2.3</jte.version>
-		<spotless.version>3.3.0</spotless.version>
+		<commonmark.version>0.29.0</commonmark.version>
+		<jsoup.version>1.22.2</jsoup.version>
+		<jte.version>3.2.4</jte.version>
+		<okapibarcode.version>0.5.6</okapibarcode.version>
+		<openrewrite-maven-plugin.version>6.43.0</openrewrite-maven-plugin.version>
+		<openrewrite-spring-recipe.version>6.34.0</openrewrite-spring-recipe.version>
+		<prettier.version>2.8.0</prettier.version>
+		<prettier-java-plugin.version>2.1.0</prettier-java-plugin.version>
+		<rest-assured.version>6.0.0</rest-assured.version>
+		<spotless.version>3.8.0</spotless.version>
 		<!-- tailwind processor stack -->
-		<node.version>v22.22.1</node.version>
-		<frontend-maven-plugin.version>1.15.4</frontend-maven-plugin.version>
-		<commonmark.version>0.27.1</commonmark.version>
-		<okapibarcode.version>0.5.5</okapibarcode.version>
+		<node.version>v24.14.1</node.version>
+		<frontend-maven-plugin.version>2.0.1</frontend-maven-plugin.version>
 	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>io.rest-assured</groupId>
+				<artifactId>rest-assured</artifactId>
+				<version>${rest-assured.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -54,7 +68,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-starter-webmvc</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -66,7 +80,7 @@
 		</dependency>
 		<dependency>
 			<groupId>gg.jte</groupId>
-			<artifactId>jte-spring-boot-starter-3</artifactId>
+			<artifactId>jte-spring-boot-starter-4</artifactId>
 			<version>${jte.version}</version>
 		</dependency>
 		<dependency>
@@ -109,6 +123,16 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
 			<scope>test</scope>
@@ -118,8 +142,8 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.hibernate.orm.tooling</groupId>
-				<artifactId>hibernate-enhance-maven-plugin</artifactId>
+				<groupId>org.hibernate.orm</groupId>
+				<artifactId>hibernate-maven-plugin</artifactId>
 				<version>${hibernate.version}</version>
 				<executions>
 					<execution>
@@ -127,11 +151,6 @@
 						<goals>
 							<goal>enhance</goal>
 						</goals>
-						<configuration>
-							<enableLazyInitialization>true</enableLazyInitialization>
-							<enableDirtyTracking>true</enableDirtyTracking>
-							<enableAssociationManagement>true</enableAssociationManagement>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -160,12 +179,27 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<groupId>org.openrewrite.maven</groupId>
+				<artifactId>rewrite-maven-plugin</artifactId>
+				<version>${openrewrite-maven-plugin.version}</version>
+				<configuration>
+					<exportDatatables>true</exportDatatables>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.openrewrite.recipe</groupId>
+						<artifactId>rewrite-spring</artifactId>
+						<version>${openrewrite-spring-recipe.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<imageBuilder>paketobuildpacks/builder-noble-java-tiny</imageBuilder>
-				</configuration>
-			</plugin>
+					<configuration>
+						<imageBuilder>paketobuildpacks/builder-noble-java-tiny</imageBuilder>
+					</configuration>
+				</plugin>
 			<!-- needed to avoid WARN with Mockito (works for both IDE and mvn because we reuse Spring property) -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -190,8 +224,8 @@
 					<java>
 						<prettier>
 							<devDependencies>
-								<prettier>2.8.8</prettier>
-								<prettier-plugin-java>2.1.0</prettier-plugin-java>
+								<prettier>${prettier.version}</prettier>
+								<prettier-plugin-java>${prettier-java-plugin.version}</prettier-plugin-java>
 							</devDependencies>
 							<configFile>prettier.config.js</configFile>
 							<nodeExecutable>target/node/node</nodeExecutable>
