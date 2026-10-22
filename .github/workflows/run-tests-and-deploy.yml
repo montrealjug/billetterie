@@ -33,11 +33,26 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      IMAGE: registry.fly.io/billetterie:${{ github.sha }}
+
     steps:
       - uses: actions/checkout@v7
+      - name: Set up JDK 25
+        uses: actions/setup-java@v6
+        with:
+          distribution: 'zulu'
+          java-version: '25'
+          cache: 'maven'
       - uses: superfly/flyctl-actions/setup-flyctl@master
+      # the image is built with the Spring Boot plugin (see `pom.xml`) because
+      # `fly.toml` can't select the buildpacks run image (tiny) nor configure the image env
+      - name: Build image
+        run: ./mvnw -B spring-boot:build-image -DskipTests -Dspring-boot.build-image.imageName=$IMAGE
+      - name: Push image to Fly registry
+        run: |
+          flyctl auth docker
+          docker push $IMAGE
       - name: Deploy image
-        if: github.ref == 'refs/heads/main'
-        run:  flyctl deploy --verbose --local-only
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: flyctl deploy --image $IMAGE

@@ -76,7 +76,7 @@ to make sure your files are formatted according to our convention.
 
 #### Java version
 
-Builds are pinned to Java 21. Using Java 25 currently breaks Hibernate enhancement because Byte Buddy does not yet support classfile version 69; upgrade tooling first if you need Java 25.
+Builds target Java 25 (see `java.version` in the `pom.xml`); `.sdkmanrc` pins the matching JDK if you use SDKMAN!. Java 25 is also required by the AOT cache used in the container image.
 
 #### Database schema changes
 
