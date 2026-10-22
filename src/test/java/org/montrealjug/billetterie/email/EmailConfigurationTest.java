@@ -83,19 +83,17 @@ public class EmailConfigurationTest {
 
     @Test
     void valid_EmailProperties_should_have_valid_asInternetAddress() {
-        contextRunner
-            .withPropertyValues(VALID_PROPERTIES)
-            .run(context -> {
-                var emailProperties = context.getBean(EmailProperties.class);
-                var from = emailProperties.from();
-                assertThat(from.asInternetAddress())
-                    .satisfies(ia -> assertThat(ia.getAddress()).isEqualTo(from.address()))
-                    .satisfies(ia -> assertThat(ia.getPersonal()).isEqualTo(from.name()));
-                var replyTo = emailProperties.replyTo();
-                assertThat(replyTo.asInternetAddress())
-                    .satisfies(ia -> assertThat(ia.getAddress()).isEqualTo(replyTo.address()))
-                    .satisfies(ia -> assertThat(ia.getPersonal()).isEqualTo(replyTo.name()));
-            });
+        contextRunner.withPropertyValues(VALID_PROPERTIES).run(context -> {
+            var emailProperties = context.getBean(EmailProperties.class);
+            var from = emailProperties.from();
+            assertThat(from.asInternetAddress())
+                .satisfies(ia -> assertThat(ia.getAddress()).isEqualTo(from.address()))
+                .satisfies(ia -> assertThat(ia.getPersonal()).isEqualTo(from.name()));
+            var replyTo = emailProperties.replyTo();
+            assertThat(replyTo.asInternetAddress())
+                .satisfies(ia -> assertThat(ia.getAddress()).isEqualTo(replyTo.address()))
+                .satisfies(ia -> assertThat(ia.getPersonal()).isEqualTo(replyTo.name()));
+        });
     }
 
     private static final String[] VALID_PROPERTIES = {

@@ -8,8 +8,9 @@ public record PresentationActivityParticipant(PresentationActivity presentationA
         return presentationActivity
             .waitingParticipants()
             .stream()
-            .anyMatch(activityParticipant ->
-                activityParticipant.getActivityParticipantKey().getParticipantId() == participant.getId()
+            .anyMatch(
+                activityParticipant ->
+                    activityParticipant.getActivityParticipantKey().getParticipantId() == participant.getId()
             );
     }
 }

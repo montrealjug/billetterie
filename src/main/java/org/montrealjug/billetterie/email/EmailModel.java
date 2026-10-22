@@ -16,21 +16,21 @@ import org.montrealjug.billetterie.ui.PresentationActivityParticipant;
 public class EmailModel {
 
     // to use in email templates via Email implementation utility methods
-    private static final DateTimeFormatter FR_DATE_FORMAT = DateTimeFormatter
-        .ofPattern("dd/MM/yyyy")
-        .withLocale(Locale.CANADA_FRENCH);
-    private static final DateTimeFormatter EN_DATE_FORMAT = DateTimeFormatter
-        .ofPattern("MM/dd/yyyy")
-        .withLocale(Locale.CANADA_FRENCH);
-    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter
-        .ofPattern("H:mm a")
-        .withLocale(Locale.CANADA_FRENCH);
-    private static final DateTimeFormatter ISO_DATE_TIME_FORMAT = DateTimeFormatter
-        .ofPattern("yyyy-MM-dd'T'HH:mm:ss")
-        .withLocale(Locale.CANADA_FRENCH);
-    private static final DateTimeFormatter ISO_DATE_FORMAT = DateTimeFormatter
-        .ofPattern("yyyy-MM-dd")
-        .withLocale(Locale.CANADA_FRENCH);
+    private static final DateTimeFormatter FR_DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(
+        Locale.CANADA_FRENCH
+    );
+    private static final DateTimeFormatter EN_DATE_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy").withLocale(
+        Locale.CANADA_FRENCH
+    );
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("H:mm a").withLocale(
+        Locale.CANADA_FRENCH
+    );
+    private static final DateTimeFormatter ISO_DATE_TIME_FORMAT = DateTimeFormatter.ofPattern(
+        "yyyy-MM-dd'T'HH:mm:ss"
+    ).withLocale(Locale.CANADA_FRENCH);
+    private static final DateTimeFormatter ISO_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd").withLocale(
+        Locale.CANADA_FRENCH
+    );
 
     private EmailModel() {
         // model class
@@ -143,8 +143,11 @@ public class EmailModel {
     }
 
     // must be public to be used in jte template
-    public record AfterBookingEmail(Booker booker, Event event, Set<ActivityParticipant> participants)
-        implements Email {
+    public record AfterBookingEmail(
+        Booker booker,
+        Event event,
+        Set<ActivityParticipant> participants
+    ) implements Email {
         public AfterBookingEmail(Booker booker, Event event, Set<ActivityParticipant> participants) {
             this.booker = booker;
             this.event = event;
@@ -188,8 +191,7 @@ public class EmailModel {
         Event event,
         String baseUrl,
         Optional<byte[]> qrCode
-    )
-        implements Email {
+    ) implements Email {
         @Override
         public EmailType type() {
             return EmailType.AFTER_PARTICIPANTS_CHANGES;
@@ -211,8 +213,7 @@ public class EmailModel {
         Event event,
         String baseUrl,
         Optional<byte[]> qrCode
-    )
-        implements Email {
+    ) implements Email {
         @Override
         public EmailType type() {
             return EmailType.PARTICIPANT_UPGRADED;
@@ -250,8 +251,7 @@ public class EmailModel {
         Event event,
         String baseUrl,
         Optional<byte[]> qrCode
-    )
-        implements Email {
+    ) implements Email {
         @Override
         public EmailType type() {
             return EmailType.LAST_REMINDER;

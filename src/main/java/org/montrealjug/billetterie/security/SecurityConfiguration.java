@@ -102,15 +102,13 @@ public class SecurityConfiguration {
     @Bean
     UserDetailsService userDetailsService(PasswordEncoder passwordEncoder, AdminProperties adminProperties) {
         var adminPassword = passwordEncoder.encode(adminProperties.adminPassword());
-        var adminUser = User
-            .builder()
+        var adminUser = User.builder()
             .username(adminProperties.adminUsername())
             .password(adminPassword)
             .roles(ADMIN_ROLE)
             .build();
         var actuatorPassword = passwordEncoder.encode(adminProperties.actuatorPassword());
-        var actuatorUser = User
-            .builder()
+        var actuatorUser = User.builder()
             .username(adminProperties.actuatorUsername())
             .password(actuatorPassword)
             .roles(ACTUATOR_ROLE)

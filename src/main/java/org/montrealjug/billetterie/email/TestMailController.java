@@ -51,16 +51,14 @@ public class TestMailController {
         // saving everything in DB is not needed, but it does not hurt 🤷😉 and is a cheap way to
         // test stuffs...
         // this is not the most efficient code, but it's for local dev testing after all...
-        var event = eventRepository
-            .findByActiveIsTrue()
-            .orElseGet(() -> {
-                var newEvent = new Event();
-                newEvent.setTitle("Test Event for mail notification");
-                newEvent.setDescription("Test Event for mail notification description");
-                newEvent.setActive(true);
-                newEvent.setDate(LocalDate.now().plusDays(7L));
-                return eventRepository.save(newEvent);
-            });
+        var event = eventRepository.findByActiveIsTrue().orElseGet(() -> {
+            var newEvent = new Event();
+            newEvent.setTitle("Test Event for mail notification");
+            newEvent.setDescription("Test Event for mail notification description");
+            newEvent.setActive(true);
+            newEvent.setDate(LocalDate.now().plusDays(7L));
+            return eventRepository.save(newEvent);
+        });
 
         var testActivityTitle = "Test Activity for mail notification";
         var activity = event
@@ -82,31 +80,29 @@ public class TestMailController {
             });
 
         var testEmail = "booker@test.org";
-        var booker = bookerRepository
-            .findById(testEmail)
-            .orElseGet(() -> {
-                var newBooker = new Booker();
-                newBooker.setFirstName("Booker First Name");
-                newBooker.setLastName("Booker Last Name");
-                newBooker.setEmail("booker@test.org");
-                newBooker = bookerRepository.save(newBooker);
-                var firstPart = new Participant();
-                firstPart.setFirstName("FirstParticipant First Name");
-                firstPart.setLastName("FirstParticipant Last Name");
-                firstPart.setBooker(newBooker);
-                newBooker.getParticipants().add(firstPart);
-                newBooker = bookerRepository.save(newBooker);
-                var secondPart = new Participant();
-                secondPart.setFirstName("SecondParticipant First Name");
-                secondPart.setLastName("SecondParticipant Last Name");
-                secondPart.setBooker(newBooker);
-                newBooker.getParticipants().add(secondPart);
-                bookerRepository.save(newBooker);
-                // to get the ids in the created Participants
-                return bookerRepository
-                    .findById(testEmail)
-                    .orElseThrow(() -> new IllegalStateException("we should have found the just" + " created booker!"));
-            });
+        var booker = bookerRepository.findById(testEmail).orElseGet(() -> {
+            var newBooker = new Booker();
+            newBooker.setFirstName("Booker First Name");
+            newBooker.setLastName("Booker Last Name");
+            newBooker.setEmail("booker@test.org");
+            newBooker = bookerRepository.save(newBooker);
+            var firstPart = new Participant();
+            firstPart.setFirstName("FirstParticipant First Name");
+            firstPart.setLastName("FirstParticipant Last Name");
+            firstPart.setBooker(newBooker);
+            newBooker.getParticipants().add(firstPart);
+            newBooker = bookerRepository.save(newBooker);
+            var secondPart = new Participant();
+            secondPart.setFirstName("SecondParticipant First Name");
+            secondPart.setLastName("SecondParticipant Last Name");
+            secondPart.setBooker(newBooker);
+            newBooker.getParticipants().add(secondPart);
+            bookerRepository.save(newBooker);
+            // to get the ids in the created Participants
+            return bookerRepository
+                .findById(testEmail)
+                .orElseThrow(() -> new IllegalStateException("we should have found the just" + " created booker!"));
+        });
 
         var bookerParticipantIds = booker
             .getParticipants()
@@ -120,14 +116,12 @@ public class TestMailController {
             .collect(Collectors.toSet());
 
         if (participants.isEmpty()) {
-            booker
-                .getParticipants()
-                .forEach(participant -> {
-                    var registration = new ActivityParticipant();
-                    registration.setParticipant(participant);
-                    registration.setActivity(activity);
-                    activityRepository.save(activity);
-                });
+            booker.getParticipants().forEach(participant -> {
+                var registration = new ActivityParticipant();
+                registration.setParticipant(participant);
+                registration.setActivity(activity);
+                activityRepository.save(activity);
+            });
             // to get all ids set properly
             var updatedActivity = activityRepository
                 .findById(activity.getId())

@@ -14,7 +14,10 @@ import org.montrealjug.billetterie.entity.Participant;
 public class Utils {
 
     static List<PresentationActivity> toPresentationActivities(Set<Activity> activities) {
-        return activities.stream().map((Activity activity) -> toPresentationActivity(activity, true)).toList();
+        return activities
+            .stream()
+            .map((Activity activity) -> toPresentationActivity(activity, true))
+            .toList();
     }
 
     static List<PresentationActivity> toPresentationActivitiesLimitedToBooker(

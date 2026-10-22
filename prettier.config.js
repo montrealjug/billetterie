@@ -1,4 +1,5 @@
 module.exports = {
+  plugins: ["prettier-plugin-java"],
   printWidth: 120,
   tabWidth: 4,
   useTabs: false,
@@ -6,7 +7,7 @@ module.exports = {
   singleQuote: false,
   trailingComma: "all",
   bracketSpacing: true,
-  arrowParens: "always",
+  arrowParens: "avoid",
   endOfLine: "lf",
   overrides: [
     {

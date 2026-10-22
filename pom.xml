@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.8</version>
+		<version>4.1.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>org.montrealjug</groupId>
@@ -28,16 +28,17 @@
 	</scm>
 	<properties>
 		<!-- general properties -->
-		<java.version>21</java.version>
+		<java.version>25</java.version>
 		<!-- third-party dependencies (outside of springboot BOM) -->
-		<jsoup.version>1.22.1</jsoup.version>
-		<jte.version>3.2.3</jte.version>
-		<spotless.version>3.3.0</spotless.version>
+		<jsoup.version>1.23.2</jsoup.version>
+		<jte.version>3.2.4</jte.version>
+		<spotless.version>3.10.4</spotless.version>
 		<!-- tailwind processor stack -->
-		<node.version>v22.22.1</node.version>
-		<frontend-maven-plugin.version>1.15.4</frontend-maven-plugin.version>
-		<commonmark.version>0.27.1</commonmark.version>
-		<okapibarcode.version>0.5.5</okapibarcode.version>
+		<node.version>v24.22.1</node.version>
+		<frontend-maven-plugin.version>2.0.2</frontend-maven-plugin.version>
+		<commonmark.version>0.31.0</commonmark.version>
+		<okapibarcode.version>0.5.7</okapibarcode.version>
+		<rest-assured.version>6.2.0</rest-assured.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -54,7 +55,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-starter-webmvc</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -66,7 +67,7 @@
 		</dependency>
 		<dependency>
 			<groupId>gg.jte</groupId>
-			<artifactId>jte-spring-boot-starter-3</artifactId>
+			<artifactId>jte-spring-boot-starter-4</artifactId>
 			<version>${jte.version}</version>
 		</dependency>
 		<dependency>
@@ -103,6 +104,16 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
 			<version>${jsoup.version}</version>
@@ -111,6 +122,7 @@
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
+			<version>${rest-assured.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -118,8 +130,8 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.hibernate.orm.tooling</groupId>
-				<artifactId>hibernate-enhance-maven-plugin</artifactId>
+				<groupId>org.hibernate.orm</groupId>
+				<artifactId>hibernate-maven-plugin</artifactId>
 				<version>${hibernate.version}</version>
 				<executions>
 					<execution>
@@ -128,8 +140,6 @@
 							<goal>enhance</goal>
 						</goals>
 						<configuration>
-							<enableLazyInitialization>true</enableLazyInitialization>
-							<enableDirtyTracking>true</enableDirtyTracking>
 							<enableAssociationManagement>true</enableAssociationManagement>
 						</configuration>
 					</execution>
@@ -190,8 +200,8 @@
 					<java>
 						<prettier>
 							<devDependencies>
-								<prettier>2.8.8</prettier>
-								<prettier-plugin-java>2.1.0</prettier-plugin-java>
+								<prettier>3.9.10</prettier>
+								<prettier-plugin-java>2.11.0</prettier-plugin-java>
 							</devDependencies>
 							<configFile>prettier.config.js</configFile>
 							<nodeExecutable>target/node/node</nodeExecutable>

@@ -113,9 +113,9 @@ public class CheckInController {
             }
         } catch (Exception e) {
             LOGGER.error("Error checking in participant: {}", e.getMessage());
-            return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("{\"message\":\"An error occurred while checking in the participant\"}");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                "{\"message\":\"An error occurred while checking in the participant\"}"
+            );
         }
     }
 }

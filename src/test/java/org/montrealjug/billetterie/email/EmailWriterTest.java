@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import gg.jte.TemplateEngine;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Year;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -52,7 +53,11 @@ class EmailWriterTest {
         var plainTextContent = EmailTestHelper.loadResourceContent(expectedPlainTextFile);
         assertThat(emailToSend.plainText().trim()).isEqualTo(plainTextContent.trim());
         var expectedHtmlFile = "email/%s.html".formatted(email.type().name().toLowerCase());
-        var expectedHtmlContent = EmailTestHelper.loadResourceContent(expectedHtmlFile);
+        // the footer copyright year is computed at render time
+        var expectedHtmlContent = EmailTestHelper.loadResourceContent(expectedHtmlFile).replace(
+            "{{currentYear}}",
+            String.valueOf(Year.now().getValue())
+        );
         assertThat(Jsoup.parse(emailToSend.html()).html()).isEqualTo(Jsoup.parse(expectedHtmlContent).html());
     }
 

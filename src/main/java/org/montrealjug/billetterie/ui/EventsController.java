@@ -73,17 +73,16 @@ public class EventsController {
         PresentationEvent presentationEvent;
         if (optionalEvent.isPresent()) {
             Event event = optionalEvent.get();
-            presentationEvent =
-                new PresentationEvent(
-                    event.getId(),
-                    event.getTitle(),
-                    event.getDescription(),
-                    event.getDate(),
-                    Collections.emptyList(),
-                    event.isActive(),
-                    event.getImagePath(),
-                    event.getLocation()
-                );
+            presentationEvent = new PresentationEvent(
+                event.getId(),
+                event.getTitle(),
+                event.getDescription(),
+                event.getDate(),
+                Collections.emptyList(),
+                event.isActive(),
+                event.getImagePath(),
+                event.getLocation()
+            );
         } else {
             throw new EntityNotFoundException("Event with id " + id + " not found", "events-create-update");
         }
@@ -172,13 +171,11 @@ public class EventsController {
             activity.setMaxParticipants(presentationActivity.maxParticipants());
             activity.setMaxWaitingQueue(presentationActivity.maxWaitingQueue());
 
-            eventRepository
-                .findById(eventId)
-                .ifPresent(event -> {
-                    LocalDate date = event.getDate();
-                    LocalDateTime localDateTime = date.atTime(presentationActivity.time());
-                    activity.setStartTime(localDateTime);
-                });
+            eventRepository.findById(eventId).ifPresent(event -> {
+                LocalDate date = event.getDate();
+                LocalDateTime localDateTime = date.atTime(presentationActivity.time());
+                activity.setStartTime(localDateTime);
+            });
 
             activityRepository.save(activity);
         } else {
@@ -220,15 +217,14 @@ public class EventsController {
 
     @DeleteMapping("{eventId}/activities/{activityId}")
     public ResponseEntity<Void> deleteActivity(@PathVariable long eventId, @PathVariable long activityId) {
-        this.eventRepository.findById(eventId)
-            .ifPresent(event -> {
-                Optional<Activity> optionalActivity = activityRepository.findById(activityId);
-                optionalActivity.ifPresent(activity -> {
-                    event.getActivities().remove(activity);
-                    eventRepository.save(event);
-                    activityRepository.delete(activity);
-                });
+        this.eventRepository.findById(eventId).ifPresent(event -> {
+            Optional<Activity> optionalActivity = activityRepository.findById(activityId);
+            optionalActivity.ifPresent(activity -> {
+                event.getActivities().remove(activity);
+                eventRepository.save(event);
+                activityRepository.delete(activity);
             });
+        });
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

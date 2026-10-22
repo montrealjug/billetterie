@@ -66,30 +66,26 @@ public class BookersController {
         Iterable<Booker> bookers = bookerRepository.findAll();
         Iterable<Event> allEvents = eventRepository.findAll();
         List<PresentationBookerWithParticipants> presentationBookers;
-        presentationBookers =
-            StreamSupport
-                .stream(bookers.spliterator(), false)
-                .map(booker ->
-                    new PresentationBookerWithParticipants(
-                        booker.getFirstName(),
-                        booker.getLastName(),
-                        booker.getEmail(),
-                        booker.getEmailSignature(),
-                        StreamSupport
-                            .stream(allEvents.spliterator(), false)
-                            .collect(
-                                Collectors.toMap(
-                                    event -> event,
-                                    event ->
-                                        activityParticipantRepository.findAllActivityParticipantByEventIdAndBookerEmail(
-                                            event.getId(),
-                                            booker.getEmail()
-                                        )
+        presentationBookers = StreamSupport.stream(bookers.spliterator(), false)
+            .map(booker ->
+                new PresentationBookerWithParticipants(
+                    booker.getFirstName(),
+                    booker.getLastName(),
+                    booker.getEmail(),
+                    booker.getEmailSignature(),
+                    StreamSupport.stream(allEvents.spliterator(), false).collect(
+                        Collectors.toMap(
+                            event -> event,
+                            event ->
+                                activityParticipantRepository.findAllActivityParticipantByEventIdAndBookerEmail(
+                                    event.getId(),
+                                    booker.getEmail()
                                 )
-                            )
+                        )
                     )
                 )
-                .toList();
+            )
+            .toList();
 
         model.addAttribute("bookerList", presentationBookers);
         model.addAttribute("allEvents", StreamSupport.stream(allEvents.spliterator(), false).toList());
@@ -144,36 +140,32 @@ public class BookersController {
 
     @PostMapping("/sendReminderEmail")
     public ResponseEntity<Void> sendReminderEmail(HttpServletRequest request) {
-        eventRepository
-            .findByActiveIsTrue()
-            .ifPresent(event ->
-                bookerRepository
-                    .findAll()
-                    .forEach(booker -> {
-                        List<ActivityParticipant> bookings =
-                            activityParticipantRepository.findAllActivityParticipantByEventIdAndBookerEmail(
-                                event.getId(),
-                                booker.getEmail()
-                            );
-                        if (!bookings.isEmpty()) {
-                            try {
-                                emailService.sendEmail(
-                                    EmailModel.Email.lastReminder(
-                                        booker,
-                                        toPresentationActivityParticipants(bookings),
-                                        event,
-                                        retrieveBaseUrl(request),
-                                        qrCodeService.generateQrCode(
-                                            retrieveBaseUrl(request) + "/admin/bookings/" + booker.getEmailSignature()
-                                        )
-                                    )
-                                );
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    })
-            );
+        eventRepository.findByActiveIsTrue().ifPresent(event ->
+            bookerRepository.findAll().forEach(booker -> {
+                List<ActivityParticipant> bookings =
+                    activityParticipantRepository.findAllActivityParticipantByEventIdAndBookerEmail(
+                        event.getId(),
+                        booker.getEmail()
+                    );
+                if (!bookings.isEmpty()) {
+                    try {
+                        emailService.sendEmail(
+                            EmailModel.Email.lastReminder(
+                                booker,
+                                toPresentationActivityParticipants(bookings),
+                                event,
+                                retrieveBaseUrl(request),
+                                qrCodeService.generateQrCode(
+                                    retrieveBaseUrl(request) + "/admin/bookings/" + booker.getEmailSignature()
+                                )
+                            )
+                        );
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            })
+        );
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

@@ -3,10 +3,12 @@ package org.montrealjug.billetterie.security;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.matcher.RestAssuredMatchers.detailedCookie;
+import static org.hamcrest.Matchers.lessThan;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.util.Date;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -119,7 +121,10 @@ public class SecurityTest {
             .then()
             .statusCode(302)
             .header("Location", "http://localhost:" + port + "/")
-            .cookie(adminProperties.sessionCookieName(), detailedCookie().path("/").maxAge(0).value(""));
+            .cookie(
+                adminProperties.sessionCookieName(),
+                detailedCookie().path("/").expiryDate(lessThan(new Date())).value("")
+            );
         // `/admin/events` -> `/admin/login`
         given()
             .redirects()
@@ -162,7 +167,7 @@ public class SecurityTest {
             .get("http://localhost:" + port + "/actuator")
             .then()
             .statusCode(401)
-            .header("WWW-Authenticate", "Basic realm=\"actuator realm\"");
+            .header("WWW-Authenticate", "Basic realm=\"actuator realm\", charset=\"UTF-8\"");
         // 200 with basic auth
         given()
             .auth()

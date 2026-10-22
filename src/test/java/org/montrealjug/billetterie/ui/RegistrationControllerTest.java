@@ -25,7 +25,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.montrealjug.billetterie.email.EmailModel.Email;
 import org.montrealjug.billetterie.email.EmailModel.EmailType;
@@ -85,8 +84,8 @@ class RegistrationControllerTest {
     @MockitoSpyBean
     EmailService emailService;
 
-    @Captor
-    ArgumentCaptor<Email> emailCaptor;
+    // Spring Boot 4 no longer processes Mockito's `@Captor` in Spring tests, so we create it explicitly
+    ArgumentCaptor<Email> emailCaptor = ArgumentCaptor.forClass(Email.class);
 
     @Test
     void retrieveBaseUrlTest() {
@@ -234,14 +233,13 @@ class RegistrationControllerTest {
             .statusCode(HttpStatus.CREATED.value());
 
         var savedBooker = bookerRepository.findById(email);
-        assertThat(savedBooker)
-            .hasValueSatisfying(b -> {
-                assertThat(b.getFirstName()).isEqualTo(booker.firstName());
-                assertThat(b.getLastName()).isEqualTo(booker.lastName());
-                assertThat(b.getEmail()).isEqualTo(booker.email());
-                assertThat(b.getEmailSignature()).isEqualTo(SIGNATURE);
-                assertThat(b.getValidationTime()).isNull();
-            });
+        assertThat(savedBooker).hasValueSatisfying(b -> {
+            assertThat(b.getFirstName()).isEqualTo(booker.firstName());
+            assertThat(b.getLastName()).isEqualTo(booker.lastName());
+            assertThat(b.getEmail()).isEqualTo(booker.email());
+            assertThat(b.getEmailSignature()).isEqualTo(SIGNATURE);
+            assertThat(b.getValidationTime()).isNull();
+        });
         verify(emailService).sendEmail(emailCaptor.capture());
         assertThat(emailCaptor.getValue().type()).isSameAs(EmailType.AFTER_REGISTRATION);
     }
@@ -318,8 +316,9 @@ class RegistrationControllerTest {
             .findById(email)
             .orElseThrow(() -> new IllegalStateException("Booker not found"));
         // compare with millis, because we lose precision in the DB
-        assertThat(validatedBooker.getValidationTime().truncatedTo(ChronoUnit.MILLIS))
-            .isEqualTo(booker.getValidationTime().truncatedTo(ChronoUnit.MILLIS));
+        assertThat(validatedBooker.getValidationTime().truncatedTo(ChronoUnit.MILLIS)).isEqualTo(
+            booker.getValidationTime().truncatedTo(ChronoUnit.MILLIS)
+        );
     }
 
     @Test
@@ -385,18 +384,16 @@ class RegistrationControllerTest {
     }
 
     private Event getOrCreateActiveEvent() {
-        var activeEvent = eventRepository
-            .findByActiveIsTrue()
-            .orElseGet(() -> {
-                var event = new Event();
-                event.setTitle("Test Event");
-                event.setDescription("Test Description");
-                event.setActive(true);
-                event.setDate(LocalDate.now());
-                event = eventRepository.save(event);
-                CREATED_EVENT_IDS.add(event.getId());
-                return event;
-            });
+        var activeEvent = eventRepository.findByActiveIsTrue().orElseGet(() -> {
+            var event = new Event();
+            event.setTitle("Test Event");
+            event.setDescription("Test Description");
+            event.setActive(true);
+            event.setDate(LocalDate.now());
+            event = eventRepository.save(event);
+            CREATED_EVENT_IDS.add(event.getId());
+            return event;
+        });
 
         if (activeEvent.getActivities().isEmpty()) {
             // add an Activity to the active Event

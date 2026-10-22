@@ -98,9 +98,9 @@ public class RegistrationController {
         if (bookerRepository.existsById(email)) {
             // should never happen as it should be tested first via `/check-returning-booker`
             // but let's play it safe if someone tries to call this directly without using our UI
-            return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body("{\"message\":\"Email address already registered\"}");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                "{\"message\":\"Email address already registered\"}"
+            );
         }
 
         // Generate a signature for the booker using the email
@@ -163,9 +163,9 @@ public class RegistrationController {
 
             // Check if both regular spots and waiting queue are full
             if (activity.getRegistrationStatus().equals(Activity.RegistrationStatus.CLOSED)) {
-                return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("{\"message\":\"This activity is full and the waiting queue is also" + " full\"}");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    "{\"message\":\"This activity is full and the waiting queue is also" + " full\"}"
+                );
             }
 
             // Create and save the ActivityParticipant entity
@@ -183,14 +183,14 @@ public class RegistrationController {
             return ResponseEntity.ok().body(participantSub);
         } catch (DataIntegrityViolationException e) {
             LOGGER.warn("Data integrity violation: {}", e.getMessage());
-            return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body("{\"message\":\"Failed to register participant due to data integrity" + " violation\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                "{\"message\":\"Failed to register participant due to data integrity" + " violation\"}"
+            );
         } catch (Exception e) {
             LOGGER.error("Error registering participant: {}", e.getMessage());
-            return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("{\"message\":\"An error occurred while registering the participant\"}");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                "{\"message\":\"An error occurred while registering the participant\"}"
+            );
         }
     }
 
@@ -224,7 +224,8 @@ public class RegistrationController {
                 // Check if the activityId matches an existing activity
                 Activity activity = activityRepository
                     .findById(participantSub.activityId())
-                    .orElseThrow(() -> new EntityNotFoundException("Activity not found: " + participantSub.activityId())
+                    .orElseThrow(() ->
+                        new EntityNotFoundException("Activity not found: " + participantSub.activityId())
                     );
 
                 // Check if both regular spots and waiting queue are full
@@ -286,14 +287,14 @@ public class RegistrationController {
             return ResponseEntity.ok().body("{\"message\":\"All participants registered successfully\"}");
         } catch (DataIntegrityViolationException e) {
             LOGGER.warn("Data integrity violation: {}", e.getMessage());
-            return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body("{\"message\":\"Failed to register participants due to data integrity violation\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                "{\"message\":\"Failed to register participants due to data integrity violation\"}"
+            );
         } catch (Exception e) {
             LOGGER.error("Error registering participants: {}", e.getMessage());
-            return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("{\"message\":\"An error occurred while registering the participants\"}");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                "{\"message\":\"An error occurred while registering the participants\"}"
+            );
         }
     }
 
@@ -368,10 +369,9 @@ public class RegistrationController {
                 )
             );
 
-            activity =
-                activityRepository
-                    .findById(participantSub.activityId())
-                    .orElseThrow(() -> new EntityNotFoundException("Activity not found"));
+            activity = activityRepository
+                .findById(participantSub.activityId())
+                .orElseThrow(() -> new EntityNotFoundException("Activity not found"));
 
             var lastParticipantAfterRemoval = activity
                 .getNonWaitingParticipants()
@@ -392,8 +392,8 @@ public class RegistrationController {
                         retrieveBaseUrl(request),
                         qrCodeService.generateQrCode(
                             retrieveBaseUrl(request) +
-                            "/admin/bookings/" +
-                            upgradedParticipantBooker.getEmailSignature()
+                                "/admin/bookings/" +
+                                upgradedParticipantBooker.getEmailSignature()
                         )
                     )
                 );
@@ -404,17 +404,17 @@ public class RegistrationController {
             return ResponseEntity.ok().body(participantSub);
         } catch (DataIntegrityViolationException e) {
             LOGGER.warn("Data integrity violation: {}", e.getMessage());
-            return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body("{\"message\":\"Failed to remove participant due to data integrity" + " violation\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                "{\"message\":\"Failed to remove participant due to data integrity" + " violation\"}"
+            );
         } catch (NoSuchElementException e) {
             LOGGER.info("UI tried to remove non existant participant");
             return ResponseEntity.ok().body(participantSub);
         } catch (Exception e) {
             LOGGER.error("Error removing participant: {}", e.getMessage());
-            return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("{\"message\":\"An error occurred while removing the participant\"}");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                "{\"message\":\"An error occurred while removing the participant\"}"
+            );
         }
     }
 
@@ -511,10 +511,9 @@ public class RegistrationController {
             // Save the updated activity with merge to ensure the removal is persisted
             activityRepository.save(activity);
 
-            activity =
-                activityRepository
-                    .findById(activityId)
-                    .orElseThrow(() -> new EntityNotFoundException("Activity not found"));
+            activity = activityRepository
+                .findById(activityId)
+                .orElseThrow(() -> new EntityNotFoundException("Activity not found"));
             // this participant just got upgraded from waiting to non-waiting
             ActivityParticipant upgradedActivityParticipant = activity.getNonWaitingParticipants().getLast();
             Participant upgradedParticipant = upgradedActivityParticipant.getParticipant();
@@ -536,9 +535,9 @@ public class RegistrationController {
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             LOGGER.error("Error deleting participant from activity: {}", e.getMessage());
-            return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("{\"message\":\"An error occurred while deleting the participant from" + " the activity\"}");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                "{\"message\":\"An error occurred while deleting the participant from" + " the activity\"}"
+            );
         }
     }
 }
