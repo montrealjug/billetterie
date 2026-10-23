@@ -8,10 +8,14 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.montrealjug.billetterie.email.EmailConfiguration.EmailProperties;
 import org.montrealjug.billetterie.email.EmailModel.EmailToSend;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
 class SmtpEmailSender implements EmailSender {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SmtpEmailSender.class.getName());
 
     private final JavaMailSender javaMailSender;
     private final InternetAddress from;
@@ -35,6 +39,7 @@ class SmtpEmailSender implements EmailSender {
             var attachment = email.attachment().get();
             helper.addAttachment("qrCode.jpg", () -> new ByteArrayInputStream(attachment), "image/jpeg");
         }
+        LOGGER.info("Sending email with subject {} to {}", email.subject(), email.to());
         this.javaMailSender.send(msg);
     }
 }
