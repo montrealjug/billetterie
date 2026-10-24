@@ -3,6 +3,7 @@ package org.montrealjug.billetterie.ui;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -20,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +35,7 @@ import org.montrealjug.billetterie.entity.Activity;
 import org.montrealjug.billetterie.entity.Booker;
 import org.montrealjug.billetterie.entity.Event;
 import org.montrealjug.billetterie.entity.Participant;
+import org.montrealjug.billetterie.repository.ActivityParticipantRepository;
 import org.montrealjug.billetterie.repository.BookerRepository;
 import org.montrealjug.billetterie.repository.EventRepository;
 import org.montrealjug.billetterie.service.SignatureService;
@@ -63,8 +66,9 @@ class RegistrationControllerTest {
         // we can't use spring's @Transactional because the transaction
         // won't be committed and the data won't be available in the web layer
         // that shouldn't be done, but it will ease dev life
-        bookerRepository.deleteAllById(CREATED_BOOKER_IDS);
+        // events first: their activities' participants reference the bookers' participants
         eventRepository.deleteAllById(CREATED_EVENT_IDS);
+        bookerRepository.deleteAllById(CREATED_BOOKER_IDS);
         CREATED_BOOKER_IDS.clear();
         CREATED_EVENT_IDS.clear();
     }
@@ -77,6 +81,9 @@ class RegistrationControllerTest {
 
     @Autowired
     EventRepository eventRepository;
+
+    @Autowired
+    ActivityParticipantRepository activityParticipantRepository;
 
     @MockitoBean
     SignatureService signatureService;
@@ -381,6 +388,105 @@ class RegistrationControllerTest {
             event.setActive(true);
             eventRepository.save(event);
         }
+    }
+
+    @Test
+    void registerParticipants_should_ignore_a_participant_already_registered_in_the_activity() {
+        var email = "register-twice@test.org";
+        createBooker(email, true);
+        var event = createEventWithActivity();
+        var activityId = event.getActivities().getFirst().getId();
+        var participant = new ParticipantSubmission("Twice", "Registered", 2018, activityId, SIGNATURE);
+
+        // first submission, then the same one again (double submit, stale page, etc.)
+        for (var i = 0; i < 2; i++) {
+            given()
+                .contentType(ContentType.JSON)
+                .body(List.of(participant))
+                .when()
+                .post("/events/{eventId}/registerParticipants", event.getId())
+                .then()
+                .statusCode(HttpStatus.OK.value());
+        }
+
+        var registrations = activityParticipantRepository.findAllActivityParticipantByEventIdAndBookerEmail(
+            event.getId(),
+            email
+        );
+        assertThat(registrations).hasSize(1);
+    }
+
+    @Test
+    void registerParticipants_should_validate_each_participant() {
+        createBooker("register-invalid@test.org", true);
+        var event = createEventWithActivity();
+        var activityId = event.getActivities().getFirst().getId();
+        var valid = new ParticipantSubmission("Valid", "Participant", 2018, activityId, SIGNATURE);
+        var blankFirstName = new ParticipantSubmission(" ", "Participant", 2018, activityId, SIGNATURE);
+
+        given()
+            .contentType(ContentType.JSON)
+            .body(List.of(valid, blankFirstName))
+            .when()
+            .post("/events/{eventId}/registerParticipants", event.getId())
+            .then()
+            .statusCode(HttpStatus.BAD_REQUEST.value());
+
+        assertThat(
+            activityParticipantRepository.findAllActivityParticipantByEventIdAndBookerEmail(
+                event.getId(),
+                "register-invalid@test.org"
+            )
+        ).isEmpty();
+    }
+
+    @Test
+    void removeParticipant_should_return_404_for_a_participant_never_registered() {
+        createBooker("remove-unknown@test.org", true);
+        var event = createEventWithActivity();
+        var activityId = event.getActivities().getFirst().getId();
+        // registered by someone, so the activity is not empty
+        given()
+            .contentType(ContentType.JSON)
+            .body(List.of(new ParticipantSubmission("Known", "Participant", 2018, activityId, SIGNATURE)))
+            .when()
+            .post("/events/{eventId}/registerParticipants", event.getId())
+            .then()
+            .statusCode(HttpStatus.OK.value());
+
+        given()
+            .contentType(ContentType.JSON)
+            .body(new ParticipantSubmission("Never", "Submitted", 2018, activityId, SIGNATURE))
+            .when()
+            .delete("/events/{eventId}/removeParticipant", event.getId())
+            .then()
+            .statusCode(HttpStatus.NOT_FOUND.value())
+            .body("message", equalTo("Participant not found"));
+    }
+
+    @Test
+    void participantSubmission_toString_should_not_leak_the_booker_signature() {
+        var participant = new ParticipantSubmission("First", "Last", 2018, 42L, "secret-signature");
+
+        assertThat(participant.toString()).doesNotContain("secret-signature").contains("First", "Last", "42");
+    }
+
+    private Event createEventWithActivity() {
+        var event = new Event();
+        event.setTitle("Test Event (not active)");
+        event.setDescription("Test Description");
+        event.setDate(LocalDate.now());
+        var activity = new Activity();
+        activity.setTitle("Test Activity");
+        activity.setDescription("Test Description");
+        activity.setEvent(event);
+        activity.setStartTime(LocalDateTime.now().plusMinutes(1L));
+        activity.setMaxParticipants(12);
+        activity.setMaxWaitingQueue(12);
+        event.getActivities().add(activity);
+        event = eventRepository.save(event);
+        CREATED_EVENT_IDS.add(event.getId());
+        return event;
     }
 
     private Event getOrCreateActiveEvent() {

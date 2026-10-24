@@ -93,14 +93,25 @@ public class ActivityParticipant implements Comparable<ActivityParticipant> {
 
     @Override
     public int compareTo(ActivityParticipant o) {
+        // consistent with `equals`, so a sorted set never holds two entries for the same (activity, participant)
+        if (this.equals(o)) {
+            return 0;
+        }
         var activityComp = Long.compare(
             this.activityParticipantKey.getActivityId(),
             o.activityParticipantKey.getActivityId()
         );
-        if (activityComp == 0) {
-            return this.registrationTime.compareTo(o.registrationTime);
-        } else {
+        if (activityComp != 0) {
             return activityComp;
         }
+        var registrationTimeComp = this.registrationTime.compareTo(o.registrationTime);
+        if (registrationTimeComp != 0) {
+            return registrationTimeComp;
+        }
+        // same registration time: still keep both participants
+        return Long.compare(
+            this.activityParticipantKey.getParticipantId(),
+            o.activityParticipantKey.getParticipantId()
+        );
     }
 }

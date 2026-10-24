@@ -50,7 +50,7 @@ content = @`
                                 !{var waitingParticipantsNumber = activity.totalWaitingQueue(); }
                                 !{var regularParticipantsNumber = activity.totalParticipants() - waitingParticipantsNumber; }
 
-                                <article class="my-4 flex flex-col md:flex-row md:my-8 p-4">
+                                <article data-activity-id="${activity.id()}" class="my-4 flex flex-col md:flex-row md:my-8 p-4">
                                     <div class="size-12 shrink-0 mr-2 md:size-16 md:mr-4">
                                         @template.layouts.image_with_fallback(
                                             entityType = "activity",
@@ -230,6 +230,18 @@ content = @`
                     return;
                 }
 
+                const alreadyPending = pendingParticipants.some((p) =>
+                    p.activityId === activityId &&
+                    p.firstName.toLowerCase() === firstName.toLowerCase() &&
+                    p.lastName.toLowerCase() === lastName.toLowerCase() &&
+                    p.yearOfBirth === yearOfBirth
+                );
+                if (alreadyPending) {
+                    errorMessage.textContent = "This participant is already added to this activity.";
+                    errorMessage.classList.remove("hidden");
+                    return;
+                }
+
                 errorMessage.classList.add("hidden");
 
                 // Create participant data object
@@ -344,16 +356,7 @@ content = @`
             const container = document.getElementById("participants-container-" + activityId);
             const list = document.getElementById("participants-list-" + activityId);
 
-            // Find the article element for this activity
-            const articles = document.querySelectorAll("article");
-            let activityArticle = null;
-            for (const article of articles) {
-                const button = article.querySelector("button[onclick*='" + activityId + "']");
-                if (button) {
-                    activityArticle = article;
-                    break;
-                }
-            }
+            const activityArticle = findActivityArticle(activityId);
 
             // Get max participants from the seats display (format: "X/Y")
             const seatsElements = activityArticle.querySelectorAll(".flex-row");
@@ -409,9 +412,8 @@ content = @`
                 listItem.innerHTML = `
                     <span>${participant.firstName} ${participant.lastName}, born in ${participant.yearOfBirth} (waiting)</span>
                     <div class="flex space-x-2">
-                        <button onclick='displayRemovalModal(${activityId}, "${participant.firstName}", "${participant.lastName}", ${participant.yearOfBirth})'
-                                data-activity-id="${activityId}"
-                                class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
+                        <button type="button"
+                                class="pending-remove-button bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
                             Remove
                         </button>
                     </div>
@@ -425,15 +427,19 @@ content = @`
                 listItem.innerHTML = `
                     <span>${participant.firstName} ${participant.lastName}, born in ${participant.yearOfBirth}</span>
                     <div class="flex space-x-2">
-                        <button onclick='displayRemovalModal(${activityId}, "${participant.firstName}", "${participant.lastName}", ${participant.yearOfBirth})'
-                                data-activity-id="${activityId}"
-                                class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
+                        <button type="button"
+                                class="pending-remove-button bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
                             Remove
                         </button>
                     </div>
                 `
                 @endraw
             }
+
+            // not submitted yet: removing it only undoes the local addition
+            listItem.querySelector(".pending-remove-button").addEventListener("click", () =>
+                removePendingParticipant(activityId, participant, listItem, isWaiting)
+            );
 
             // Add the list item to the appropriate section
             section.appendChild(listItem);
@@ -445,20 +451,26 @@ content = @`
             updateCounts(activityId, isWaiting);
         }
 
-        function updateCounts(activityId, isWaiting) {
+        function findActivityArticle(activityId) {
+            return document.querySelector("article[data-activity-id='" + activityId + "']");
+        }
+
+        function removePendingParticipant(activityId, participant, listItem, isWaiting) {
+            const index = pendingParticipants.indexOf(participant);
+            if (index >= 0) {
+                pendingParticipants.splice(index, 1);
+            }
+            listItem.remove();
+            updateCounts(activityId, isWaiting, -1);
+            hasPendingChanges = pendingParticipants.length > 0;
+            updateSubmitChangesButton();
+        }
+
+        function updateCounts(activityId, isWaiting, delta = 1) {
             // This is a simplified update - in a real app, you'd want to refresh from the server
             // or maintain more accurate client-side state
 
-            // Find the article element for this activity
-            const articles = document.querySelectorAll("article");
-            let activityArticle = null;
-            for (const article of articles) {
-                const button = article.querySelector("button[onclick*='" + activityId + "']");
-                if (button) {
-                    activityArticle = article;
-                    break;
-                }
-            }
+            const activityArticle = findActivityArticle(activityId);
 
             if (activityArticle) {
                 // Find the seats and waiting elements
@@ -478,8 +490,18 @@ content = @`
                     // Update waiting count
                     const waitingText = waitingElement.textContent;
                     const [current, max] = waitingText.split('/');
-                    const newCount = parseInt(current) + 1;
+                    const newCount = parseInt(current) + delta;
                     waitingElement.textContent = newCount + '/' + max;
+
+                    // a pending participant was removed: re-enable the add button we disabled
+                    const clientFullButton = activityArticle.querySelector("button[data-client-full]");
+                    if (clientFullButton && newCount < parseInt(max)) {
+                        const addButton = document.createElement("button");
+                        addButton.setAttribute("onclick", "displayParticipantModal(" + activityId + ")");
+                        addButton.className = "bg-d4k-orange text-white px-3 py-1 rounded hover:opacity-80 focus:outline-none focus:ring focus:ring-orange-300";
+                        addButton.textContent = "Add participant";
+                        clientFullButton.parentNode.replaceChild(addButton, clientFullButton);
+                    }
 
                     // If waiting queue is now full, disable the add button
                     if (newCount >= parseInt(max)) {
@@ -487,6 +509,7 @@ content = @`
                         if (addButton) {
                             const disabledButton = document.createElement("button");
                             disabledButton.disabled = true;
+                            disabledButton.dataset.clientFull = "true";
                             disabledButton.className = "bg-gray-400 text-white px-3 py-1 rounded cursor-not-allowed";
                             disabledButton.textContent = "Activity Full";
                             addButton.parentNode.replaceChild(disabledButton, addButton);
@@ -496,7 +519,7 @@ content = @`
                     // Update attendance count
                     const seatsText = seatsElement.textContent;
                     const [current, max] = seatsText.split('/');
-                    const newCount = parseInt(current) + 1;
+                    const newCount = parseInt(current) + delta;
                     seatsElement.textContent = newCount + '/' + max;
                 }
             }
@@ -522,10 +545,17 @@ content = @`
             }
         }
 
+        let submitting = false;
+
         async function submitAllParticipants() {
-            if (!hasPendingChanges || pendingParticipants.length === 0) {
+            if (submitting || !hasPendingChanges || pendingParticipants.length === 0) {
                 return;
             }
+
+            // prevent double submissions while the request is in flight
+            submitting = true;
+            const submitButton = document.getElementById("submit-changes-button");
+            submitButton.disabled = true;
 
             try {
                 const url = "/events/" + eventId + "/registerParticipants";
@@ -547,6 +577,8 @@ content = @`
 
                     // Show success message
                     alert("All participants have been successfully registered!");
+                    // reload to display the participants as the server registered them
+                    window.location.reload();
                 } else {
                     const errorData = await response.json();
                     alert(errorData.message || "Failed to register participants.");
@@ -554,6 +586,9 @@ content = @`
             } catch (error) {
                 console.error("Error during registration:", error);
                 alert("An error occurred while registering participants. Please try again.");
+            } finally {
+                submitting = false;
+                updateSubmitChangesButton();
             }
         }
 

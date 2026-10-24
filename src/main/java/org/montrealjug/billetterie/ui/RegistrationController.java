@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -125,7 +126,25 @@ public class RegistrationController {
         @Min(2005) int yearOfBirth,
         @NotNull Long activityId,
         @NotBlank String bookerEmailSignature
-    ) {}
+    ) {
+        // the signature is the booker's access token: never log it
+        @Override
+        public String toString() {
+            return "ParticipantSubmission[firstName=%s, lastName=%s, yearOfBirth=%d, activityId=%d]".formatted(
+                firstName,
+                lastName,
+                yearOfBirth,
+                activityId
+            );
+        }
+    }
+
+    static boolean isAlreadyRegistered(Activity activity, Participant participant) {
+        return activity
+            .getParticipants()
+            .stream()
+            .anyMatch(activityParticipant -> activityParticipant.getParticipant().getId() == participant.getId());
+    }
 
     @PostMapping("/events/{eventId}/registerParticipant")
     public ResponseEntity<?> registerParticipant(
@@ -160,6 +179,12 @@ public class RegistrationController {
                     participantToCreate.setBooker(booker);
                     return participantRepository.save(participantToCreate);
                 });
+
+            // registering twice the same participant is a no-op (double submit, stale page, etc.)
+            if (isAlreadyRegistered(activity, participant)) {
+                LOGGER.info("Participant already registered, ignoring: {}", participantSub);
+                return ResponseEntity.ok().body(participantSub);
+            }
 
             // Check if both regular spots and waiting queue are full
             if (activity.getRegistrationStatus().equals(Activity.RegistrationStatus.CLOSED)) {
@@ -197,7 +222,7 @@ public class RegistrationController {
     @PostMapping("/events/{eventId}/registerParticipants")
     public ResponseEntity<?> registerParticipants(
         @PathVariable Long eventId,
-        @RequestBody @Valid List<ParticipantSubmission> participantSubs,
+        @RequestBody List<@Valid ParticipantSubmission> participantSubs,
         HttpServletRequest request
     ) {
         // Log the batch registration request
@@ -254,6 +279,12 @@ public class RegistrationController {
                         participantToCreate.setBooker(booker);
                         return participantRepository.save(participantToCreate);
                     });
+
+                // registering twice the same participant is a no-op (double submit, stale page, etc.)
+                if (isAlreadyRegistered(activity, participant)) {
+                    LOGGER.info("Participant already registered, skipping: {}", participantSub);
+                    continue;
+                }
 
                 // Create and save the ActivityParticipant entity
                 ActivityParticipant activityParticipant = new ActivityParticipant();
@@ -329,12 +360,18 @@ public class RegistrationController {
                 .findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found"));
 
-            Participant participant = booker
+            var participantToRemove = booker
                 .getParticipants()
                 .stream()
                 .filter(p -> isSameParticipant(p, participantSub))
-                .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException("Participant does not exist"));
+                .findFirst();
+            if (participantToRemove.isEmpty()) {
+                LOGGER.info("Participant to remove not found: {}", participantSub);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{\"message\":\"Participant not found\"}");
+            }
+            Participant participant = participantToRemove.get();
 
             //            Set<ActivityParticipant> activityParticipantSet = activity.getParticipants().stream().filter(activityParticipant ->
             //                    !(activityParticipant.getParticipant().getId() == participant.getId())
