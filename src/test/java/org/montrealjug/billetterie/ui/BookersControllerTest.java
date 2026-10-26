@@ -96,7 +96,7 @@ class BookersControllerTest {
         createBooker("recent-no-participant@test.org", Instant.now());
         // recent, with a participant in the active event
         var registered = createBooker("recent-with-participant@test.org", Instant.now());
-        register(registered, activity);
+        register(registered, activity, null);
 
         var count = given()
             .cookie(SESSION_COOKIE, adminSession())
@@ -132,6 +132,54 @@ class BookersControllerTest {
             .then()
             .statusCode(302)
             .header("Location", "http://localhost:" + port + "/admin/login");
+    }
+
+    @Test
+    void bookers_should_only_list_bookers_of_the_active_event_when_filtered() {
+        var activeEvent = getOrCreateActiveEvent();
+        var activeActivity = createActivity(activeEvent);
+        var pastActivity = createActivity(createPastEvent(LocalDate.now().minusDays(30)));
+        register(createBooker("active-event-booker@test.org", Instant.now()), activeActivity, null);
+        register(createBooker("past-event-booker@test.org", Instant.now()), pastActivity, null);
+        createBooker("no-participant-booker@test.org", Instant.now());
+
+        var page = bookersPage("activeEventOnly=true");
+
+        assertThat(page)
+            .contains("active-event-booker@test.org")
+            .doesNotContain("past-event-booker@test.org")
+            .doesNotContain("no-participant-booker@test.org");
+        assertThat(bookersPage("activeEventOnly=false")).contains(
+            "active-event-booker@test.org",
+            "past-event-booker@test.org",
+            "no-participant-booker@test.org"
+        );
+    }
+
+    @Test
+    void bookers_should_only_list_bookers_whose_children_never_came_when_filtered() {
+        var pastActivity = createActivity(createPastEvent(LocalDate.now().minusDays(30)));
+        register(createBooker("no-show-booker@test.org", Instant.now()), pastActivity, null);
+        register(createBooker("came-booker@test.org", Instant.now()), pastActivity, Instant.now());
+        createBooker("never-registered-booker@test.org", Instant.now());
+
+        var page = bookersPage("noShowOnly=true");
+
+        assertThat(page)
+            .contains("no-show-booker@test.org")
+            .doesNotContain("came-booker@test.org")
+            .doesNotContain("never-registered-booker@test.org");
+    }
+
+    private String bookersPage(String query) {
+        return given()
+            .cookie(SESSION_COOKIE, adminSession())
+            .when()
+            .get("/admin/bookers?" + query)
+            .then()
+            .statusCode(200)
+            .extract()
+            .asString();
     }
 
     private String adminSession() {
@@ -193,7 +241,7 @@ class BookersControllerTest {
         return bookerRepository.save(booker);
     }
 
-    private void register(Booker booker, Activity activity) {
+    private void register(Booker booker, Activity activity, Instant checkInTime) {
         var participant = new Participant();
         participant.setFirstName("Registered");
         participant.setLastName("Child");
@@ -205,6 +253,7 @@ class BookersControllerTest {
         activityParticipant.setParticipant(participant);
         activityParticipant.getActivityParticipantKey().setActivityId(activity.getId());
         activityParticipant.getActivityParticipantKey().setParticipantId(participant.getId());
+        activityParticipant.setCheckInTime(checkInTime);
         activity.getParticipants().add(activityParticipant);
         activityRepository.save(activity);
     }

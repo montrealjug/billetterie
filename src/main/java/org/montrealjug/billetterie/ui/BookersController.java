@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("admin/bookers")
@@ -69,9 +70,16 @@ public class BookersController {
     }
 
     @GetMapping("")
-    public String bookers(Model model) {
+    public String bookers(
+        Model model,
+        @RequestParam(defaultValue = "false") boolean activeEventOnly,
+        @RequestParam(defaultValue = "false") boolean noShowOnly
+    ) {
         Iterable<Booker> bookers = bookerRepository.findAll();
-        Iterable<Event> allEvents = eventRepository.findAll();
+        Optional<Event> activeEvent = eventRepository.findByActiveIsTrue();
+        List<Event> events = activeEventOnly
+            ? activeEvent.stream().toList()
+            : StreamSupport.stream(eventRepository.findAll().spliterator(), false).toList();
         List<PresentationBookerWithParticipants> presentationBookers;
         presentationBookers = StreamSupport.stream(bookers.spliterator(), false)
             .map(booker ->
@@ -80,24 +88,60 @@ public class BookersController {
                     booker.getLastName(),
                     booker.getEmail(),
                     booker.getEmailSignature(),
-                    StreamSupport.stream(allEvents.spliterator(), false).collect(
-                        Collectors.toMap(
-                            event -> event,
-                            event ->
-                                activityParticipantRepository.findAllActivityParticipantByEventIdAndBookerEmail(
-                                    event.getId(),
-                                    booker.getEmail()
-                                )
+                    events
+                        .stream()
+                        .collect(
+                            Collectors.toMap(
+                                event -> event,
+                                event ->
+                                    activityParticipantRepository.findAllActivityParticipantByEventIdAndBookerEmail(
+                                        event.getId(),
+                                        booker.getEmail()
+                                    )
+                            )
                         )
-                    )
                 )
             )
+            .filter(
+                booker ->
+                    !activeEventOnly ||
+                    booker
+                        .participants()
+                        .values()
+                        .stream()
+                        .anyMatch(p -> !p.isEmpty())
+            )
+            .filter(booker -> !noShowOnly || isNoShow(booker))
             .toList();
 
         model.addAttribute("bookerList", presentationBookers);
-        model.addAttribute("allEvents", StreamSupport.stream(allEvents.spliterator(), false).toList());
+        model.addAttribute("allEvents", events);
+        model.addAttribute("activeEvent", activeEvent.orElse(null));
+        model.addAttribute("activeEventOnly", activeEventOnly);
+        model.addAttribute("noShowOnly", noShowOnly);
 
         return "bookers-list";
+    }
+
+    // a booker who had at least one child with a seat (not on the waiting list) to an event that already took place,
+    // but none of their children were ever checked in to those events
+    static boolean isNoShow(PresentationBookerWithParticipants booker) {
+        var today = LocalDate.now(EVENT_ZONE);
+        var registrations = booker
+            .participants()
+            .entrySet()
+            .stream()
+            .filter(entry -> entry.getKey().getDate() != null && !entry.getKey().getDate().isAfter(today))
+            .flatMap(entry -> entry.getValue().stream())
+            .toList();
+        return (
+            registrations.stream().anyMatch(registration -> !isWaiting(registration)) &&
+            registrations.stream().allMatch(registration -> registration.getCheckInTime() == null)
+        );
+    }
+
+    public static boolean isWaiting(ActivityParticipant activityParticipant) {
+        return !activityParticipant.getActivity().getNonWaitingParticipants().contains(activityParticipant);
     }
 
     @PostMapping("")

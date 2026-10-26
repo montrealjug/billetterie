@@ -2,9 +2,13 @@
 @import org.montrealjug.billetterie.ui.PresentationBookerWithParticipants
 @import org.montrealjug.billetterie.entity.Event
 @import org.montrealjug.billetterie.entity.ActivityParticipant
+@import org.montrealjug.billetterie.ui.BookersController
 
 @param List<PresentationBookerWithParticipants> bookerList
 @param List<Event> allEvents
+@param Event activeEvent = null
+@param boolean activeEventOnly = false
+@param boolean noShowOnly = false
 
 @template.layouts.admin_layout(title = "Booker List",content = @`
 
@@ -13,7 +17,21 @@
     <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
         <div class="flex flex-col items-center mb-6">
             <h1 class="text-2xl font-bold">Booker List</h1>
-            <p>Total number of bookers: ${bookerList.size()}</p>
+            <p>Total number of bookers@if(activeEventOnly || noShowOnly) (filtered)@endif: ${bookerList.size()}</p>
+            <form method="GET" action="/admin/bookers" class="flex flex-wrap gap-4 my-3 text-sm">
+                <label class="flex items-center gap-1">
+                    <input type="checkbox" name="activeEventOnly" value="true" checked="${activeEventOnly}" onchange="this.form.submit()">
+                    Active event only@if(activeEvent != null) (${activeEvent.getTitle()})@endif
+                </label>
+                <label class="flex items-center gap-1" title="Bookers with at least one child with a seat to an event that already took place, but none of their children were checked in">
+                    <input type="checkbox" name="noShowOnly" value="true" checked="${noShowOnly}" onchange="this.form.submit()">
+                    Registered, but never came (no check-in)
+                </label>
+                <noscript><button type="submit" class="underline">Apply</button></noscript>
+            </form>
+            @if(activeEventOnly && activeEvent == null)
+                <p class="text-red-500 text-sm mb-2">There is no active event.</p>
+            @endif
             <div class="flex gap-2">
                 <a href="/admin/bookers/add-booker"
                    class="bg-green-500 text-white font-medium px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
@@ -56,6 +74,13 @@
                                         @for(ActivityParticipant participant : participants.get(event))
                                             <li class="flex justify-between items-center">
                                                 <span>${participant.getParticipant().getFirstName()} ${participant.getParticipant().getLastName()} - ${participant.getActivity().getTitle()}</span>
+                                                @if(participant.getCheckInTime() != null)
+                                                    <span class="text-xs bg-green-100 text-green-800 px-2 rounded">checked in</span>
+                                                @elseif(BookersController.isWaiting(participant))
+                                                    <span class="text-xs bg-yellow-100 text-yellow-800 px-2 rounded">waiting list</span>
+                                                @else
+                                                    <span class="text-xs bg-gray-200 text-gray-700 px-2 rounded">not checked in</span>
+                                                @endif
                                             </li>
                                         @endfor
                                     </ul>
