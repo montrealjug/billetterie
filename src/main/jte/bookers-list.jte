@@ -19,9 +19,13 @@
                    class="bg-green-500 text-white font-medium px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
                     Add booker
                 </a>
-                <button onclick="displayReminderEmailModal()"
+                <button onclick="displayReminderEmailModal('participants')"
                    class="bg-red-500 text-white font-medium px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
                     Send reminder to all bookers for active event
+                </button>
+                <button onclick="displayReminderEmailModal('noParticipants')"
+                   class="bg-red-500 text-white font-medium px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
+                    Contact recent bookers without registrations
                 </button>
             </div>
         </div>
@@ -66,7 +70,25 @@
 `)
 
 <script>
-    function displayReminderEmailModal() {
+    // the reminder emails that can be sent from this page
+    const REMINDERS = {
+        participants: {
+            title: "Send Reminder Email",
+            question: "Are you sure you want to send a reminder email to all bookers registered for the active event?",
+            url: "/admin/bookers/sendReminderEmail",
+            successMessage: () => "Successfully triggered reminder emails",
+        },
+        noParticipants: {
+            title: "Contact Recent Bookers",
+            question: "Are you sure you want to send an email to all bookers who registered their email since the previous event, but no participant to the active event?",
+            url: "/admin/bookers/sendNoParticipantReminderEmail",
+            successMessage: (body) => "Successfully triggered " + body.count + " email(s)",
+        },
+    };
+    let currentReminder = null;
+
+    function displayReminderEmailModal(reminderKey) {
+        currentReminder = REMINDERS[reminderKey];
         // Create the modal elements
         const modal = document.createElement("div");
         modal.id = "reminder-email-modal";
@@ -74,18 +96,18 @@
         @raw
         modal.innerHTML = `
         <div class="bg-white rounded-lg shadow-md p-6 w-96">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4">Send Reminder Email</h2>
-            <p class="text-gray-800 text-sm mb-4">
-                Are you sure you want to send a reminder email to all bookers registered for the active event?
-            </p>
+            <h2 id="reminder-email-title" class="text-lg font-semibold text-gray-800 mb-4"></h2>
+            <p id="reminder-email-question" class="text-gray-800 text-sm mb-4"></p>
             <div id="modal-message" class="text-green-500 text-sm mb-4 hidden"></div>
             <div class="flex justify-end gap-2">
-                <button type="button" onclick="closeReminderEmailModal()" class="bg-gray-300 text-gray-700 px-3 py-1 rounded hover:bg-gray-400 focus:outline-none focus:ring">Cancel</button>
-                <button type="button" onclick="sendReminderEmail()" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">Send</button>
+                <button id="reminder-email-cancel" type="button" onclick="closeReminderEmailModal()" class="bg-gray-300 text-gray-700 px-3 py-1 rounded hover:bg-gray-400 focus:outline-none focus:ring">Cancel</button>
+                <button id="reminder-email-send" type="button" onclick="sendReminderEmail()" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">Send</button>
             </div>
         </div>
         `;
         @endraw
+        modal.querySelector("#reminder-email-title").textContent = currentReminder.title;
+        modal.querySelector("#reminder-email-question").textContent = currentReminder.question;
         // add the modal in DOM
         document.body.appendChild(modal);
     }
@@ -97,17 +119,26 @@
         }
     }
 
-    async function sendReminderEmail() {
-        try {
-            const sendButton = document.querySelector("#reminder-email-modal button[onclick='sendReminderEmail()']");
-            const cancelButton = document.querySelector("#reminder-email-modal button[onclick='closeReminderEmailModal()']");
-            const modalMessage = document.getElementById("modal-message");
+    function showReminderError(message) {
+        const modalMessage = document.getElementById("modal-message");
+        modalMessage.textContent = message;
+        modalMessage.classList.remove("hidden");
+        modalMessage.classList.add("text-red-500");
+        modalMessage.classList.remove("text-green-500");
+        document.getElementById("reminder-email-send").disabled = false;
+        document.getElementById("reminder-email-cancel").disabled = false;
+    }
 
+    async function sendReminderEmail() {
+        const sendButton = document.getElementById("reminder-email-send");
+        const cancelButton = document.getElementById("reminder-email-cancel");
+        const modalMessage = document.getElementById("modal-message");
+        try {
             // Disable buttons while processing
             sendButton.disabled = true;
             cancelButton.disabled = true;
 
-            const response = await fetch("/admin/bookers/sendReminderEmail", {
+            const response = await fetch(currentReminder.url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -115,29 +146,18 @@
             });
 
             if (response.status === 201) {
-                modalMessage.textContent = "Successfully triggered reminder emails";
+                const body = await response.json().catch(() => ({}));
+                modalMessage.textContent = currentReminder.successMessage(body);
                 modalMessage.classList.remove("hidden");
+                // the emails are sent: only allow closing the modal
                 cancelButton.disabled = false;
                 sendButton.disabled = true;
             } else {
-                modalMessage.textContent = "Error sending reminder emails. Please try again.";
-                modalMessage.classList.remove("hidden");
-                modalMessage.classList.add("text-red-500");
-                modalMessage.classList.remove("text-green-500");
-                sendButton.disabled = false;
-                cancelButton.disabled = false;
+                showReminderError("Error sending reminder emails. Please try again.");
             }
         } catch (error) {
             console.error("Error sending reminder emails:", error);
-            const modalMessage = document.getElementById("modal-message");
-            modalMessage.textContent = "An error occurred. Please try again.";
-            modalMessage.classList.remove("hidden");
-            modalMessage.classList.add("text-red-500");
-            modalMessage.classList.remove("text-green-500");
-
-            // Re-enable buttons
-            document.querySelector("#reminder-email-modal button[onclick='sendReminderEmail()']").disabled = false;
-            document.querySelector("#reminder-email-modal button[onclick='closeReminderEmailModal()']").disabled = false;
+            showReminderError("An error occurred. Please try again.");
         }
     }
 </script>

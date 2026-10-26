@@ -1,0 +1,20 @@
+Devoxx4Kids Québec, il est encore temps d'inscrire vos enfants (English version will follow):
+
+Bonjour booker-firstName-é booker-lastName-ü,
+Le 02/09/2026 à 10:05 a.m., vous avez enregistré votre adresse courriel auprès de Devoxx4Kids Québec, mais vous n'avez encore inscrit aucun enfant à Test Event, le 14/11/2026.
+Il est encore temps de le faire ! Utilisez ce lien personnel pour inscrire votre(vos) enfant(s) aux activités : base_url/bookings/signature
+
+Vous ne souhaitez plus recevoir nos courriels, ou vous vous êtes inscrit(e) avec une autre adresse ? Vous pouvez supprimer cette adresse de notre système : base_url/bookings/signature/delete
+
+L'équipe Devoxx4Kids Québec.
+
+English version:
+Devoxx4Kids Québec, there's still time to register your children:
+
+Hi booker-firstName-é booker-lastName-ü,
+On 09/02/2026 at 10:05 a.m., you registered your email address with Devoxx4Kids Québec, but you haven't registered any child to Test Event, on 11/14/2026 yet.
+There's still time! Use this personal link to register your child(ren) to the activities: base_url/bookings/signature
+
+You no longer want to receive our emails, or you registered with another address? You can delete this address from our system: base_url/bookings/signature/delete
+
+The Devoxx4Kids Québec team.

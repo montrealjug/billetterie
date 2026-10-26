@@ -4,6 +4,7 @@ package org.montrealjug.billetterie.email;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import gg.jte.TemplateEngine;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
@@ -62,7 +63,11 @@ class EmailWriterTest {
     }
 
     static Stream<Arguments> emails() {
-        return Stream.of(Arguments.of(forAfterBooking()), Arguments.of(forReturningBooker()));
+        return Stream.of(
+            Arguments.of(forAfterBooking()),
+            Arguments.of(forReturningBooker()),
+            Arguments.of(forNoParticipantReminder())
+        );
     }
 
     static Email forAfterBooking() {
@@ -99,6 +104,20 @@ class EmailWriterTest {
         secondActivityParticipant.getActivityParticipantKey().setParticipantId(secondParticipant.getId());
         var participants = Set.of(firstActivityParticipant, secondActivityParticipant);
         return Email.afterBooking(booker, event, participants);
+    }
+
+    static Email forNoParticipantReminder() {
+        var event = new Event();
+        event.setDate(LocalDate.of(2026, 11, 14));
+        event.setTitle("Test Event");
+        var booker = new Booker();
+        booker.setEmail("email@test.org");
+        booker.setFirstName("booker-firstName-é");
+        booker.setLastName("booker-lastName-ü");
+        booker.setEmailSignature("signature");
+        // 10:05 in Montréal
+        booker.setCreationTime(Instant.parse("2026-09-02T14:05:00Z"));
+        return Email.noParticipantReminder(booker, event, "base_url");
     }
 
     static Email forReturningBooker() {

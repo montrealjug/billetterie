@@ -515,6 +515,52 @@ public class RegistrationController {
         }
     }
 
+    // the booker can delete their email from our system, only if they never registered any participant:
+    // we keep the registrations (and check-ins) history of the events
+    enum BookerDeletionState {
+        CONFIRM,
+        DELETED,
+        HAS_REGISTRATIONS,
+        NOT_FOUND,
+    }
+
+    // only displays a confirmation: links in emails can be opened by mail scanners
+    @GetMapping("/bookings/{signature}/delete")
+    public String confirmBookerDeletion(@PathVariable String signature, Model model) {
+        var state = bookerRepository
+            .findByEmailSignature(signature)
+            .map(booker -> {
+                model.addAttribute("email", booker.getEmail());
+                return activityParticipantRepository.existsByParticipantBookerEmail(booker.getEmail())
+                    ? BookerDeletionState.HAS_REGISTRATIONS
+                    : BookerDeletionState.CONFIRM;
+            })
+            .orElse(BookerDeletionState.NOT_FOUND);
+        model.addAttribute("state", state.name());
+        model.addAttribute("signature", signature);
+        return "booker-delete";
+    }
+
+    @PostMapping("/bookings/{signature}/delete")
+    public String deleteBooker(@PathVariable String signature, Model model) {
+        var state = bookerRepository
+            .findByEmailSignature(signature)
+            .map(booker -> {
+                model.addAttribute("email", booker.getEmail());
+                if (activityParticipantRepository.existsByParticipantBookerEmail(booker.getEmail())) {
+                    return BookerDeletionState.HAS_REGISTRATIONS;
+                }
+                // also deletes their participants, none of them being registered to an activity
+                bookerRepository.delete(booker);
+                LOGGER.info("Booker deleted their email from the system");
+                return BookerDeletionState.DELETED;
+            })
+            .orElse(BookerDeletionState.NOT_FOUND);
+        model.addAttribute("state", state.name());
+        model.addAttribute("signature", signature);
+        return "booker-delete";
+    }
+
     static String retrieveBaseUrl(HttpServletRequest request) {
         String requestURL = request.getRequestURL().toString();
         String requestURI = request.getRequestURI();

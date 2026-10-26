@@ -21,4 +21,7 @@ public interface ActivityParticipantRepository extends CrudRepository<ActivityPa
         @Param("eventId") long eventId,
         @Param("bookerEmail") String bookerEmail
     );
+
+    // whether the booker has (or had) any participant registered to any activity
+    boolean existsByParticipantBookerEmail(String bookerEmail);
 }

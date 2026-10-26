@@ -4,6 +4,8 @@ package org.montrealjug.billetterie.email;
 import jakarta.mail.internet.InternetAddress;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.Temporal;
@@ -32,6 +34,9 @@ public class EmailModel {
         Locale.CANADA_FRENCH
     );
 
+    // the events take place in Montréal
+    private static final ZoneId EVENT_ZONE = ZoneId.of("America/Toronto");
+
     private EmailModel() {
         // model class
     }
@@ -42,7 +47,8 @@ public class EmailModel {
         AFTER_PARTICIPANTS_CHANGES,
         PARTICIPANT_UPGRADED,
         RETURNING_BOOKER,
-        LAST_REMINDER;
+        LAST_REMINDER,
+        NO_PARTICIPANT_REMINDER;
 
         public String subjectKey() {
             return this.name().toLowerCase();
@@ -127,6 +133,10 @@ public class EmailModel {
             byte[] qrCode
         ) {
             return new LastReminderEmail(booker, participants, event, baseUrl, Optional.of(qrCode));
+        }
+
+        static Email noParticipantReminder(Booker booker, Event event, String baseUrl) {
+            return new NoParticipantReminderEmail(booker, event, baseUrl);
         }
 
         private static InternetAddress fromBooker(Booker booker) {
@@ -264,6 +274,33 @@ public class EmailModel {
 
         public String registrationLink() {
             return baseUrl + "/bookings/" + booker.getEmailSignature();
+        }
+    }
+
+    // sent to bookers who registered their email but no participant to the active event
+    public record NoParticipantReminderEmail(Booker booker, Event event, String baseUrl) implements Email {
+        @Override
+        public EmailType type() {
+            return EmailType.NO_PARTICIPANT_REMINDER;
+        }
+
+        @Override
+        public InternetAddress to() {
+            return Email.fromBooker(booker);
+        }
+
+        public String registrationLink() {
+            return baseUrl + "/bookings/" + booker.getEmailSignature();
+        }
+
+        // lets the booker remove their email from our system (wrong address, changed their mind, etc.)
+        public String deletionLink() {
+            return baseUrl + "/bookings/" + booker.getEmailSignature() + "/delete";
+        }
+
+        // when the booker registered their email, in Montréal time
+        public ZonedDateTime bookerRegistrationTime() {
+            return booker.getCreationTime().atZone(EVENT_ZONE);
         }
     }
 

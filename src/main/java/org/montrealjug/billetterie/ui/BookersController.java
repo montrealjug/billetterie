@@ -9,7 +9,11 @@ import jakarta.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -37,6 +41,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("admin/bookers")
 public class BookersController {
+
+    // the events take place in Montréal
+    private static final ZoneId EVENT_ZONE = ZoneId.of("America/Toronto");
 
     private final BookerRepository bookerRepository;
     private final SignatureService signatureService;
@@ -168,6 +175,42 @@ public class BookersController {
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    // bookers who registered their email since the previous event, but no participant to the active event
+    @PostMapping("/sendNoParticipantReminderEmail")
+    public ResponseEntity<Map<String, Integer>> sendNoParticipantReminderEmail(HttpServletRequest request) {
+        var activeEvent = eventRepository.findByActiveIsTrue();
+        if (activeEvent.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("count", 0));
+        }
+        var bookers = recentBookersWithoutParticipants(activeEvent.get());
+        bookers.forEach(booker ->
+            emailService.sendEmail(
+                EmailModel.Email.noParticipantReminder(booker, activeEvent.get(), retrieveBaseUrl(request))
+            )
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("count", bookers.size()));
+    }
+
+    List<Booker> recentBookersWithoutParticipants(Event activeEvent) {
+        var activeEventDate = Optional.ofNullable(activeEvent.getDate()).orElse(LocalDate.now(EVENT_ZONE));
+        // "recent": registered after the day of the previous event (or any time if there is no previous event)
+        var registeredSince = StreamSupport.stream(eventRepository.findAll().spliterator(), false)
+            .filter(event -> event.getId() != activeEvent.getId())
+            .map(Event::getDate)
+            .filter(date -> date != null && date.isBefore(activeEventDate))
+            .max(Comparator.naturalOrder())
+            .map(previousEventDate -> previousEventDate.plusDays(1).atStartOfDay(EVENT_ZONE).toInstant())
+            .orElse(Instant.MIN);
+        return StreamSupport.stream(bookerRepository.findAll().spliterator(), false)
+            .filter(booker -> !booker.getCreationTime().isBefore(registeredSince))
+            .filter(booker ->
+                activityParticipantRepository
+                    .findAllActivityParticipantByEventIdAndBookerEmail(activeEvent.getId(), booker.getEmail())
+                    .isEmpty()
+            )
+            .toList();
     }
 
     @PostMapping("{email}")

@@ -471,6 +471,78 @@ class RegistrationControllerTest {
         assertThat(participant.toString()).doesNotContain("secret-signature").contains("First", "Last", "42");
     }
 
+    @Test
+    void confirmBookerDeletion_should_only_display_a_confirmation() {
+        createBooker("delete-confirm@test.org", false);
+
+        var html = given()
+            .when()
+            .get("/bookings/{signature}/delete", SIGNATURE)
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .contentType(ContentType.HTML)
+            .extract()
+            .asString();
+
+        assertThat(html).contains("delete-confirm@test.org").contains("action=\"/bookings/signature/delete\"");
+        // a GET (e.g. a mail scanner opening the link) must not delete anything
+        assertTrue(bookerRepository.existsById("delete-confirm@test.org"));
+    }
+
+    @Test
+    void deleteBooker_should_delete_a_booker_without_registrations() {
+        createBooker("delete-me@test.org", true);
+
+        var html = given()
+            .when()
+            .post("/bookings/{signature}/delete", SIGNATURE)
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .extract()
+            .asString();
+
+        assertThat(html).contains("has been deleted from our system");
+        assertFalse(bookerRepository.existsById("delete-me@test.org"));
+    }
+
+    @Test
+    void deleteBooker_should_keep_a_booker_with_registrations() {
+        createBooker("delete-registered@test.org", true);
+        var event = createEventWithActivity();
+        var activityId = event.getActivities().getFirst().getId();
+        given()
+            .contentType(ContentType.JSON)
+            .body(List.of(new ParticipantSubmission("Registered", "Child", 2018, activityId, SIGNATURE)))
+            .when()
+            .post("/events/{eventId}/registerParticipants", event.getId())
+            .then()
+            .statusCode(HttpStatus.OK.value());
+
+        var html = given()
+            .when()
+            .post("/bookings/{signature}/delete", SIGNATURE)
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .extract()
+            .asString();
+
+        assertThat(html).contains("can't be deleted");
+        assertTrue(bookerRepository.existsById("delete-registered@test.org"));
+    }
+
+    @Test
+    void deleteBooker_should_handle_an_unknown_signature() {
+        var html = given()
+            .when()
+            .post("/bookings/{signature}/delete", "unknown-signature")
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .extract()
+            .asString();
+
+        assertThat(html).contains("doesn't exist (anymore) in our system");
+    }
+
     private Event createEventWithActivity() {
         var event = new Event();
         event.setTitle("Test Event (not active)");
