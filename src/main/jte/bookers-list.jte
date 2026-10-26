@@ -21,7 +21,7 @@
                 </a>
                 <button onclick="displayReminderEmailModal()"
                    class="bg-red-500 text-white font-medium px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
-                    Send reminder email to all bookers
+                    Send reminder to all bookers for active event
                 </button>
             </div>
         </div>
@@ -76,7 +76,7 @@
         <div class="bg-white rounded-lg shadow-md p-6 w-96">
             <h2 class="text-lg font-semibold text-gray-800 mb-4">Send Reminder Email</h2>
             <p class="text-gray-800 text-sm mb-4">
-                Are you sure you want to send a reminder email to all bookers?
+                Are you sure you want to send a reminder email to all bookers registered for the active event?
             </p>
             <div id="modal-message" class="text-green-500 text-sm mb-4 hidden"></div>
             <div class="flex justify-end gap-2">
