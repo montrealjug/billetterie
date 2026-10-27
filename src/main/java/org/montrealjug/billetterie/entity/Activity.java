@@ -104,7 +104,8 @@ public class Activity implements Comparable<Activity> {
     @Transient
     public List<ActivityParticipant> getWaitingParticipants() {
         // ensure that `ActivityParticipant` are lazy-load if needed
-        return this.getParticipants().stream().skip(this.maxParticipants).limit(this.maxWaitingQueue).toList();
+        // not limited to `maxWaitingQueue`: participants registered beyond it must stay visible (and removable)
+        return this.getParticipants().stream().skip(this.maxParticipants).toList();
     }
 
     public enum RegistrationStatus {
@@ -118,9 +119,10 @@ public class Activity implements Comparable<Activity> {
         // ensure that we will lazy-load ActivityParticipant if needed
         var nbParticipants = getParticipants().size();
         final RegistrationStatus registrationStatus;
-        if (nbParticipants <= this.maxParticipants) {
+        // the status of the next registration: OPEN while a seat is left, WAITING_LIST while a waiting spot is left
+        if (nbParticipants < this.maxParticipants) {
             registrationStatus = RegistrationStatus.OPEN;
-        } else if (nbParticipants <= this.maxParticipants + this.maxWaitingQueue) {
+        } else if (nbParticipants < this.maxParticipants + this.maxWaitingQueue) {
             registrationStatus = RegistrationStatus.WAITING_LIST;
         } else {
             registrationStatus = RegistrationStatus.CLOSED;

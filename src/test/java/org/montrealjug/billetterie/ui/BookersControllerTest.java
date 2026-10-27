@@ -4,8 +4,8 @@ package org.montrealjug.billetterie.ui;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.after;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
@@ -44,6 +44,8 @@ class BookersControllerTest {
 
     // see `src/test/resources/application.yml`
     static final String SESSION_COOKIE = "BILLETTERIE_SESSION";
+    // `EmailService.sendEmail` is `@Async`: the emails are sent after the HTTP response
+    static final long EMAIL_TIMEOUT_MS = 1000;
 
     @LocalServerPort
     int port;
@@ -112,7 +114,8 @@ class BookersControllerTest {
             .getInt("count");
 
         var captor = ArgumentCaptor.forClass(Email.class);
-        verify(emailService, atLeastOnce()).sendEmail(captor.capture());
+        // one email per booker, sent asynchronously
+        verify(emailService, timeout(EMAIL_TIMEOUT_MS).times(count)).sendEmail(captor.capture());
         var emailedTestBookers = captor
             .getAllValues()
             .stream()
@@ -204,7 +207,7 @@ class BookersControllerTest {
 
         deleteParticipant(activity, waiting);
 
-        verify(emailService, never()).sendEmail(any());
+        verify(emailService, after(EMAIL_TIMEOUT_MS).never()).sendEmail(any());
         assertThat(participantRepository.findById(waiting.getId())).isPresent();
         assertThat(bookersPage("activeEventOnly=true")).doesNotContain("waiting-booker@test.org");
     }
@@ -218,7 +221,7 @@ class BookersControllerTest {
         deleteParticipant(activity, seated);
 
         var captor = ArgumentCaptor.forClass(Email.class);
-        verify(emailService).sendEmail(captor.capture());
+        verify(emailService, timeout(EMAIL_TIMEOUT_MS)).sendEmail(captor.capture());
         assertThat(captor.getValue().type()).isEqualTo(EmailType.PARTICIPANT_UPGRADED);
         assertThat(captor.getValue().to().getAddress()).isEqualTo("waiting-booker@test.org");
     }
@@ -235,7 +238,7 @@ class BookersControllerTest {
             .delete("/admin/activities/" + otherActivity.getId() + "/participants/" + participant.getId())
             .then()
             .statusCode(HttpStatus.NOT_FOUND.value());
-        verify(emailService, never()).sendEmail(any());
+        verify(emailService, after(EMAIL_TIMEOUT_MS).never()).sendEmail(any());
     }
 
     private void deleteParticipant(Activity activity, Participant participant) {

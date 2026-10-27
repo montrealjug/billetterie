@@ -30,6 +30,8 @@ jobs:
             **/target/surefire-reports
 
   deploy:
+    # only deploy what passed the tests
+    needs: build-and-run-tests
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 

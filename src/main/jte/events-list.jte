@@ -116,7 +116,7 @@
                                                     @for(ActivityParticipant activityParticipant : activity.participants())
                                                         !{var participant = activityParticipant.getParticipant(); }
                                                         <li class="flex justify-between items-center mb-1">
-                                                            <span>${participant.getFirstName()} ${participant.getLastName()}, aged ${participant.getAge()} - Booker: <a href="http://localhost:8080/admin/bookers/${participant.getBooker().getEmail()}">${participant.getBooker().getFirstName()} ${participant.getBooker().getLastName()} (${participant.getBooker().getEmail()})</a></span>
+                                                            <span>${participant.getFirstName()} ${participant.getLastName()}, aged ${participant.getAge()} - Booker: <a href="/admin/bookers/${participant.getBooker().getEmail()}">${participant.getBooker().getFirstName()} ${participant.getBooker().getLastName()} (${participant.getBooker().getEmail()})</a></span>
                                                             <div class="flex space-x-2">
                                                                 <button onclick="deleteParticipant(${participant.getId()})"
                                                                         data-activity-id="${activity.id()}"
@@ -136,7 +136,7 @@
                                                     @for(ActivityParticipant activityParticipant : activity.waitingParticipants())
                                                         !{var participant = activityParticipant.getParticipant(); }
                                                         <li class="flex justify-between items-center mb-1 text-orange-600">
-                                                            <span>${participant.getFirstName()} ${participant.getLastName()}, aged ${participant.getAge()} - Booker: <a href="http://localhost:8080/admin/bookers/${participant.getBooker().getEmail()}" class="text-orange-800">${participant.getBooker().getFirstName()} ${participant.getBooker().getLastName()} (${participant.getBooker().getEmail()})</a> (waiting)</span>
+                                                            <span>${participant.getFirstName()} ${participant.getLastName()}, aged ${participant.getAge()} - Booker: <a href="/admin/bookers/${participant.getBooker().getEmail()}" class="text-orange-800">${participant.getBooker().getFirstName()} ${participant.getBooker().getLastName()} (${participant.getBooker().getEmail()})</a> (waiting)</span>
                                                             <div class="flex space-x-2">
                                                                 <button onclick="deleteParticipant(${participant.getId()})"
                                                                         data-activity-id="${activity.id()}"

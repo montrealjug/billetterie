@@ -7,6 +7,9 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.after;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -90,6 +93,9 @@ class RegistrationControllerTest {
 
     @MockitoSpyBean
     EmailService emailService;
+
+    // `EmailService.sendEmail` is `@Async`: the emails are sent after the HTTP response
+    static final long EMAIL_TIMEOUT_MS = 1000;
 
     // Spring Boot 4 no longer processes Mockito's `@Captor` in Spring tests, so we create it explicitly
     ArgumentCaptor<Email> emailCaptor = ArgumentCaptor.forClass(Email.class);
@@ -184,7 +190,7 @@ class RegistrationControllerTest {
             .then()
             .statusCode(HttpStatus.NOT_FOUND.value());
 
-        verifyNoInteractions(emailService);
+        verify(emailService, after(EMAIL_TIMEOUT_MS).never()).sendEmail(any());
     }
 
     @Test
@@ -201,7 +207,7 @@ class RegistrationControllerTest {
             .then()
             .statusCode(HttpStatus.NO_CONTENT.value());
 
-        verify(emailService).sendEmail(emailCaptor.capture());
+        verify(emailService, timeout(EMAIL_TIMEOUT_MS)).sendEmail(emailCaptor.capture());
         assertThat(emailCaptor.getValue().type()).isSameAs(EmailType.RETURNING_BOOKER);
     }
 
@@ -219,7 +225,7 @@ class RegistrationControllerTest {
             .then()
             .statusCode(HttpStatus.NO_CONTENT.value());
 
-        verify(emailService).sendEmail(emailCaptor.capture());
+        verify(emailService, timeout(EMAIL_TIMEOUT_MS)).sendEmail(emailCaptor.capture());
         assertThat(emailCaptor.getValue().type()).isSameAs(EmailType.AFTER_REGISTRATION);
     }
 
@@ -247,7 +253,7 @@ class RegistrationControllerTest {
             assertThat(b.getEmailSignature()).isEqualTo(SIGNATURE);
             assertThat(b.getValidationTime()).isNull();
         });
-        verify(emailService).sendEmail(emailCaptor.capture());
+        verify(emailService, timeout(EMAIL_TIMEOUT_MS)).sendEmail(emailCaptor.capture());
         assertThat(emailCaptor.getValue().type()).isSameAs(EmailType.AFTER_REGISTRATION);
     }
 
@@ -264,7 +270,8 @@ class RegistrationControllerTest {
             .post("/register-booker")
             .then()
             .statusCode(HttpStatus.CONFLICT.value());
-        verifyNoInteractions(emailService, signatureService);
+        verify(emailService, after(EMAIL_TIMEOUT_MS).never()).sendEmail(any());
+        verifyNoInteractions(signatureService);
     }
 
     @Test
