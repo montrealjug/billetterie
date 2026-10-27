@@ -3,7 +3,9 @@ package org.montrealjug.billetterie.ui;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
@@ -171,6 +173,80 @@ class BookersControllerTest {
             .doesNotContain("never-registered-booker@test.org");
     }
 
+    @Test
+    void checkInPage_should_offer_to_remove_regular_and_waiting_participants() {
+        var activity = createActivity(getOrCreateActiveEvent(), 1);
+        var booker = createBooker("check-in-booker@test.org", Instant.now());
+        var seated = register(booker, activity, null);
+        var waiting = register(booker, activity, null);
+
+        var page = given()
+            .cookie(SESSION_COOKIE, adminSession())
+            .when()
+            .get("/admin/bookings/" + booker.getEmailSignature())
+            .then()
+            .statusCode(200)
+            .extract()
+            .asString();
+
+        assertThat(page).contains(
+            "data-participant-id=\"" + seated.getId() + "\"",
+            "data-participant-id=\"" + waiting.getId() + "\""
+        );
+        assertThat(page.split("remove-participant-button")).hasSize(1 + 2 + 1); // 2 buttons + the script selector
+    }
+
+    @Test
+    void deleteParticipant_should_not_send_upgrade_email_when_removing_a_waiting_participant() {
+        var activity = createActivity(getOrCreateActiveEvent(), 1);
+        register(createBooker("seated-booker@test.org", Instant.now()), activity, null);
+        var waiting = register(createBooker("waiting-booker@test.org", Instant.now()), activity, null);
+
+        deleteParticipant(activity, waiting);
+
+        verify(emailService, never()).sendEmail(any());
+        assertThat(participantRepository.findById(waiting.getId())).isPresent();
+        assertThat(bookersPage("activeEventOnly=true")).doesNotContain("waiting-booker@test.org");
+    }
+
+    @Test
+    void deleteParticipant_should_send_upgrade_email_to_the_first_waiting_participant_when_freeing_a_seat() {
+        var activity = createActivity(getOrCreateActiveEvent(), 1);
+        var seated = register(createBooker("seated-booker@test.org", Instant.now()), activity, null);
+        register(createBooker("waiting-booker@test.org", Instant.now()), activity, null);
+
+        deleteParticipant(activity, seated);
+
+        var captor = ArgumentCaptor.forClass(Email.class);
+        verify(emailService).sendEmail(captor.capture());
+        assertThat(captor.getValue().type()).isEqualTo(EmailType.PARTICIPANT_UPGRADED);
+        assertThat(captor.getValue().to().getAddress()).isEqualTo("waiting-booker@test.org");
+    }
+
+    @Test
+    void deleteParticipant_should_return_404_for_a_participant_not_in_the_activity() {
+        var activity = createActivity(getOrCreateActiveEvent(), 1);
+        var participant = register(createBooker("seated-booker@test.org", Instant.now()), activity, null);
+        var otherActivity = createActivity(getOrCreateActiveEvent(), 1);
+
+        given()
+            .cookie(SESSION_COOKIE, adminSession())
+            .when()
+            .delete("/admin/activities/" + otherActivity.getId() + "/participants/" + participant.getId())
+            .then()
+            .statusCode(HttpStatus.NOT_FOUND.value());
+        verify(emailService, never()).sendEmail(any());
+    }
+
+    private void deleteParticipant(Activity activity, Participant participant) {
+        given()
+            .cookie(SESSION_COOKIE, adminSession())
+            .when()
+            .delete("/admin/activities/" + activity.getId() + "/participants/" + participant.getId())
+            .then()
+            .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
     private String bookersPage(String query) {
         return given()
             .cookie(SESSION_COOKIE, adminSession())
@@ -218,12 +294,16 @@ class BookersControllerTest {
     }
 
     private Activity createActivity(Event event) {
+        return createActivity(event, 12);
+    }
+
+    private Activity createActivity(Event event, int maxParticipants) {
         var activity = new Activity();
         activity.setTitle("Test Activity");
         activity.setDescription("Test Description");
         activity.setEvent(event);
         activity.setStartTime(LocalDateTime.now().plusDays(1));
-        activity.setMaxParticipants(12);
+        activity.setMaxParticipants(maxParticipants);
         activity.setMaxWaitingQueue(12);
         activity = activityRepository.save(activity);
         createdActivityIds.add(activity.getId());
@@ -241,7 +321,7 @@ class BookersControllerTest {
         return bookerRepository.save(booker);
     }
 
-    private void register(Booker booker, Activity activity, Instant checkInTime) {
+    private Participant register(Booker booker, Activity activity, Instant checkInTime) {
         var participant = new Participant();
         participant.setFirstName("Registered");
         participant.setLastName("Child");
@@ -256,5 +336,6 @@ class BookersControllerTest {
         activityParticipant.setCheckInTime(checkInTime);
         activity.getParticipants().add(activityParticipant);
         activityRepository.save(activity);
+        return participant;
     }
 }

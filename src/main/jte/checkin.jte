@@ -81,7 +81,7 @@ content = @`
                                                 <span class="font-medium">Regular participants:</span>
                                                 @for(ActivityParticipant activityParticipant : activity.participants())
                                                     !{var participant = activityParticipant.getParticipant(); }
-                                                    <li class="flex items-center">
+                                                    <li class="flex items-center mb-1">
                                                         <input type="checkbox"
                                                                id="checkin-${activity.id()}-${participant.getId()}"
                                                                class="mr-2 checkin-checkbox"
@@ -92,6 +92,13 @@ content = @`
                                                         <label for="checkin-${activity.id()}-${participant.getId()}">
                                                             ${participant.getFirstName()} ${participant.getLastName()}, born in ${participant.getYearOfBirth()}
                                                         </label>
+                                                        <button type="button"
+                                                                class="remove-participant-button ml-auto bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300"
+                                                                data-activity-id="${activity.id()}"
+                                                                data-participant-id="${participant.getId()}"
+                                                                data-participant-name="${participant.getFirstName()} ${participant.getLastName()}">
+                                                            Remove
+                                                        </button>
                                                     </li>
                                                 @endfor
                                             </div>
@@ -103,7 +110,7 @@ content = @`
                                                 <span class="font-medium text-orange-600">Waiting list:</span>
                                                 @for(ActivityParticipant activityParticipant : activity.waitingParticipants())
                                                     !{var participant = activityParticipant.getParticipant(); }
-                                                    <li class="flex items-center text-orange-600">
+                                                    <li class="flex items-center mb-1 text-orange-600">
                                                         <input type="checkbox"
                                                                id="checkin-${activity.id()}-${participant.getId()}"
                                                                class="mr-2 checkin-checkbox"
@@ -114,6 +121,13 @@ content = @`
                                                         <label for="checkin-${activity.id()}-${participant.getId()}">
                                                             ${participant.getFirstName()} ${participant.getLastName()}, born in ${participant.getYearOfBirth()} (waiting)
                                                         </label>
+                                                        <button type="button"
+                                                                class="remove-participant-button ml-auto bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300"
+                                                                data-activity-id="${activity.id()}"
+                                                                data-participant-id="${participant.getId()}"
+                                                                data-participant-name="${participant.getFirstName()} ${participant.getLastName()}">
+                                                            Remove
+                                                        </button>
                                                     </li>
                                                 @endfor
                                             </div>
@@ -141,7 +155,38 @@ content = @`
         checkboxes.forEach(checkbox => {
             checkbox.addEventListener('change', handleCheckInChange);
         });
+        document.querySelectorAll('.remove-participant-button').forEach(button => {
+            button.addEventListener('click', handleRemoveParticipant);
+        });
     });
+
+    async function handleRemoveParticipant(event) {
+        const button = event.currentTarget;
+        const activityId = button.getAttribute('data-activity-id');
+        const participantId = button.getAttribute('data-participant-id');
+        const participantName = button.getAttribute('data-participant-name');
+        if (!confirm("Are you sure you want to remove " + participantName + " from this activity?")) {
+            return;
+        }
+        button.disabled = true;
+        try {
+            const response = await fetch('/admin/activities/' + activityId + '/participants/' + participantId, {
+                method: 'DELETE',
+            });
+            if (response.ok) {
+                // the waiting list may have moved up: show the up to date lists
+                window.location.reload();
+            } else {
+                const errorData = await response.json().catch(() => ({}));
+                alert(errorData.message || "Failed to remove the participant");
+                button.disabled = false;
+            }
+        } catch (error) {
+            console.error("Error removing participant:", error);
+            alert("An error occurred while removing the participant. Please try again.");
+            button.disabled = false;
+        }
+    }
 
     async function handleCheckInChange(event) {
         const checkbox = event.target;

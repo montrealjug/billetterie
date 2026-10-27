@@ -587,9 +587,16 @@ public class RegistrationController {
                 .findById(activityId)
                 .orElseThrow(() -> new EntityNotFoundException("Activity not found"));
 
-            activity
+            var nonWaitingBeforeRemoval = activity.getNonWaitingParticipants();
+
+            var removed = activity
                 .getParticipants()
                 .removeIf(activityParticipant -> activityParticipant.getParticipant().getId() == participantId);
+            if (!removed) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{\"message\":\"Participant not found in this activity\"}");
+            }
 
             // Save the updated activity with merge to ensure the removal is persisted
             activityRepository.save(activity);
@@ -597,22 +604,30 @@ public class RegistrationController {
             activity = activityRepository
                 .findById(activityId)
                 .orElseThrow(() -> new EntityNotFoundException("Activity not found"));
-            // this participant just got upgraded from waiting to non-waiting
-            ActivityParticipant upgradedActivityParticipant = activity.getNonWaitingParticipants().getLast();
-            Participant upgradedParticipant = upgradedActivityParticipant.getParticipant();
-            Booker upgradedParticipantBooker = upgradedParticipant.getBooker();
-            var event = activity.getEvent();
-            emailService.sendEmail(
-                Email.participantUpgraded(
-                    upgradedParticipantBooker,
-                    toPresentationParticipantActivity(upgradedActivityParticipant),
-                    event,
-                    retrieveBaseUrl(request),
-                    qrCodeService.generateQrCode(
-                        retrieveBaseUrl(request) + "/admin/bookings/" + upgradedParticipantBooker.getEmailSignature()
+            // only when a seat was freed (and not when removing a waiting participant): the first waiting participant
+            // just got upgraded to non-waiting
+            var upgraded = activity
+                .getNonWaitingParticipants()
+                .stream()
+                .filter(activityParticipant -> !nonWaitingBeforeRemoval.contains(activityParticipant))
+                .findFirst();
+            if (upgraded.isPresent()) {
+                ActivityParticipant upgradedActivityParticipant = upgraded.get();
+                Booker upgradedParticipantBooker = upgradedActivityParticipant.getParticipant().getBooker();
+                emailService.sendEmail(
+                    Email.participantUpgraded(
+                        upgradedParticipantBooker,
+                        toPresentationParticipantActivity(upgradedActivityParticipant),
+                        activity.getEvent(),
+                        retrieveBaseUrl(request),
+                        qrCodeService.generateQrCode(
+                            retrieveBaseUrl(request) +
+                                "/admin/bookings/" +
+                                upgradedParticipantBooker.getEmailSignature()
+                        )
                     )
-                )
-            );
+                );
+            }
 
             // Return success response
             return ResponseEntity.noContent().build();
